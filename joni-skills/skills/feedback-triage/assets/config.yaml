@@ -1,0 +1,36 @@
+# Feedback Triage Configuration
+# Copy this file and customize for your needs
+
+# Focus areas - feedback matching these will be highlighted
+focus_areas:
+  - onboarding
+  - checkout
+  - mobile
+
+# Customer segments to prioritize (if segment data available)
+segments_to_prioritize:
+  - enterprise
+  - trial
+
+# Additional urgency keywords beyond defaults
+urgency_keywords:
+  - cancel
+  - refund
+  - lawyer
+  - lawsuit
+  - security breach
+
+# Custom theme patterns (regex)
+# Add domain-specific categories here
+custom_themes:
+  integration:
+    - '\bapi\b'
+    - '\bintegrat'
+    - '\bconnect to'
+    - '\bsync'
+    - '\bwebhook'
+  billing:
+    - '\binvoice'
+    - '\bcharge'
+    - '\bbilled'
+    - '\breceipt'
