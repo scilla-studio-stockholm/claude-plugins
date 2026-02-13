@@ -1,0 +1,53 @@
+/* =================================================================
+   [CLIENT_NAME] Design System Tokens
+   Extracted from Figma design system
+
+   These use --[PREFIX]- prefix to avoid conflicts with Tailwind's @theme.
+   Tailwind mapping is in globals.css @theme inline block.
+   ================================================================= */
+
+:root {
+  /* ---------------------------------------------------------------
+     PRIMITIVE COLORS — Brand Primary
+     --------------------------------------------------------------- */
+  --[PREFIX]-brand-900: [BRAND_900];
+  --[PREFIX]-brand-800: [BRAND_800];
+  --[PREFIX]-brand-700: [BRAND_700];
+  --[PREFIX]-brand-600: [BRAND_600];
+  --[PREFIX]-brand-500: [BRAND_500];
+  --[PREFIX]-brand-400: [BRAND_400];
+  --[PREFIX]-brand-300: [BRAND_300];
+  --[PREFIX]-brand-200: [BRAND_200];
+  --[PREFIX]-brand-100: [BRAND_100];
+  --[PREFIX]-brand-50: [BRAND_50];
+
+  /* Greyscale */
+  --[PREFIX]-grey-950: #000000;
+  --[PREFIX]-grey-900: [GREY_900];
+  --[PREFIX]-grey-800: [GREY_800];
+  --[PREFIX]-grey-700: [GREY_700];
+  --[PREFIX]-grey-600: [GREY_600];
+  --[PREFIX]-grey-500: [GREY_500];
+  --[PREFIX]-grey-400: [GREY_400];
+  --[PREFIX]-grey-300: [GREY_300];
+  --[PREFIX]-grey-200: [GREY_200];
+  --[PREFIX]-grey-100: [GREY_100];
+  --[PREFIX]-grey-50: [GREY_50];
+  --[PREFIX]-grey-0: #ffffff;
+
+  /* Additional color palettes go here as needed
+     (e.g., secondary brand, status colors if they differ from greyscale) */
+
+  /* ---------------------------------------------------------------
+     TYPOGRAPHY
+     --------------------------------------------------------------- */
+  --[PREFIX]-font-family: '[FONT_FAMILY]', sans-serif;
+
+  /* ---------------------------------------------------------------
+     SHADOWS
+     --------------------------------------------------------------- */
+  --[PREFIX]-shadow-sm: 0px 2px 4px rgba(0, 0, 0, 0.2);
+  --[PREFIX]-shadow-md: 0px 6px 16px rgba(0, 0, 0, 0.1);
+  --[PREFIX]-shadow-lg: 0px 12px 25px rgba(0, 0, 0, 0.1);
+  --[PREFIX]-shadow-sheet: 0px 6px 16px rgba(0, 0, 0, 0.1);
+}

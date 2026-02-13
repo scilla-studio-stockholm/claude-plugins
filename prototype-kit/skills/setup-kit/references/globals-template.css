@@ -1,0 +1,73 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+
+/* =================================================================
+   Tailwind v4 Theme — Maps [CLIENT_NAME] tokens to utility classes
+
+   Usage examples:
+     bg-accent         → brand primary button background
+     text-accent-fg    → brand primary text
+     bg-accent-surface → light brand background
+     bg-surface        → white background
+     text-foreground   → primary text
+     border-border     → default border
+   ================================================================= */
+
+@theme inline {
+  /* --- Semantic: Surfaces / Backgrounds --- */
+  --color-surface: var(--[PREFIX]-grey-0);
+  --color-surface-secondary: var(--[PREFIX]-grey-100);
+  --color-surface-tertiary: var(--[PREFIX]-grey-200);
+  --color-surface-inverted: var(--[PREFIX]-grey-800);
+
+  --color-accent: var(--[PREFIX]-brand-[ACCENT_SHADE]);
+  --color-accent-surface: var(--[PREFIX]-brand-50);
+  --color-accent-fg: var(--[PREFIX]-brand-[ACCENT_FG_SHADE]);
+
+  /* --- Semantic: Text / Foreground --- */
+  --color-foreground: var(--[PREFIX]-grey-800);
+  --color-foreground-secondary: var(--[PREFIX]-grey-500);
+  --color-foreground-tertiary: var(--[PREFIX]-grey-600);
+  --color-foreground-muted: var(--[PREFIX]-grey-400);
+  --color-foreground-on-color: var(--[PREFIX]-grey-0);
+
+  /* --- Semantic: Border --- */
+  --color-border: var(--[PREFIX]-grey-200);
+  --color-border-accent: var(--[PREFIX]-brand-[ACCENT_SHADE]);
+  --color-border-muted: var(--[PREFIX]-grey-300);
+
+  /* --- Status colors --- */
+  --color-positive: [POSITIVE_COLOR];
+  --color-positive-surface: [POSITIVE_SURFACE];
+  --color-negative: [NEGATIVE_COLOR];
+  --color-negative-surface: [NEGATIVE_SURFACE];
+  --color-info: [INFO_COLOR];
+  --color-info-surface: [INFO_SURFACE];
+  --color-warning: [WARNING_COLOR];
+  --color-warning-surface: [WARNING_SURFACE];
+
+  /* --- Font --- */
+  --font-sans: var(--[PREFIX]-font-family);
+
+  /* --- Border Radius --- */
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 32px;
+  --radius-full: 50px;
+
+  /* --- Shadows --- */
+  --shadow-sm: var(--[PREFIX]-shadow-sm);
+  --shadow-md: var(--[PREFIX]-shadow-md);
+  --shadow-lg: var(--[PREFIX]-shadow-lg);
+  --shadow-sheet: var(--[PREFIX]-shadow-sheet);
+}
+
+body {
+  font-family: var(--[PREFIX]-font-family);
+  color: var(--[PREFIX]-grey-800);
+  background: var(--[PREFIX]-grey-0);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
