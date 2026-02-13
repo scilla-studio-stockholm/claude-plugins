@@ -1,0 +1,9 @@
+{
+  "name": "prototype-kit",
+  "description": "Rapid prototyping kit generator. Extracts design tokens from Figma, scaffolds a Next.js + Tailwind project, and teaches Claude your client's design system.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Joni Lindgren / Scilla Studio"
+  },
+  "keywords": ["prototyping", "design-system", "figma", "nextjs", "tailwind"]
+}

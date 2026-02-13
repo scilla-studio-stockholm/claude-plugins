@@ -23,6 +23,15 @@
         "name": "Joni Lindgren"
       },
       "source": "./joni-writing"
+    },
+    {
+      "name": "prototype-kit",
+      "description": "Rapid prototyping kit generator from Figma design systems",
+      "version": "1.0.0",
+      "author": {
+        "name": "Joni Lindgren / Scilla Studio"
+      },
+      "source": "./prototype-kit"
     }
   ]
 }
