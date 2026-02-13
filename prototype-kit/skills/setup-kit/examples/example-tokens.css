@@ -1,0 +1,49 @@
+/* =================================================================
+   Example Design System Tokens (Scilla Studio)
+
+   This is a complete example of what tokens.css looks like after
+   the setup-kit wizard extracts colors from a Figma design system.
+   ================================================================= */
+
+:root {
+  /* ---------------------------------------------------------------
+     PRIMITIVE COLORS — Brand Primary (Indigo)
+     --------------------------------------------------------------- */
+  --sc-brand-900: #1e1b4b;
+  --sc-brand-800: #312e81;
+  --sc-brand-700: #3730a3;
+  --sc-brand-600: #4338ca;
+  --sc-brand-500: #6366f1;
+  --sc-brand-400: #818cf8;
+  --sc-brand-300: #a5b4fc;
+  --sc-brand-200: #c7d2fe;
+  --sc-brand-100: #e0e7ff;
+  --sc-brand-50: #eef2ff;
+
+  /* Greyscale */
+  --sc-grey-950: #000000;
+  --sc-grey-900: #111827;
+  --sc-grey-800: #1f2937;
+  --sc-grey-700: #374151;
+  --sc-grey-600: #4b5563;
+  --sc-grey-500: #6b7280;
+  --sc-grey-400: #9ca3af;
+  --sc-grey-300: #d1d5db;
+  --sc-grey-200: #e5e7eb;
+  --sc-grey-100: #f3f4f6;
+  --sc-grey-50: #f9fafb;
+  --sc-grey-0: #ffffff;
+
+  /* ---------------------------------------------------------------
+     TYPOGRAPHY
+     --------------------------------------------------------------- */
+  --sc-font-family: 'Inter', sans-serif;
+
+  /* ---------------------------------------------------------------
+     SHADOWS
+     --------------------------------------------------------------- */
+  --sc-shadow-sm: 0px 2px 4px rgba(0, 0, 0, 0.2);
+  --sc-shadow-md: 0px 6px 16px rgba(0, 0, 0, 0.1);
+  --sc-shadow-lg: 0px 12px 25px rgba(0, 0, 0, 0.1);
+  --sc-shadow-sheet: 0px 6px 16px rgba(0, 0, 0, 0.1);
+}
