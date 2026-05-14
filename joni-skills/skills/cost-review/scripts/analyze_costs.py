@@ -420,7 +420,7 @@ def format_human_report(agg: dict, signals: list, repo: str, scope_label: str) -
     if w["sessions"] == 0:
         push(f"Window:  (no transcripts) — 0 sessions")
     else:
-        push(f"Window:  {w['first'][:10]} -> {w['last'][:10]}  "
+        push(f"Window:  {w['first'][:10]} → {w['last'][:10]}  "
              f"({w['days']} days, {w['sessions']} sessions, {w['turns']:,} turns)")
     push("")
 
@@ -460,7 +460,7 @@ def format_human_report(agg: dict, signals: list, repo: str, scope_label: str) -
             extra = f"  (~{_fmt_dollars(s['cost_share'])} of bill)" if s["cost_share"] > 0 else ""
             push(f"  {mark} {title}: {s['anchor']}{extra}")
             if s["tip"]:
-                push(f"     -> Tip: {s['tip']}")
+                push(f"     → Tip: {s['tip']}")
         push("")
 
     push("To dig deeper: ask \"explain signal X\", \"show sessions matching <topic>\", "
