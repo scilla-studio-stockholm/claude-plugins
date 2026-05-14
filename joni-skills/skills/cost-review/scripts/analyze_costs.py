@@ -520,7 +520,7 @@ def main(argv: list = None) -> int:
     if args.topic:
         sessions = filter_by_topic(sessions, transcript_dir, args.topic)
         if not sessions:
-            print(f"No sessions matched topic '{args.topic}' (>=3 hits required). "
+            print(f"No sessions matched topic '{args.topic}' (≥3 hits required). "
                   f"{total_sessions_before} total sessions in this repo.")
             return 0
         scope_label = f"topic=\"{args.topic}\" ({len(sessions)} of {total_sessions_before} sessions)"

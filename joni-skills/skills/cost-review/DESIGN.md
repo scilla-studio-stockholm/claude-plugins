@@ -159,7 +159,7 @@ Top-level object:
 |---|---|
 | `~/.claude/projects/<encoded-cwd>/` doesn't exist | Print "No Claude Code transcripts for this repo (looked under <path>). Have you used Claude Code in this directory?" Exit 0. |
 | Folder exists but 0 `.jsonl` files | Print "Found the project folder but no `.jsonl` transcripts." Exit 0. |
-| Topic filter matches 0 sessions | Print "No sessions matched topic '<text>' (≥3 hits required). N of M sessions had any hits." Exit 0. |
+| Topic filter matches 0 sessions | Print "No sessions matched topic '<text>' (≥3 hits required). <N> total sessions in this repo." Exit 0. |
 | Unknown model name in a record | Use Sonnet pricing, mark "(estimated)" on its per-model line and in JSON. |
 | Malformed JSONL line | Skip silently. |
 | Record with no `usage` field | Skip silently (not all messages have usage — only assistant messages do). |
