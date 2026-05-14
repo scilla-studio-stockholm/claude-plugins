@@ -75,3 +75,34 @@ def walk_transcripts(transcript_dir: Path) -> dict:
         except OSError:
             continue
     return dict(sessions)
+
+
+# USD per million tokens. Anthropic public list prices, April 2026.
+PRICING = {
+    "opus":   {"input": 15.00, "output": 75.00, "cache_write": 18.75, "cache_read": 1.50},
+    "sonnet": {"input":  3.00, "output": 15.00, "cache_write":  3.75, "cache_read": 0.30},
+    "haiku":  {"input":  1.00, "output":  5.00, "cache_write":  1.25, "cache_read": 0.10},
+}
+
+
+def family_for_model(model: str) -> tuple:
+    """Return (family, estimated). family is 'opus'|'sonnet'|'haiku'.
+
+    estimated=True when model name didn't match any known family and we fell back.
+    """
+    m = (model or "").lower()
+    for family in ("opus", "sonnet", "haiku"):
+        if family in m:
+            return (family, False)
+    return ("sonnet", True)  # conservative fallback for unknown
+
+
+def compute_cost(usage: dict, family: str) -> float:
+    """Dollar cost for one usage dict at the family's rates."""
+    p = PRICING[family]
+    return (
+        usage.get("input_tokens", 0)                 * p["input"]
+        + usage.get("output_tokens", 0)              * p["output"]
+        + usage.get("cache_creation_input_tokens", 0) * p["cache_write"]
+        + usage.get("cache_read_input_tokens", 0)    * p["cache_read"]
+    ) / 1_000_000

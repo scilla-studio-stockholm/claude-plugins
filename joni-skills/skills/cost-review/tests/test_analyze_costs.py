@@ -103,5 +103,48 @@ class TestWalkTranscripts(unittest.TestCase):
         self.assertEqual(sessions, {})
 
 
+class TestPricing(unittest.TestCase):
+    def test_family_for_opus(self):
+        self.assertEqual(ac.family_for_model("claude-opus-4-7"), ("opus", False))
+
+    def test_family_for_sonnet(self):
+        self.assertEqual(ac.family_for_model("claude-sonnet-4-6"), ("sonnet", False))
+
+    def test_family_for_haiku(self):
+        self.assertEqual(ac.family_for_model("claude-haiku-4-5-20251001"), ("haiku", False))
+
+    def test_family_for_unknown_falls_back_to_sonnet_estimated(self):
+        self.assertEqual(ac.family_for_model("claude-3-opus-20240229"),
+                         ("opus", False))  # still contains 'opus'
+        self.assertEqual(ac.family_for_model("some-future-model"),
+                         ("sonnet", True))
+
+    def test_family_for_empty(self):
+        self.assertEqual(ac.family_for_model(""), ("sonnet", True))
+
+    def test_compute_cost_opus(self):
+        usage = {
+            "input_tokens": 1_000_000, "output_tokens": 1_000_000,
+            "cache_creation_input_tokens": 1_000_000, "cache_read_input_tokens": 1_000_000,
+        }
+        cost = ac.compute_cost(usage, "opus")
+        # 15 + 75 + 18.75 + 1.50 = 110.25
+        self.assertAlmostEqual(cost, 110.25, places=2)
+
+    def test_compute_cost_haiku(self):
+        usage = {
+            "input_tokens": 1_000_000, "output_tokens": 1_000_000,
+            "cache_creation_input_tokens": 1_000_000, "cache_read_input_tokens": 1_000_000,
+        }
+        cost = ac.compute_cost(usage, "haiku")
+        # 1 + 5 + 1.25 + 0.10 = 7.35
+        self.assertAlmostEqual(cost, 7.35, places=2)
+
+    def test_compute_cost_zero(self):
+        usage = {"input_tokens": 0, "output_tokens": 0,
+                 "cache_creation_input_tokens": 0, "cache_read_input_tokens": 0}
+        self.assertEqual(ac.compute_cost(usage, "opus"), 0.0)
+
+
 if __name__ == "__main__":
     unittest.main()
