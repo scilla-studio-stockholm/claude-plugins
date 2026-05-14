@@ -384,3 +384,85 @@ def detect_signals(agg: dict) -> list:
         ))
 
     return out
+
+
+SIGNAL_TITLES = {
+    "opus-on-lightweight": "Opus on lightweight work",
+    "high-cache-write": "High cache-write ratio",
+    "low-cache-read": "Cache-read ratio",
+    "output-heavy": "Output-heavy session",
+    "session-fragmentation": "Session fragmentation",
+    "direct-input-cost": "Direct (uncached) input",
+}
+
+
+def _fmt_tokens(n: int) -> str:
+    """Compact token formatter: 1.2M, 3.4K, 567."""
+    if n >= 1_000_000:
+        return f"{n/1_000_000:.1f}M"
+    if n >= 1_000:
+        return f"{n/1_000:.1f}K"
+    return str(n)
+
+
+def _fmt_dollars(n: float) -> str:
+    return f"${n:,.2f}"
+
+
+def format_human_report(agg: dict, signals: list, repo: str, scope_label: str) -> str:
+    lines = []
+    push = lines.append
+
+    push("=== Claude Code cost report ===")
+    push(f"Repo:    {repo}")
+    push(f"Scope:   {scope_label}")
+    w = agg["window"]
+    if w["sessions"] == 0:
+        push(f"Window:  (no transcripts) — 0 sessions")
+    else:
+        push(f"Window:  {w['first'][:10]} -> {w['last'][:10]}  "
+             f"({w['days']} days, {w['sessions']} sessions, {w['turns']:,} turns)")
+    push("")
+
+    push("=== Total ===")
+    push(f"{_fmt_dollars(agg['total']['cost'])}   {_fmt_tokens(agg['total']['tokens'])} tokens")
+    for m in agg["per_model"]:
+        est = " (estimated)" if m["estimated"] else ""
+        total_tokens = m['input_tokens'] + m['output_tokens'] + m['cache_read'] + m['cache_write']
+        push(f"  {m['model']:<28s}{est}  {_fmt_dollars(m['cost']):>12s}  "
+             f"{_fmt_tokens(total_tokens):>8s} tokens   "
+             f"(cache_read {_fmt_tokens(m['cache_read'])}, output {_fmt_tokens(m['output_tokens'])}, "
+             f"cache_write {_fmt_tokens(m['cache_write'])}, input {_fmt_tokens(m['input_tokens'])})")
+    push("")
+
+    if agg["per_session"]:
+        push("=== Top 5 sessions by cost ===")
+        for s in sorted(agg["per_session"], key=lambda x: -x["cost"])[:5]:
+            push(f"  {_fmt_dollars(s['cost']):>10s}  {s['first_ts'][:16]}  "
+                 f"{s['turns']:>4} turns  {_fmt_tokens(s['tokens']):>8s} tokens  "
+                 f"{s['model']:<25s}  {s['sid'][:8]}")
+        push("")
+
+    if agg["daily"]:
+        push("=== Daily timeline (last 30 days) ===")
+        max_cost = max(d["cost"] for d in agg["daily"])
+        for d in agg["daily"][-30:]:
+            bar_len = int((d["cost"] / max_cost) * 40) if max_cost > 0 else 0
+            push(f"  {d['date']}  {_fmt_dollars(d['cost']):>10s}  "
+                 f"{_fmt_tokens(d['tokens']):>8s} tokens   {'█' * bar_len}")
+        push("")
+
+    if signals:
+        push("=== Cost-reduction signals ===")
+        for s in signals:
+            mark = "⚠" if s["severity"] == "warn" else "✓"
+            title = SIGNAL_TITLES.get(s["id"], s["id"])
+            extra = f"  (~{_fmt_dollars(s['cost_share'])} of bill)" if s["cost_share"] > 0 else ""
+            push(f"  {mark} {title}: {s['anchor']}{extra}")
+            if s["tip"]:
+                push(f"     -> Tip: {s['tip']}")
+        push("")
+
+    push("To dig deeper: ask \"explain signal X\", \"show sessions matching <topic>\", "
+         "or rerun with --topic <text>.")
+    return "\n".join(lines)

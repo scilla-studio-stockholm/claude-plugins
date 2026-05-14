@@ -384,5 +384,81 @@ class TestDetectSignals(unittest.TestCase):
         self.assertEqual(warn_ids, set())
 
 
+class TestFormatHumanReport(unittest.TestCase):
+    def _agg(self):
+        return {
+            "window": {"first": "2026-05-10T08:00:00Z", "last": "2026-05-13T16:00:00Z",
+                       "days": 4, "sessions": 2, "turns": 250},
+            "total": {"cost": 1273.77, "tokens": 547_800_000},
+            "per_model": [
+                {"model": "claude-opus-4-7", "family": "opus", "estimated": False,
+                 "turns": 200, "input_tokens": 30_000, "output_tokens": 4_000_000,
+                 "cache_read": 416_000_000, "cache_write": 16_000_000, "cost": 1235.33},
+            ],
+            "per_session": [
+                {"sid": "5626067c-aaaa-bbbb-cccc-dddddddddddd",
+                 "first_ts": "2026-05-07T10:18:00Z", "last_ts": "2026-05-07T12:00:00Z",
+                 "turns": 224, "tokens": 12_300_000, "cost": 161.46,
+                 "model": "claude-opus-4-7", "input_tokens": 0, "output_tokens": 0,
+                 "cache_read": 12_000_000, "cache_write": 300_000},
+            ],
+            "daily": [
+                {"date": "2026-05-10", "cost": 100.0, "tokens": 5_000_000},
+                {"date": "2026-05-11", "cost": 213.56, "tokens": 18_200_000},
+            ],
+        }
+
+    def test_includes_repo_scope_window(self):
+        out = ac.format_human_report(self._agg(), [], repo="/Users/x/y", scope_label="all-time")
+        self.assertIn("Repo:", out)
+        self.assertIn("/Users/x/y", out)
+        self.assertIn("Scope:   all-time", out)
+        self.assertIn("Window:", out)
+
+    def test_includes_total_with_dollar_and_tokens(self):
+        out = ac.format_human_report(self._agg(), [], repo="x", scope_label="all-time")
+        self.assertIn("$1,273.77", out)
+        self.assertIn("547.8M tokens", out)
+
+    def test_includes_per_model_line(self):
+        out = ac.format_human_report(self._agg(), [], repo="x", scope_label="all-time")
+        self.assertIn("claude-opus-4-7", out)
+        self.assertIn("$1,235.33", out)
+
+    def test_includes_top_session_with_short_sid(self):
+        out = ac.format_human_report(self._agg(), [], repo="x", scope_label="all-time")
+        self.assertIn("$161.46", out)
+        self.assertIn("224 turns", out)
+        self.assertIn("5626067c", out)
+
+    def test_includes_daily_timeline(self):
+        out = ac.format_human_report(self._agg(), [], repo="x", scope_label="all-time")
+        self.assertIn("2026-05-11", out)
+        self.assertIn("$213.56", out)
+
+    def test_includes_signal_lines(self):
+        signals = [
+            {"id": "opus-on-lightweight", "severity": "warn",
+             "anchor": "3 sessions: avg 1.4K output tokens per turn",
+             "cost_share": 45.0, "tip": "Use /model haiku for routine edits and lookups"},
+            {"id": "low-cache-read", "severity": "ok",
+             "anchor": "cache-read ratio healthy (62%) — caching is working",
+             "cost_share": 0.0, "tip": ""},
+        ]
+        out = ac.format_human_report(self._agg(), signals, repo="x", scope_label="all-time")
+        self.assertIn("⚠ Opus", out)  # warn marker for lightweight
+        self.assertIn("Use /model haiku", out)
+        self.assertIn("✓", out)  # ok marker
+
+    def test_empty_aggregate_still_renders_a_message(self):
+        empty = {
+            "window": {"first": "", "last": "", "days": 0, "sessions": 0, "turns": 0},
+            "total": {"cost": 0.0, "tokens": 0},
+            "per_model": [], "per_session": [], "daily": [],
+        }
+        out = ac.format_human_report(empty, [], repo="x", scope_label="all-time")
+        self.assertIn("0 sessions", out)
+
+
 if __name__ == "__main__":
     unittest.main()
