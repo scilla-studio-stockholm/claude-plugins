@@ -8,7 +8,9 @@ Self-contained: stdlib only, Python 3.8+.
 """
 from __future__ import annotations
 
+import json
 from pathlib import Path
+from typing import Optional
 
 
 def encode_cwd_to_transcript_dir(cwd: Path) -> Path:
@@ -20,3 +22,34 @@ def encode_cwd_to_transcript_dir(cwd: Path) -> Path:
     abs_path = str(cwd.resolve()) if cwd.exists() else str(cwd)
     encoded = abs_path.replace("/", "-")
     return Path.home() / ".claude/projects" / encoded
+
+
+def parse_message(line: str) -> Optional[dict]:
+    """Parse one JSONL line. Return {sid, model, usage, ts} or None.
+
+    Returns None for: malformed JSON, non-assistant types, messages without usage.
+    """
+    try:
+        obj = json.loads(line)
+    except (json.JSONDecodeError, ValueError):
+        return None
+    if obj.get("type") != "assistant":
+        return None
+    msg = obj.get("message") or {}
+    usage = msg.get("usage")
+    if not usage:
+        return None
+    sid = obj.get("sessionId")
+    if not sid:
+        return None
+    return {
+        "sid": sid,
+        "model": msg.get("model") or "",
+        "ts": obj.get("timestamp") or "",
+        "usage": {
+            "input_tokens": usage.get("input_tokens", 0) or 0,
+            "output_tokens": usage.get("output_tokens", 0) or 0,
+            "cache_read_input_tokens": usage.get("cache_read_input_tokens", 0) or 0,
+            "cache_creation_input_tokens": usage.get("cache_creation_input_tokens", 0) or 0,
+        },
+    }
