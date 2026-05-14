@@ -87,7 +87,7 @@ All thresholds are first-pass; tunable in code. Signals that don't trigger are o
 | Signal | Threshold | Tip |
 |---|---|---|
 | Opus on lightweight work | ≥3 sessions where model contains `opus` AND avg output per turn <2K tokens | Use `/model haiku` for routine edits and lookups |
-| High cache-write ratio | overall `cache_write_cost / total_input_cost > 30%` | Long sessions are cheaper than many short ones — reuse rather than restart |
+| High cache-write ratio | `cache_write_tokens / (cache_write_tokens + cache_read_tokens) > 50%` — writes exceed reads, cache isn't paying back | Long sessions are cheaper than many short ones — reuse rather than restart |
 | Low cache-read ratio | overall `cache_read / (cache_read + direct_input) < 50%` | Avoid `/clear` early in a session; it discards your warm cache |
 | Output-heavy session | individual session with output >50K tokens | Use Edit instead of Write for partial changes; reference files instead of re-outputting them |
 | Session fragmentation | ≥5 sessions started in one calendar day, ≥4 of them under 30 turns | Consolidate into fewer longer sessions to retain warm cache |
