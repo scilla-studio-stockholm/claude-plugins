@@ -9,6 +9,7 @@ Self-contained: stdlib only, Python 3.8+.
 from __future__ import annotations
 
 import json
+from collections import defaultdict
 from pathlib import Path
 from typing import Optional
 
@@ -53,3 +54,24 @@ def parse_message(line: str) -> Optional[dict]:
             "cache_creation_input_tokens": usage.get("cache_creation_input_tokens", 0) or 0,
         },
     }
+
+
+def walk_transcripts(transcript_dir: Path) -> dict:
+    """Walk *.jsonl + */subagents/*.jsonl under transcript_dir.
+
+    Returns: dict mapping sessionId -> list of parsed message dicts.
+    """
+    sessions: dict = defaultdict(list)
+    if not transcript_dir.exists() or not transcript_dir.is_dir():
+        return {}
+    paths = list(transcript_dir.glob("*.jsonl")) + list(transcript_dir.glob("*/subagents/*.jsonl"))
+    for p in paths:
+        try:
+            with open(p, "r", errors="ignore") as f:
+                for line in f:
+                    msg = parse_message(line)
+                    if msg is not None:
+                        sessions[msg["sid"]].append(msg)
+        except OSError:
+            continue
+    return dict(sessions)

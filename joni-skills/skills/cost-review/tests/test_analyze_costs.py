@@ -71,5 +71,37 @@ class TestParseMessage(unittest.TestCase):
         self.assertEqual(result["usage"]["cache_creation_input_tokens"], 0)
 
 
+import tempfile
+import shutil
+
+
+class TestWalkTranscripts(unittest.TestCase):
+    def setUp(self):
+        self.fixture_dir = SKILL_DIR / "tests/fixtures"
+
+    def test_walks_single_jsonl_and_groups_by_session(self):
+        with tempfile.TemporaryDirectory() as td:
+            td_path = Path(td)
+            shutil.copy(self.fixture_dir / "sample_session.jsonl", td_path / "session.jsonl")
+            sessions = ac.walk_transcripts(td_path)
+            # Two distinct sessionIds in the fixture
+            self.assertEqual(set(sessions.keys()), {"abc-123", "sub-456"})
+            self.assertEqual(len(sessions["abc-123"]), 2)
+            self.assertEqual(len(sessions["sub-456"]), 1)
+
+    def test_walks_subagent_subdir(self):
+        with tempfile.TemporaryDirectory() as td:
+            td_path = Path(td)
+            (td_path / "abc/subagents").mkdir(parents=True)
+            shutil.copy(self.fixture_dir / "sample_session.jsonl",
+                        td_path / "abc/subagents/agent-x.jsonl")
+            sessions = ac.walk_transcripts(td_path)
+            self.assertIn("abc-123", sessions)
+
+    def test_returns_empty_for_missing_dir(self):
+        sessions = ac.walk_transcripts(Path("/does/not/exist/anywhere"))
+        self.assertEqual(sessions, {})
+
+
 if __name__ == "__main__":
     unittest.main()
