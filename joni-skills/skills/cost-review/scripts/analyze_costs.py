@@ -8,8 +8,12 @@ Self-contained: stdlib only, Python 3.8+.
 """
 from __future__ import annotations
 
+import argparse
 import json
+import os
+import sys
 from collections import defaultdict
+from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
@@ -106,9 +110,6 @@ def compute_cost(usage: dict, family: str) -> float:
         + usage.get("cache_creation_input_tokens", 0) * p["cache_write"]
         + usage.get("cache_read_input_tokens", 0)    * p["cache_read"]
     ) / 1_000_000
-
-
-from datetime import datetime
 
 
 def aggregate(sessions: dict) -> dict:
@@ -342,15 +343,28 @@ def detect_signals(agg: dict) -> list:
                 0.0, "",
             ))
 
-    # 4. Output-heavy sessions (>50K output tokens in one session)
-    for s in agg["per_session"]:
-        if s["output_tokens"] > 50_000:
-            out.append(_signal(
-                "output-heavy", "warn",
-                f"session {s['sid'][:8]} had {s['output_tokens'] / 1000:.0f}K output tokens",
-                s["cost"],
-                "Use Edit instead of Write for partial changes; reference files instead of re-outputting them",
-            ))
+    # 4. Output-heavy sessions (>50K output tokens). Cap report at top 5 by cost
+    # to keep the signals section readable; add a tail line for the rest.
+    heavy = sorted(
+        [s for s in agg["per_session"] if s["output_tokens"] > 50_000],
+        key=lambda x: -x["cost"],
+    )
+    for s in heavy[:5]:
+        out.append(_signal(
+            "output-heavy", "warn",
+            f"session {s['sid'][:8]} had {s['output_tokens']/1000:.0f}K output tokens",
+            s["cost"],
+            "Use Edit instead of Write for partial changes; reference files instead of re-outputting them",
+        ))
+    if len(heavy) > 5:
+        extra = heavy[5:]
+        out.append(_signal(
+            "output-heavy", "warn",
+            f"…and {len(extra)} more sessions over 50K output tokens",
+            sum(s["cost"] for s in extra),
+            "Pattern: long file writes, verbose narration, or full-file regenerations. "
+            "Audit with --json and look at output_tokens per session.",
+        ))
 
     # 5. Session fragmentation: >=5 sessions on one calendar day, >=4 with <30 turns
     by_day_sessions: dict = defaultdict(list)
@@ -481,11 +495,6 @@ def format_json_report(agg: dict, signals: list, repo: str,
         "signals": signals,
     }
     return json.dumps(payload, indent=2, default=str)
-
-
-import argparse
-import os
-import sys
 
 
 def main(argv: list = None) -> int:
