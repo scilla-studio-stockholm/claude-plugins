@@ -481,3 +481,63 @@ def format_json_report(agg: dict, signals: list, repo: str,
         "signals": signals,
     }
     return json.dumps(payload, indent=2, default=str)
+
+
+import argparse
+import os
+import sys
+
+
+def main(argv: list = None) -> int:
+    parser = argparse.ArgumentParser(
+        description="Claude Code cost analyzer + cost-reduction coach."
+    )
+    parser.add_argument("--cwd", default=os.getcwd(),
+                        help="Repo to analyze (default: $PWD)")
+    parser.add_argument("--topic", default=None,
+                        help="Narrow to sessions with >=3 case-insensitive hits of TEXT")
+    parser.add_argument("--json", action="store_true",
+                        help="Emit structured JSON instead of human report")
+    args = parser.parse_args(argv)
+
+    cwd = Path(args.cwd)
+    if not cwd.exists():
+        print(f"Path {cwd} does not exist.")
+        return 1
+
+    transcript_dir = encode_cwd_to_transcript_dir(cwd)
+    if not transcript_dir.exists():
+        print(f"No Claude Code transcripts for this repo (looked under {transcript_dir}). "
+              "Have you used Claude Code in this directory?")
+        return 0
+
+    sessions = walk_transcripts(transcript_dir)
+    if not sessions:
+        print(f"Found the project folder but no .jsonl transcripts.")
+        return 0
+
+    total_sessions_before = len(sessions)
+    if args.topic:
+        sessions = filter_by_topic(sessions, transcript_dir, args.topic)
+        if not sessions:
+            print(f"No sessions matched topic '{args.topic}' (>=3 hits required). "
+                  f"{total_sessions_before} total sessions in this repo.")
+            return 0
+        scope_label = f"topic=\"{args.topic}\" ({len(sessions)} of {total_sessions_before} sessions)"
+    else:
+        scope_label = "all-time"
+
+    agg = aggregate(sessions)
+    signals = detect_signals(agg)
+
+    if args.json:
+        print(format_json_report(agg, signals, repo=str(cwd.resolve()),
+                                  scope_label=scope_label, topic=args.topic))
+    else:
+        print(format_human_report(agg, signals, repo=str(cwd.resolve()),
+                                   scope_label=scope_label))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

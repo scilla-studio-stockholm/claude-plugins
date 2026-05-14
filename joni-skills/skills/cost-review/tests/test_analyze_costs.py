@@ -490,5 +490,52 @@ class TestFormatJsonReport(unittest.TestCase):
         self.assertEqual(parsed["scope"]["topic"], "OST")
 
 
+import io
+from unittest.mock import patch
+
+
+class TestMain(unittest.TestCase):
+    def test_missing_transcript_dir_prints_message_exits_zero(self):
+        # Use an existing dir whose encoded transcript dir won't exist
+        with tempfile.TemporaryDirectory() as td:
+            buf = io.StringIO()
+            with patch("sys.stdout", buf):
+                rc = ac.main(["--cwd", td])
+            self.assertEqual(rc, 0)
+            self.assertIn("No Claude Code transcripts", buf.getvalue())
+
+    def test_nonexistent_cwd_exits_one(self):
+        buf = io.StringIO()
+        with patch("sys.stdout", buf):
+            rc = ac.main(["--cwd", "/nonexistent/path/xyz123"])
+        self.assertEqual(rc, 1)
+
+    def test_json_flag_emits_json(self):
+        with tempfile.TemporaryDirectory() as td:
+            home = Path(td)
+            td_cwd = home / "myrepo"
+            td_cwd.mkdir()
+            # Build the encoded transcript dir manually
+            encoded = str(td_cwd.resolve()).replace("/", "-")
+            tdir = home / ".claude/projects" / encoded
+            tdir.mkdir(parents=True)
+            (tdir / "s.jsonl").write_text(
+                '{"type":"assistant","sessionId":"s",'
+                '"timestamp":"2026-05-10T10:00:00Z",'
+                '"message":{"model":"claude-haiku-4-5","usage":{'
+                '"input_tokens":1,"output_tokens":1,'
+                '"cache_creation_input_tokens":0,"cache_read_input_tokens":0}}}\n'
+            )
+            # Patch Path.home to return our temp home
+            with patch.object(Path, "home", classmethod(lambda cls: home)):
+                buf = io.StringIO()
+                with patch("sys.stdout", buf):
+                    rc = ac.main(["--cwd", str(td_cwd), "--json"])
+                self.assertEqual(rc, 0)
+                parsed = json.loads(buf.getvalue())
+                self.assertEqual(parsed["scope"]["mode"], "all-time")
+                self.assertEqual(parsed["window"]["sessions"], 1)
+
+
 if __name__ == "__main__":
     unittest.main()
