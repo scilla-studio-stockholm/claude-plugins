@@ -106,3 +106,123 @@ def compute_cost(usage: dict, family: str) -> float:
         + usage.get("cache_creation_input_tokens", 0) * p["cache_write"]
         + usage.get("cache_read_input_tokens", 0)    * p["cache_read"]
     ) / 1_000_000
+
+
+from datetime import datetime
+
+
+def aggregate(sessions: dict) -> dict:
+    """Build summary structure from sessionId -> [messages]."""
+    if not sessions:
+        return {
+            "window": {"first": "", "last": "", "days": 0, "sessions": 0, "turns": 0},
+            "total": {"cost": 0.0, "tokens": 0},
+            "per_model": [],
+            "per_session": [],
+            "daily": [],
+        }
+
+    # Per-model accumulator
+    by_model: dict = defaultdict(lambda: {
+        "model": "", "family": "", "estimated": False, "turns": 0,
+        "input_tokens": 0, "output_tokens": 0, "cache_read": 0, "cache_write": 0,
+    })
+    per_session: list = []
+    by_day: dict = defaultdict(lambda: {"cost": 0.0, "tokens": 0})
+
+    all_ts = []
+    total_turns = 0
+    total_cost = 0.0
+    total_tokens = 0
+
+    for sid, msgs in sessions.items():
+        s_cost = 0.0
+        s_tokens = 0
+        s_input = 0; s_output = 0; s_cw = 0; s_cr = 0
+        s_first_ts = ""
+        s_last_ts = ""
+        s_models: dict = defaultdict(int)
+
+        for m in msgs:
+            family, estimated = family_for_model(m["model"])
+            cost = compute_cost(m["usage"], family)
+            tokens = (m["usage"]["input_tokens"] + m["usage"]["output_tokens"]
+                      + m["usage"]["cache_creation_input_tokens"]
+                      + m["usage"]["cache_read_input_tokens"])
+
+            bm = by_model[m["model"] or "(unknown)"]
+            bm["model"] = m["model"] or "(unknown)"
+            bm["family"] = family
+            bm["estimated"] = bm["estimated"] or estimated
+            bm["turns"] += 1
+            bm["input_tokens"] += m["usage"]["input_tokens"]
+            bm["output_tokens"] += m["usage"]["output_tokens"]
+            bm["cache_read"] += m["usage"]["cache_read_input_tokens"]
+            bm["cache_write"] += m["usage"]["cache_creation_input_tokens"]
+
+            s_cost += cost
+            s_tokens += tokens
+            s_input += m["usage"]["input_tokens"]
+            s_output += m["usage"]["output_tokens"]
+            s_cw += m["usage"]["cache_creation_input_tokens"]
+            s_cr += m["usage"]["cache_read_input_tokens"]
+            s_models[m["model"]] += 1
+
+            ts = m["ts"]
+            if ts:
+                all_ts.append(ts)
+                if not s_first_ts or ts < s_first_ts:
+                    s_first_ts = ts
+                if not s_last_ts or ts > s_last_ts:
+                    s_last_ts = ts
+                day = ts[:10]
+                by_day[day]["cost"] += cost
+                by_day[day]["tokens"] += tokens
+
+            total_turns += 1
+            total_cost += cost
+            total_tokens += tokens
+
+        primary_model = max(s_models.items(), key=lambda kv: kv[1])[0] if s_models else ""
+        per_session.append({
+            "sid": sid,
+            "first_ts": s_first_ts,
+            "last_ts": s_last_ts,
+            "turns": len(msgs),
+            "tokens": s_tokens,
+            "cost": s_cost,
+            "model": primary_model,
+            "input_tokens": s_input, "output_tokens": s_output,
+            "cache_read": s_cr, "cache_write": s_cw,
+        })
+
+    per_model = []
+    for bm in by_model.values():
+        usage = {"input_tokens": bm["input_tokens"], "output_tokens": bm["output_tokens"],
+                 "cache_creation_input_tokens": bm["cache_write"],
+                 "cache_read_input_tokens": bm["cache_read"]}
+        bm["cost"] = compute_cost(usage, bm["family"])
+        per_model.append(bm)
+    per_model.sort(key=lambda x: -x["cost"])
+
+    daily = [{"date": d, "cost": v["cost"], "tokens": v["tokens"]} for d, v in sorted(by_day.items())]
+
+    first = min(all_ts) if all_ts else ""
+    last = max(all_ts) if all_ts else ""
+    days = 0
+    if first and last:
+        try:
+            d1 = datetime.fromisoformat(first.rstrip("Z"))
+            d2 = datetime.fromisoformat(last.rstrip("Z"))
+            days = (d2.date() - d1.date()).days + 1
+        except ValueError:
+            days = 0
+
+    return {
+        "window": {"first": first, "last": last, "days": days,
+                   "sessions": len(sessions), "turns": total_turns},
+        "total": {"cost": total_cost, "tokens": total_tokens},
+        "per_model": per_model,
+        "per_session": per_session,
+        "daily": daily,
+    }

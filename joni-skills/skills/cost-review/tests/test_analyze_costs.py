@@ -146,5 +146,66 @@ class TestPricing(unittest.TestCase):
         self.assertEqual(ac.compute_cost(usage, "opus"), 0.0)
 
 
+class TestAggregate(unittest.TestCase):
+    def _msg(self, sid, model, ts, **usage):
+        defaults = dict(input_tokens=0, output_tokens=0,
+                        cache_creation_input_tokens=0, cache_read_input_tokens=0)
+        defaults.update(usage)
+        return {"sid": sid, "model": model, "ts": ts, "usage": defaults}
+
+    def test_aggregates_two_sessions_one_model(self):
+        sessions = {
+            "s1": [
+                self._msg("s1", "claude-opus-4-7", "2026-05-10T10:00:00Z",
+                          input_tokens=10, output_tokens=100, cache_read_input_tokens=1000),
+                self._msg("s1", "claude-opus-4-7", "2026-05-10T10:05:00Z",
+                          input_tokens=5, output_tokens=50, cache_read_input_tokens=500),
+            ],
+            "s2": [
+                self._msg("s2", "claude-opus-4-7", "2026-05-11T08:00:00Z",
+                          input_tokens=20, output_tokens=200, cache_read_input_tokens=2000),
+            ],
+        }
+        agg = ac.aggregate(sessions)
+        self.assertEqual(agg["window"]["sessions"], 2)
+        self.assertEqual(agg["window"]["turns"], 3)
+        self.assertEqual(agg["window"]["first"], "2026-05-10T10:00:00Z")
+        self.assertEqual(agg["window"]["last"], "2026-05-11T08:00:00Z")
+
+        # one model entry, opus
+        self.assertEqual(len(agg["per_model"]), 1)
+        opus = agg["per_model"][0]
+        self.assertEqual(opus["family"], "opus")
+        self.assertEqual(opus["turns"], 3)
+        self.assertEqual(opus["input_tokens"], 35)
+        self.assertEqual(opus["output_tokens"], 350)
+        self.assertEqual(opus["cache_read"], 3500)
+
+        # per-session
+        self.assertEqual(len(agg["per_session"]), 2)
+        s1 = next(s for s in agg["per_session"] if s["sid"] == "s1")
+        self.assertEqual(s1["turns"], 2)
+
+    def test_aggregates_mixed_models(self):
+        sessions = {
+            "s1": [
+                self._msg("s1", "claude-opus-4-7", "2026-05-10T10:00:00Z", output_tokens=100),
+                self._msg("s1", "claude-haiku-4-5", "2026-05-10T10:01:00Z", output_tokens=50),
+            ],
+        }
+        agg = ac.aggregate(sessions)
+        self.assertEqual(len(agg["per_model"]), 2)
+        families = {m["family"] for m in agg["per_model"]}
+        self.assertEqual(families, {"opus", "haiku"})
+
+    def test_empty_input(self):
+        agg = ac.aggregate({})
+        self.assertEqual(agg["window"]["sessions"], 0)
+        self.assertEqual(agg["window"]["turns"], 0)
+        self.assertEqual(agg["per_model"], [])
+        self.assertEqual(agg["per_session"], [])
+        self.assertEqual(agg["total"]["cost"], 0.0)
+
+
 if __name__ == "__main__":
     unittest.main()
