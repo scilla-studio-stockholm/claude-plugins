@@ -263,3 +263,124 @@ def filter_by_topic(sessions: dict, transcript_dir: Path, topic: str) -> dict:
             continue
 
     return {sid: msgs for sid, msgs in sessions.items() if hits_by_sid.get(sid, 0) >= 3}
+
+
+def _signal(sid: str, severity: str, anchor: str, cost_share: float, tip: str) -> dict:
+    return {"id": sid, "severity": severity, "anchor": anchor,
+            "cost_share": round(cost_share, 2), "tip": tip}
+
+
+def detect_signals(agg: dict) -> list:
+    """Run all 6 signal detectors. Return list of triggered signals (warn/ok)."""
+    out: list = []
+    total_cost = agg["total"]["cost"]
+
+    # 1. Opus on lightweight work (>=3 sessions where model is opus and avg output <2K per turn)
+    light_opus = [
+        s for s in agg["per_session"]
+        if "opus" in (s.get("model") or "").lower()
+        and s["turns"] > 0
+        and (s["output_tokens"] / s["turns"]) < 2000
+    ]
+    if len(light_opus) >= 3:
+        total_turns = sum(s["turns"] for s in light_opus)
+        avg_out = sum(s["output_tokens"] for s in light_opus) / total_turns
+        cost = sum(s["cost"] for s in light_opus)
+        out.append(_signal(
+            "opus-on-lightweight", "warn",
+            f"{len(light_opus)} sessions: avg {avg_out / 1000:.1f}K output tokens per turn",
+            cost,
+            "Use /model haiku for routine edits and lookups",
+        ))
+
+    # 2/3. Cache-write and cache-read ratios
+    total_cr = sum(m["cache_read"] for m in agg["per_model"])
+    total_di = sum(m["input_tokens"] for m in agg["per_model"])
+
+    cw_cost = sum(
+        compute_cost({"cache_creation_input_tokens": m["cache_write"],
+                      "input_tokens": 0, "output_tokens": 0,
+                      "cache_read_input_tokens": 0}, m["family"])
+        for m in agg["per_model"]
+    )
+    cr_cost = sum(
+        compute_cost({"cache_read_input_tokens": m["cache_read"],
+                      "input_tokens": 0, "output_tokens": 0,
+                      "cache_creation_input_tokens": 0}, m["family"])
+        for m in agg["per_model"]
+    )
+
+    # Detector 2: high-cache-write — writing more cache than you read back (cache not reused)
+    # Compare token counts: if writes > reads, cache is being thrown away between sessions.
+    total_cw = sum(m["cache_write"] for m in agg["per_model"])
+    cache_token_basis = total_cw + total_cr
+    if cache_token_basis > 0:
+        cw_token_ratio = total_cw / cache_token_basis
+        if cw_token_ratio > 0.50:
+            out.append(_signal(
+                "high-cache-write", "warn",
+                f"{cw_token_ratio * 100:.0f}% of cached tokens were writes (not reads)",
+                cw_cost,
+                "Long sessions are cheaper than many short ones — reuse rather than restart",
+            ))
+
+    # Detector 3: low-cache-read — warm cache underused relative to direct input
+    cr_basis = total_cr + total_di
+    if cr_basis > 0:
+        cr_ratio = total_cr / cr_basis
+        if cr_ratio < 0.50:
+            out.append(_signal(
+                "low-cache-read", "warn",
+                f"only {cr_ratio * 100:.0f}% of input came from warm cache",
+                0.0,
+                "Avoid /clear early in a session; it discards your warm cache",
+            ))
+        else:
+            out.append(_signal(
+                "low-cache-read", "ok",
+                f"cache-read ratio healthy ({cr_ratio * 100:.0f}%) — caching is working",
+                0.0, "",
+            ))
+
+    # 4. Output-heavy sessions (>50K output tokens in one session)
+    for s in agg["per_session"]:
+        if s["output_tokens"] > 50_000:
+            out.append(_signal(
+                "output-heavy", "warn",
+                f"session {s['sid'][:8]} had {s['output_tokens'] / 1000:.0f}K output tokens",
+                s["cost"],
+                "Use Edit instead of Write for partial changes; reference files instead of re-outputting them",
+            ))
+
+    # 5. Session fragmentation: >=5 sessions on one calendar day, >=4 with <30 turns
+    by_day_sessions: dict = defaultdict(list)
+    for s in agg["per_session"]:
+        if s.get("first_ts"):
+            by_day_sessions[s["first_ts"][:10]].append(s)
+    for day, sess in by_day_sessions.items():
+        if len(sess) >= 5:
+            short = [s for s in sess if s["turns"] < 30]
+            if len(short) >= 4:
+                out.append(_signal(
+                    "session-fragmentation", "warn",
+                    f"{day}: {len(sess)} sessions started, {len(short)} under 30 turns",
+                    sum(s["cost"] for s in short),
+                    "Consolidate into fewer longer sessions to retain warm cache",
+                ))
+
+    # 6. Direct-input cost > 5% of total cost
+    di_cost = sum(
+        compute_cost({"input_tokens": m["input_tokens"],
+                      "output_tokens": 0, "cache_creation_input_tokens": 0,
+                      "cache_read_input_tokens": 0}, m["family"])
+        for m in agg["per_model"]
+    )
+    if total_cost > 0 and (di_cost / total_cost) > 0.05:
+        out.append(_signal(
+            "direct-input-cost", "warn",
+            f"direct (uncached) input is {di_cost / total_cost * 100:.1f}% of total cost",
+            di_cost,
+            "First user message sets the cache breakpoint — keep system prompt + initial context stable",
+        ))
+
+    return out

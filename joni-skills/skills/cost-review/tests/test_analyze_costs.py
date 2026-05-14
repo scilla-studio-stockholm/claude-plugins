@@ -286,5 +286,103 @@ class TestFilterByTopic(unittest.TestCase):
             self.assertNotIn("s2", kept)
 
 
+class TestDetectSignals(unittest.TestCase):
+    def _build_agg(self, **overrides):
+        """Minimal aggregate skeleton; tests override fields they care about."""
+        agg = {
+            "window": {"first": "2026-05-10T10:00:00Z", "last": "2026-05-10T10:00:00Z",
+                       "days": 1, "sessions": 1, "turns": 1},
+            "total": {"cost": 100.0, "tokens": 1_000_000},
+            "per_model": [],
+            "per_session": [],
+            "daily": [],
+        }
+        agg.update(overrides)
+        return agg
+
+    def test_opus_on_lightweight_work(self):
+        # 3 opus sessions, each with avg output <2K per turn
+        per_session = [
+            {"sid": f"s{i}", "first_ts": "2026-05-10T10:00:00Z",
+             "last_ts": "2026-05-10T10:00:00Z", "turns": 5, "tokens": 50_000,
+             "cost": 10.0, "model": "claude-opus-4-7",
+             "input_tokens": 0, "output_tokens": 5_000,
+             "cache_read": 50_000, "cache_write": 0}
+            for i in range(3)
+        ]
+        agg = self._build_agg(per_session=per_session)
+        signals = ac.detect_signals(agg)
+        ids = {s["id"] for s in signals}
+        self.assertIn("opus-on-lightweight", ids)
+
+    def test_high_cache_write_ratio(self):
+        per_model = [{"model": "claude-opus-4-7", "family": "opus", "estimated": False,
+                      "turns": 100, "input_tokens": 1000, "output_tokens": 0,
+                      "cache_read": 0, "cache_write": 1_000_000, "cost": 18.78}]
+        agg = self._build_agg(per_model=per_model)
+        signals = ac.detect_signals(agg)
+        ids = {s["id"] for s in signals}
+        self.assertIn("high-cache-write", ids)
+
+    def test_low_cache_read_ratio(self):
+        per_model = [{"model": "claude-opus-4-7", "family": "opus", "estimated": False,
+                      "turns": 10, "input_tokens": 1_000_000, "output_tokens": 0,
+                      "cache_read": 100_000, "cache_write": 0, "cost": 15.15}]
+        agg = self._build_agg(per_model=per_model)
+        signals = ac.detect_signals(agg)
+        ids = {s["id"] for s in signals}
+        self.assertIn("low-cache-read", ids)
+
+    def test_output_heavy_session(self):
+        per_session = [{"sid": "big", "first_ts": "2026-05-10T08:00:00Z",
+                        "last_ts": "2026-05-10T12:00:00Z", "turns": 50, "tokens": 100_000,
+                        "cost": 50.0, "model": "claude-opus-4-7",
+                        "input_tokens": 0, "output_tokens": 60_000,
+                        "cache_read": 40_000, "cache_write": 0}]
+        agg = self._build_agg(per_session=per_session)
+        signals = ac.detect_signals(agg)
+        ids = {s["id"] for s in signals}
+        self.assertIn("output-heavy", ids)
+
+    def test_session_fragmentation(self):
+        per_session = [
+            {"sid": f"s{i}", "first_ts": "2026-05-10T08:00:00Z",
+             "last_ts": "2026-05-10T08:30:00Z", "turns": 10, "tokens": 5000,
+             "cost": 1.0, "model": "claude-opus-4-7",
+             "input_tokens": 0, "output_tokens": 100,
+             "cache_read": 5000, "cache_write": 0}
+            for i in range(5)
+        ]
+        agg = self._build_agg(per_session=per_session)
+        signals = ac.detect_signals(agg)
+        ids = {s["id"] for s in signals}
+        self.assertIn("session-fragmentation", ids)
+
+    def test_direct_input_cost(self):
+        per_model = [{"model": "claude-opus-4-7", "family": "opus", "estimated": False,
+                      "turns": 1, "input_tokens": 1_000_000, "output_tokens": 0,
+                      "cache_read": 0, "cache_write": 0, "cost": 15.0}]
+        # Total cost = 15, all from direct input -> 100% > 5%
+        agg = self._build_agg(per_model=per_model, total={"cost": 15.0, "tokens": 1_000_000})
+        signals = ac.detect_signals(agg)
+        ids = {s["id"] for s in signals}
+        self.assertIn("direct-input-cost", ids)
+
+    def test_no_signals_on_clean_data(self):
+        per_session = [{"sid": "ok", "first_ts": "2026-05-10T08:00:00Z",
+                        "last_ts": "2026-05-10T12:00:00Z", "turns": 100, "tokens": 1_000_000,
+                        "cost": 30.0, "model": "claude-sonnet-4-6",
+                        "input_tokens": 100, "output_tokens": 10_000,
+                        "cache_read": 800_000, "cache_write": 100_000}]
+        per_model = [{"model": "claude-sonnet-4-6", "family": "sonnet", "estimated": False,
+                      "turns": 100, "input_tokens": 100, "output_tokens": 10_000,
+                      "cache_read": 800_000, "cache_write": 100_000, "cost": 0.79}]
+        agg = self._build_agg(per_session=per_session, per_model=per_model,
+                              total={"cost": 0.79, "tokens": 910_100})
+        signals = ac.detect_signals(agg)
+        warn_ids = {s["id"] for s in signals if s["severity"] == "warn"}
+        self.assertEqual(warn_ids, set())
+
+
 if __name__ == "__main__":
     unittest.main()
