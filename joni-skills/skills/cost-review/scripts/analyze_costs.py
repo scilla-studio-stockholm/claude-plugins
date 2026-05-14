@@ -466,3 +466,18 @@ def format_human_report(agg: dict, signals: list, repo: str, scope_label: str) -
     push("To dig deeper: ask \"explain signal X\", \"show sessions matching <topic>\", "
          "or rerun with --topic <text>.")
     return "\n".join(lines)
+
+
+def format_json_report(agg: dict, signals: list, repo: str,
+                       scope_label: str, topic) -> str:
+    payload = {
+        "repo": repo,
+        "scope": {"mode": "topic" if topic else "all-time", "topic": topic},
+        "window": agg["window"],
+        "total": agg["total"],
+        "per_model": agg["per_model"],
+        "per_session": sorted(agg["per_session"], key=lambda x: -x["cost"]),
+        "daily": agg["daily"],
+        "signals": signals,
+    }
+    return json.dumps(payload, indent=2, default=str)

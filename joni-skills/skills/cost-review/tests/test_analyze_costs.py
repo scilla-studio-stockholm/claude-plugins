@@ -460,5 +460,35 @@ class TestFormatHumanReport(unittest.TestCase):
         self.assertIn("0 sessions", out)
 
 
+class TestFormatJsonReport(unittest.TestCase):
+    def test_emits_valid_json_with_expected_top_keys(self):
+        agg = {
+            "window": {"first": "", "last": "", "days": 0, "sessions": 0, "turns": 0},
+            "total": {"cost": 0.0, "tokens": 0},
+            "per_model": [], "per_session": [], "daily": [],
+        }
+        out = ac.format_json_report(agg, [], repo="/x", scope_label="all-time", topic=None)
+        parsed = json.loads(out)
+        self.assertEqual(parsed["repo"], "/x")
+        self.assertEqual(parsed["scope"]["mode"], "all-time")
+        self.assertIsNone(parsed["scope"]["topic"])
+        self.assertIn("window", parsed)
+        self.assertIn("total", parsed)
+        self.assertIn("per_model", parsed)
+        self.assertIn("per_session", parsed)
+        self.assertIn("daily", parsed)
+        self.assertEqual(parsed["signals"], [])
+
+    def test_topic_mode_in_json(self):
+        agg = {"window": {"first":"","last":"","days":0,"sessions":0,"turns":0},
+               "total": {"cost":0.0, "tokens":0},
+               "per_model":[],"per_session":[],"daily":[]}
+        out = ac.format_json_report(agg, [], repo="/x", scope_label="topic=OST",
+                                    topic="OST")
+        parsed = json.loads(out)
+        self.assertEqual(parsed["scope"]["mode"], "topic")
+        self.assertEqual(parsed["scope"]["topic"], "OST")
+
+
 if __name__ == "__main__":
     unittest.main()
