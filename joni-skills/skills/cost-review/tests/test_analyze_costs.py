@@ -1,4 +1,5 @@
 """Tests for cost-review analyze_costs.py. Stdlib unittest only."""
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -205,6 +206,52 @@ class TestAggregate(unittest.TestCase):
         self.assertEqual(agg["per_model"], [])
         self.assertEqual(agg["per_session"], [])
         self.assertEqual(agg["total"]["cost"], 0.0)
+
+
+class TestFilterByTopic(unittest.TestCase):
+    def _write_session(self, dir_path: Path, sid: str, content_lines: list):
+        """Write a JSONL file with one assistant turn carrying given text."""
+        path = dir_path / f"{sid}.jsonl"
+        with open(path, "w") as f:
+            for content in content_lines:
+                f.write(
+                    '{"type":"assistant","sessionId":"' + sid + '",'
+                    '"timestamp":"2026-05-10T10:00:00Z",'
+                    '"message":{"model":"claude-opus-4-7","usage":{"input_tokens":1,"output_tokens":1,'
+                    '"cache_creation_input_tokens":0,"cache_read_input_tokens":0},'
+                    '"content":[{"type":"text","text":' + json.dumps(content) + '}]}}\n'
+                )
+
+    def test_drops_sessions_below_threshold(self):
+        with tempfile.TemporaryDirectory() as td:
+            td_path = Path(td)
+            self._write_session(td_path, "match", [
+                "this is about OST", "more OST work", "OST again"  # 3 hits
+            ])
+            self._write_session(td_path, "nomatch", ["unrelated work"])  # 0 hits
+            self._write_session(td_path, "weak", ["one OST mention"])  # 1 hit
+
+            sessions = ac.walk_transcripts(td_path)
+            kept = ac.filter_by_topic(sessions, td_path, "OST")
+            self.assertIn("match", kept)
+            self.assertNotIn("nomatch", kept)
+            self.assertNotIn("weak", kept)
+
+    def test_case_insensitive(self):
+        with tempfile.TemporaryDirectory() as td:
+            td_path = Path(td)
+            self._write_session(td_path, "s1", ["ost", "Ost", "OST"])  # 3 hits if ci
+            sessions = ac.walk_transcripts(td_path)
+            kept = ac.filter_by_topic(sessions, td_path, "OST")
+            self.assertIn("s1", kept)
+
+    def test_empty_topic_returns_all(self):
+        with tempfile.TemporaryDirectory() as td:
+            td_path = Path(td)
+            self._write_session(td_path, "s1", ["anything"])
+            sessions = ac.walk_transcripts(td_path)
+            kept = ac.filter_by_topic(sessions, td_path, "")
+            self.assertEqual(kept, sessions)
 
 
 if __name__ == "__main__":
