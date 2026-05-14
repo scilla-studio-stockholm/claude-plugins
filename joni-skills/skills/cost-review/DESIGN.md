@@ -203,12 +203,12 @@ Body sections:
 
 ## Sanity test
 
-Running with `--cwd /Users/jonilindgren/claude-projects/Metria --topic OST` must reproduce the $1,273.77 figure from yesterday's manual analysis, within rounding (±$1). The implementation plan includes this as a one-line acceptance check.
+Running against a real repo with a known topic must produce a plausible cost (positive, dominated by the model the user actually used, with a window matching when work happened). The original target was reproducing the manual OST analysis of $1,273.77 (2026-05-13), but that figure used a domain-curated marker list (specific paths + 13 skill names) that a generic substring filter cannot replicate. With `--topic OST` against Metria, the skill reports ≈$4,000–4,700 because the bare token "OST" appears in every session (skill listing, system reminders), not because the filter is broken. For tight Metria-OST scoping use a more specific term like `--topic skills-design` or `--topic "OST-"`; for arbitrary repos, pick a substring distinctive to the work being measured.
 
 ## Caveats and known limits
 
 - **API list prices, not actual bill.** A Max user pays subscription; this is what the same usage would have cost via the API.
-- **Marker-based topic filter is conservative.** ≥3 hits keeps the signal-to-noise tight but may miss a session that only briefly touched the topic. Acceptable for v1.
+- **Topic filter is a substring match, not domain curation.** ≥3 case-insensitive hits keeps the signal-to-noise tight, but a short token (e.g. "OST") can appear in metadata (installed skill names in system reminders) across sessions that didn't actually do that work. Pick distinctive substrings, or use a path fragment like `skills-design/` or a hyphenated prefix like `OST-`. For domain-precise filtering, a curated marker list outside the skill is still the right tool.
 - **Subagent attribution.** Subagent JSONLs carry the parent's `sessionId`, so their costs roll up into the parent — verified manually against Metria data. If a future Claude Code version changes this, the script needs a re-verification.
 - **Pricing table goes stale.** Hardcoded April 2026 list prices. Bump when Anthropic ships new pricing.
 - **Older model families (claude-3-\*)** estimated at Sonnet rates. Fine for the recent past; if you analyze old transcripts, the figure is approximate.
