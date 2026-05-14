@@ -253,6 +253,38 @@ class TestFilterByTopic(unittest.TestCase):
             kept = ac.filter_by_topic(sessions, td_path, "")
             self.assertEqual(kept, sessions)
 
+    def test_per_line_attribution_when_file_has_multiple_sids(self):
+        """When a JSONL file mixes two sessionIds, each session should only get
+        credited for hits on lines mentioning its own sessionId."""
+        with tempfile.TemporaryDirectory() as td:
+            td_path = Path(td)
+            # One file with both sessions; only s1's lines mention the topic
+            path = td_path / "mixed.jsonl"
+            with open(path, "w") as f:
+                # 3 lines for s1, each with "OST"
+                for _ in range(3):
+                    f.write(
+                        '{"type":"assistant","sessionId":"s1",'
+                        '"timestamp":"2026-05-10T10:00:00Z",'
+                        '"message":{"model":"claude-opus-4-7","usage":{"input_tokens":1,"output_tokens":1,'
+                        '"cache_creation_input_tokens":0,"cache_read_input_tokens":0},'
+                        '"content":[{"type":"text","text":"talking about OST"}]}}\n'
+                    )
+                # 1 line for s2 with no topic hit
+                f.write(
+                    '{"type":"assistant","sessionId":"s2",'
+                    '"timestamp":"2026-05-10T10:00:00Z",'
+                    '"message":{"model":"claude-opus-4-7","usage":{"input_tokens":1,"output_tokens":1,'
+                    '"cache_creation_input_tokens":0,"cache_read_input_tokens":0},'
+                    '"content":[{"type":"text","text":"unrelated"}]}}\n'
+                )
+            sessions = ac.walk_transcripts(td_path)
+            kept = ac.filter_by_topic(sessions, td_path, "OST")
+            # s1 has 3 hits on its own lines — should be kept
+            self.assertIn("s1", kept)
+            # s2 has 0 hits on its own lines — must NOT be kept even though the file has 3 OST mentions
+            self.assertNotIn("s2", kept)
+
 
 if __name__ == "__main__":
     unittest.main()

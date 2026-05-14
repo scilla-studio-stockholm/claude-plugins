@@ -231,39 +231,35 @@ def aggregate(sessions: dict) -> dict:
 def filter_by_topic(sessions: dict, transcript_dir: Path, topic: str) -> dict:
     """Return subset of sessions whose JSONL content has >=3 hits of `topic`.
 
-    Case-insensitive substring match across all lines of all files. If a session
-    has hits in any of its files (parent + subagents), they sum.
+    Case-insensitive substring match, attributed per line: each line's hits are
+    credited only to the sessionId on that line. A session that spans multiple
+    files (parent + subagents) sums its hits across them.
     """
     if not topic:
         return sessions
+    if not transcript_dir.exists() or not transcript_dir.is_dir():
+        return {}
     needle = topic.lower()
     hits_by_sid: dict = defaultdict(int)
 
-    if not transcript_dir.exists():
-        return {}
     paths = list(transcript_dir.glob("*.jsonl")) + list(transcript_dir.glob("*/subagents/*.jsonl"))
     for p in paths:
         try:
-            text = p.read_text(errors="ignore")
+            with open(p, "r", errors="ignore") as f:
+                for line in f:
+                    if '"sessionId"' not in line:
+                        continue
+                    hits = line.lower().count(needle)
+                    if hits == 0:
+                        continue
+                    try:
+                        obj = json.loads(line)
+                    except (json.JSONDecodeError, ValueError):
+                        continue
+                    sid = obj.get("sessionId")
+                    if sid:
+                        hits_by_sid[sid] += hits
         except OSError:
             continue
-        n = text.lower().count(needle)
-        if n == 0:
-            continue
-        # Find sessionIds referenced in this file
-        sids_in_file = set()
-        for line in text.splitlines():
-            if '"sessionId"' not in line:
-                continue
-            try:
-                obj = json.loads(line)
-                sid = obj.get("sessionId")
-                if sid:
-                    sids_in_file.add(sid)
-            except (json.JSONDecodeError, ValueError):
-                continue
-        # Attribute hits to each session in the file (a session may span multiple files)
-        for sid in sids_in_file:
-            hits_by_sid[sid] += n
 
     return {sid: msgs for sid, msgs in sessions.items() if hits_by_sid.get(sid, 0) >= 3}
