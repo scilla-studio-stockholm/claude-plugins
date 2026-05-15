@@ -1,7 +1,7 @@
 ---
 title: "OST-select-top-three-solutions: design spec (v2)"
 date: 2026-05-11
-purpose: Locked v2 design for assist 8 in opportunity-solution-tree-agents.md - takes the v0.1 solution-candidates JSON from OST-brainstorm-solutions (assist 6) plus the trio's chosen-opportunity and product-outcome context, runs a single-pass LLM call to pick 3 specific member solutions ranked by outcome-impact probability, each with a 2-3 sentence outcome-mapping rationale. Schema v0.2 in knowledge/discovery/top-three-selection.md replaces v0.1 (cluster-input + discriminator picks). OST-cluster-solutions stays built but is removed from the required pipeline. Input to the implementation plan.
+purpose: Locked v2 design for assist 8 in opportunity-solution-tree-agents.md - takes the v0.1 solution-candidates JSON from OST-brainstorm-solutions (assist 6) plus the trio's chosen-opportunity and product-outcome context, runs a single-pass LLM call to pick 3 specific member solutions ranked by outcome-impact probability, each with a 2-3 sentence outcome-mapping rationale. Schema v0.2 in ../knowledge/discovery/top-three-selection.md replaces v0.1 (cluster-input + discriminator picks). OST-cluster-solutions stays built but is removed from the required pipeline. Input to the implementation plan.
 tags: [skill-design, workshop-3, ost, top-three-selection, schema-v0.2]
 
 ---
@@ -14,7 +14,7 @@ This is the locked v2 design for **assist 8** in `opportunity-solution-tree-agen
 
 For product trios and researchers, when picking the top 3 solutions to carry into assumption testing from a divergent brainstorm output, output a paired JSON + markdown proposal with 3 specific solutions ranked by outcome-impact probability, each with a 2-3 sentence outcome-mapping rationale. Input to assist 9 (assumption generator) after trio ratification.
 
-Input is the v0.1 solution-candidates JSON from `OST-brainstorm-solutions` (the 18 specific solutions) and the trio's chosen-opportunity + product-outcome context. Output is two files in `workspace/6-top-three/` with the same root name: a top-three-solutions JSON conforming to schema v0.2 in `knowledge/discovery/top-three-selection.md`, and a markdown rendering generated deterministically from the JSON.
+Input is the v0.1 solution-candidates JSON from `OST-brainstorm-solutions` (the 18 specific solutions) and the trio's chosen-opportunity + product-outcome context. Output is two files in `workspace/6-top-three/` with the same root name: a top-three-solutions JSON conforming to schema v0.2 in `../knowledge/discovery/top-three-selection.md`, and a markdown rendering generated deterministically from the JSON.
 
 The skill produces a **proposal**, not a decision-of-record. The trio reviews the proposal, edits if needed, and writes a one-line entry into `workspace/context/ratifications.md` (the ratification-flag pattern). Assist 9 reads `ratifications.md` to find the approved version. The selector itself does not write to `workspace/context/`.
 
@@ -74,7 +74,7 @@ Distinct from `OST-brainstorm-solutions` (generates the 18; doesn't pick), `OST-
 
 | File pattern | Source | Used for |
 |---|---|---|
-| `workspace/4-solution-brainstorm/solution-candidates-<date>.json` | `OST-brainstorm-solutions` (assist 6) | The 18 specific solutions to rank and pick from. v0.1 schema (per `knowledge/discovery/solution-brainstorm.md`). |
+| `workspace/4-solution-brainstorm/solution-candidates-<date>.json` | `OST-brainstorm-solutions` (assist 6) | The 18 specific solutions to rank and pick from. v0.1 schema (per `../knowledge/discovery/solution-brainstorm.md`). |
 | `workspace/context/chosen-opportunity.md` | Trio-ratified | Cross-check against source JSON's `chosen_opportunity.id`. Quote and source available as grounding context in the LLM prompt; not required in rationale prose (rationale is outcome-mapping only). |
 | `workspace/context/product-outcome.md` | Trio-authored, fixed path | Outcome formulation that grounds the outcome-mapping in the rationale. |
 
@@ -82,9 +82,9 @@ Distinct from `OST-brainstorm-solutions` (generates the 18; doesn't pick), `OST-
 
 **Knowledge anchors read at runtime:**
 
-- **`knowledge/discovery/top-three-selection.md`** (UPDATED, bumped to v0.2) — schema v0.2, the v2 locked decisions, the ratification-flag pattern (unchanged from v0.1), the no-effort rule.
-- `knowledge/discovery/solution-brainstorm.md` — source schema (v0.1) so the picker can parse the brainstormer's output.
-- `knowledge/discovery/opportunity-solution-tree-teresa-torres.md` — Torres principles. The canonical anchor is "Choose three solutions to explore in parallel" (CDH ch 7 step 6). The "Don't assess effort during opportunity selection" rule is carried to solution selection prose per convention.
+- **`../knowledge/discovery/top-three-selection.md`** (UPDATED, bumped to v0.2) — schema v0.2, the v2 locked decisions, the ratification-flag pattern (unchanged from v0.1), the no-effort rule.
+- `../knowledge/discovery/solution-brainstorm.md` — source schema (v0.1) so the picker can parse the brainstormer's output.
+- `../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` — Torres principles. The canonical anchor is "Choose three solutions to explore in parallel" (CDH ch 7 step 6). The "Don't assess effort during opportunity selection" rule is carried to solution selection prose per convention.
 
 **What the skill does NOT consume:**
 
@@ -92,7 +92,7 @@ Distinct from `OST-brainstorm-solutions` (generates the 18; doesn't pick), `OST-
 - The paired markdown brainstormer file (`solution-candidates-<date>.md`). JSON is the contract.
 - The experience map, comparison matrix, validated opportunities, interview transcripts.
 
-## The knowledge anchor: `knowledge/discovery/top-three-selection.md` (v0.2)
+## The knowledge anchor: `../knowledge/discovery/top-three-selection.md` (v0.2)
 
 The existing anchor (created at commit `9693096` for v0.1) is updated in place to v0.2. v0.1's schema and decisions move to the Evolution section as historical record; v0.2 sections describe the current state.
 
@@ -167,7 +167,7 @@ One LLM call, deterministic post-processing.
    - Role frame: "You are picking the 3 specific solutions with the strongest probability of moving the product outcome within the chosen opportunity."
    - Grounding: chosen opportunity (full record with quote+source), product outcome (verbatim).
    - The 18 candidates rendered as a flat list with full records (id, title, generating_role, round_number, description). Raw JSON acceptable; flat-list rendering also acceptable.
-   - Schema reference: point to `knowledge/discovery/top-three-selection.md` by path; include v0.2 JSON skeleton inline.
+   - Schema reference: point to `../knowledge/discovery/top-three-selection.md` by path; include v0.2 JSON skeleton inline.
    - The four v2 locked decisions verbatim as rules (strict 3, always specific member, outcome-mapping-only rationale, no alternatives).
    - The no-effort rule.
    - Output instruction: "Return only a single JSON object matching the schema. No prose preamble."
@@ -343,15 +343,15 @@ The skill explicitly does NOT:
 
 As part of building v2:
 
-1. **Update `knowledge/discovery/top-three-selection.md`** — bump schema to v0.2. Sections: "The four v2 locked decisions" replaces "The eight locked decisions" (the eight collapse to four after dropping discriminator, alternatives, three-ingredient rationale). Customer-evidence anchor convention section removed (no longer required). v0.1 decisions move to Evolution as historical entry. Schema in the body replaced with v0.2.
+1. **Update `../knowledge/discovery/top-three-selection.md`** — bump schema to v0.2. Sections: "The four v2 locked decisions" replaces "The eight locked decisions" (the eight collapse to four after dropping discriminator, alternatives, three-ingredient rationale). Customer-evidence anchor convention section removed (no longer required). v0.1 decisions move to Evolution as historical entry. Schema in the body replaced with v0.2.
 2. **Update `skills-design/skill-template.md` Bygg-status** — change the assist-7 (OST-cluster-solutions) entry to note "off-pipeline; available but not required for assist 8". Keep the assist-8 entry as built; update body to describe v2.
 3. **Update `skills-design/opportunity-solution-tree-agents.md`** — update assist 8 entry (lines 530-559) to reflect v2: input is OST-brainstorm-solutions output (not OST-cluster-solutions); 3 specific picks; outcome-mapping-only rationale. Update assist 7 entry to note "off-pipeline".
 
 What is NOT updated:
 
-- `knowledge/discovery/solution-cluster.md` — still describes OST-cluster-solutions schema. The skill still works; users can still invoke it. Unchanged.
-- `knowledge/discovery/solution-brainstorm.md` — picker reads schema v0.1 unchanged.
-- `knowledge/discovery/opportunity-solution-tree-teresa-torres.md` — picker references it but doesn't extend it.
+- `../knowledge/discovery/solution-cluster.md` — still describes OST-cluster-solutions schema. The skill still works; users can still invoke it. Unchanged.
+- `../knowledge/discovery/solution-brainstorm.md` — picker reads schema v0.1 unchanged.
+- `../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` — picker references it but doesn't extend it.
 
 ## Open follow-ups (v0.3 candidates)
 

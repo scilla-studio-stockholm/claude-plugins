@@ -1,7 +1,7 @@
 ---
 title: "OST-assumption-categorizer: design spec"
 date: 2026-05-12
-purpose: Locked design for assist 10 in opportunity-solution-tree-agents.md - takes the deduped per-solution assumption list from OST-generate-assumptions (assist 9), runs a single classification LLM pass against the 5-category Cagan taxonomy in knowledge/discovery/assumption-types.md, and writes paired JSON + markdown with each assumption tagged with exactly one category. Identity-mapping over upstream assumptions (no reorder, no add, no drop, no re-wording). Input to assist 11 (OST-riskiest-assumptions). Input to the implementation plan.
+purpose: Locked design for assist 10 in opportunity-solution-tree-agents.md - takes the deduped per-solution assumption list from OST-generate-assumptions (assist 9), runs a single classification LLM pass against the 5-category Cagan taxonomy in ../knowledge/discovery/assumption-types.md, and writes paired JSON + markdown with each assumption tagged with exactly one category. Identity-mapping over upstream assumptions (no reorder, no add, no drop, no re-wording). Input to assist 11 (OST-riskiest-assumptions). Input to the implementation plan.
 tags: [skill-design, workshop-3, ost, assumption-categorization, schema-v0.1]
 
 ---
@@ -14,7 +14,7 @@ This is the locked design for **assist 10** in `opportunity-solution-tree-agents
 
 For product trios and researchers, when categorizing the deduped assumptions for the top 3 solutions into Cagan's five product-risk categories, output a paired JSON + markdown rendering with each assumption tagged in exactly one category. Input to assist 11 (OST-riskiest-assumptions).
 
-Input is the latest `assumptions-*.json` in `workspace/7-assumptions/` by date in filename (assist 9's output). Output is two files in `workspace/8-assumptions-categorized/` with the same root name: a categorized JSON conforming to schema v0.1 in a new knowledge anchor `knowledge/discovery/assumption-categorization.md`, and a markdown rendering generated deterministically from the JSON.
+Input is the latest `assumptions-*.json` in `workspace/7-assumptions/` by date in filename (assist 9's output). Output is two files in `workspace/8-assumptions-categorized/` with the same root name: a categorized JSON conforming to schema v0.1 in a new knowledge anchor `../knowledge/discovery/assumption-categorization.md`, and a markdown rendering generated deterministically from the JSON.
 
 The orchestration is a **single LLM classification pass** over the full flat list of assumptions (all three solutions concatenated). Per-assumption classification against a locked 5-category taxonomy is a bounded transformation that does not benefit from sub-agent diversification - the taxonomy is the same lens for every assumption, and a single pass keeps classification consistent across solutions. The skill enforces strict **identity-mapping** over the upstream assumptions: every upstream assumption.id, text, and source_methods array carries through byte-identical; the skill adds exactly one `category` field per assumption and nothing else.
 
@@ -30,7 +30,7 @@ The four open questions in `opportunity-solution-tree-agents.md` (lines 639-644)
 | 'Other'-semantics | **Reserved for non-Cagan assumptions only.** Force one of `{desirability, usability, feasibility, viability}` whenever an assumption fits even marginally. 'Other' is for assumptions that are genuinely orthogonal to Cagan's four product risks: legal, ethical, regulatory, market-timing, organizational. Keeps the four primary buckets meaningful for downstream risk-mapping. |
 | Row ordering | **Preserve upstream order.** Identity-mapping over upstream `assumptions[]`. No re-ordering by category, no triangulation-strength-desc sort. Trio sees the same order assist 9 produced. Easiest invariant to enforce (length-equality plus id-equality at each index). |
 | Input source pattern | **Latest-by-date, no ratification gate.** Read latest `assumptions-*.json` from `workspace/7-assumptions/` by date in filename. Per the locked phase-3 HITL design in `OST-generate-assumptions-design.md`, the trio gate for phase 3 is downstream at assist 11; no ratification between 9 and 10. |
-| Schema home | **New `knowledge/discovery/assumption-categorization.md`.** Per the per-assist precedent (every prior assist got its own anchor: `solution-brainstorm.md`, `solution-cluster.md`, `top-three-selection.md`, `assumption-generation.md`). Schema v0.1 owns the category enum, the risk-falls tiebreaker rule, the 'other'-reservation rule, the carry-forward rules, and the renderer template. |
+| Schema home | **New `../knowledge/discovery/assumption-categorization.md`.** Per the per-assist precedent (every prior assist got its own anchor: `solution-brainstorm.md`, `solution-cluster.md`, `top-three-selection.md`, `assumption-generation.md`). Schema v0.1 owns the category enum, the risk-falls tiebreaker rule, the 'other'-reservation rule, the carry-forward rules, and the renderer template. |
 | HITL flavor | **No in-skill HITL banner.** Phase 3 trio gate is at assist 11. Matches `OST-generate-assumptions` precedent. |
 | Output location | `workspace/8-assumptions-categorized/`. Stage-numbered convention continuing the `1-` through `7-` subdirs. |
 | Output filename | `assumptions-categorized-<YYYY-MM-DD>.{json,md}` per cross-cutting datakontrakt. |
@@ -75,14 +75,14 @@ That is the only input. The skill does NOT read:
 
 **Knowledge anchors read at runtime:**
 
-- **`knowledge/discovery/assumption-categorization.md`** (NEW, created as part of this build) - owns the schema, the category enum, the risk-falls tiebreaker rule, the 'other'-reservation rule, the carry-forward rules, and the renderer template.
-- **`knowledge/discovery/assumption-types.md`** - the 5-category taxonomy with definitions and examples. Read in full; the prompt instructs the LLM to apply the "Definition" and "Application notes" sections per category to every assumption.
-- **`knowledge/foundations/product-operating-model-marty-cagan.md`** - Cagan five-product-risks framing that anchors the taxonomy. Read as reference for the conceptual grounding.
-- **`knowledge/discovery/assumption-generation.md`** - the upstream schema (v0.1) so the skill can parse the input JSON cleanly without ambiguity.
+- **`../knowledge/discovery/assumption-categorization.md`** (NEW, created as part of this build) - owns the schema, the category enum, the risk-falls tiebreaker rule, the 'other'-reservation rule, the carry-forward rules, and the renderer template.
+- **`../knowledge/discovery/assumption-types.md`** - the 5-category taxonomy with definitions and examples. Read in full; the prompt instructs the LLM to apply the "Definition" and "Application notes" sections per category to every assumption.
+- **`../knowledge/foundations/product-operating-model-marty-cagan.md`** - Cagan five-product-risks framing that anchors the taxonomy. Read as reference for the conceptual grounding.
+- **`../knowledge/discovery/assumption-generation.md`** - the upstream schema (v0.1) so the skill can parse the input JSON cleanly without ambiguity.
 
 Per the cross-cutting datakontrakt, anchors are read at runtime rather than hard-coded into the prompt.
 
-## The new knowledge anchor: `knowledge/discovery/assumption-categorization.md`
+## The new knowledge anchor: `../knowledge/discovery/assumption-categorization.md`
 
 This anchor carries the same role for the categorizer that `assumption-generation.md` carries for the generator: it owns the schema, the category enum, the risk-falls tiebreaker rule, the 'other'-reservation rule, the carry-forward rules, and the renderer template. Created as a one-time write during this skill's build; not modified at runtime.
 
@@ -211,7 +211,7 @@ workspace/8-assumptions-categorized/assumptions-categorized-<YYYY-MM-DD>.json
 workspace/8-assumptions-categorized/assumptions-categorized-<YYYY-MM-DD>.md
 ```
 
-**The JSON** is strict schema v0.1 from `knowledge/discovery/assumption-categorization.md`. No extra fields beyond the schema.
+**The JSON** is strict schema v0.1 from `../knowledge/discovery/assumption-categorization.md`. No extra fields beyond the schema.
 
 **The markdown** is generated deterministically from the JSON via an embedded template in the prompt:
 
@@ -284,15 +284,15 @@ Categorization rule: single category per assumption, risk-falls tiebreaker. 'Oth
 
 As part of building this skill:
 
-- **Create `knowledge/discovery/assumption-categorization.md`** (the new anchor). Sections per "The new knowledge anchor" above. This is the canonical source for the schema, the category enum, the risk-falls rule, the 'other'-reservation rule, the carry-forward rules, and the renderer template.
+- **Create `../knowledge/discovery/assumption-categorization.md`** (the new anchor). Sections per "The new knowledge anchor" above. This is the canonical source for the schema, the category enum, the risk-falls rule, the 'other'-reservation rule, the carry-forward rules, and the renderer template.
 - **Update `skills-design/skill-template.md` Bygg-status** - mark `OST-assumption-categorizer` as built. Final task in the implementation plan, not in this design.
 - **Update `skills-design/opportunity-solution-tree-agents.md`** - replace the four open design questions in section 10 (lines 639-644) with a reference to the locked decisions in `skills-design/OST-assumption-categorizer-design.md`. Update the "Föreslagen typ: Skill" line is already correct - no change needed there.
 
 What is NOT updated:
 
-- `knowledge/discovery/assumption-types.md` - read as reference; the taxonomy stays as the canonical source. Untouched.
-- `knowledge/foundations/product-operating-model-marty-cagan.md` - referenced but not extended.
-- `knowledge/discovery/assumption-generation.md` - read for upstream schema; no changes.
+- `../knowledge/discovery/assumption-types.md` - read as reference; the taxonomy stays as the canonical source. Untouched.
+- `../knowledge/foundations/product-operating-model-marty-cagan.md` - referenced but not extended.
+- `../knowledge/discovery/assumption-generation.md` - read for upstream schema; no changes.
 - `workspace/README.md` - the staging-dir-documentation follow-up is the same TODO already opened by upstream skills; `workspace/8-assumptions-categorized/` adds another data point but is not a separate update here.
 
 ## Error handling

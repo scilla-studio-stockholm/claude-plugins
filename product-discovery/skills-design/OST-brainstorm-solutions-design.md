@@ -1,7 +1,7 @@
 ---
 title: "OST-brainstorm-solutions: design spec"
 date: 2026-05-10
-purpose: Locked design for assist 6 in opportunity-solution-tree-agents.md - takes the trio-ratified chosen-opportunity from workspace/context/chosen-opportunity.md and the product outcome, spawns three role sub-agents (PM, UX, Tech Lead) in parallel per round across three rounds via the Agent tool with a prompt-only "new or build-on, no paraphrases" anti-duplication rule, and produces 18 paired JSON + markdown solution candidates conforming to a new schema v0.1 in knowledge/discovery/solution-brainstorm.md. Input to the implementation plan.
+purpose: Locked design for assist 6 in opportunity-solution-tree-agents.md - takes the trio-ratified chosen-opportunity from workspace/context/chosen-opportunity.md and the product outcome, spawns three role sub-agents (PM, UX, Tech Lead) in parallel per round across three rounds via the Agent tool with a prompt-only "new or build-on, no paraphrases" anti-duplication rule, and produces 18 paired JSON + markdown solution candidates conforming to a new schema v0.1 in ../knowledge/discovery/solution-brainstorm.md. Input to the implementation plan.
 tags: [skill-design, workshop-3, ost, solution-brainstorm, schema-v0.1, agent-orchestration]
 
 ---
@@ -16,7 +16,7 @@ This is the first assist in **phase 2 (solution space)**. All prior assists were
 
 For product trios and researchers, when generating a divergent set of solution candidates for one chosen opportunity, output 18 paired JSON + markdown solution candidates produced by three role-diversified sub-agents (PM, UX, Tech Lead) over three rounds with cross-round anti-duplication.
 
-Input is the trio-ratified `workspace/context/chosen-opportunity.md`, the trio's `workspace/context/product-outcome.md`, three role anchors, and three knowledge anchors. Output is two files in `workspace/4-solution-brainstorm/` with the same root name: a solution-candidates JSON conforming to schema v0.1 in a new knowledge anchor `knowledge/discovery/solution-brainstorm.md`, and a markdown rendering generated deterministically from the JSON.
+Input is the trio-ratified `workspace/context/chosen-opportunity.md`, the trio's `workspace/context/product-outcome.md`, three role anchors, and three knowledge anchors. Output is two files in `workspace/4-solution-brainstorm/` with the same root name: a solution-candidates JSON conforming to schema v0.1 in a new knowledge anchor `../knowledge/discovery/solution-brainstorm.md`, and a markdown rendering generated deterministically from the JSON.
 
 The orchestration uses the **Agent tool** to spawn three role sub-agents in parallel per round. Within a round the sub-agents are blind to each other (each only sees the chosen opp, outcome, and its own role anchor); in rounds 2 and 3 they all see the full prior pool of ideas and follow a "new or build-on, no paraphrases" rule. Anti-duplication is prompt-only; assist 7 (clusterer) is the dedup layer.
 
@@ -42,7 +42,7 @@ The brainstorm narrowed the open questions in `opportunity-solution-tree-agents.
 | Output location | `workspace/4-solution-brainstorm/`. Stage-numbered convention continuing `1-opportunity-val/`, `2-opportunity-compare/`, `3-opportunity-select/`. |
 | Output filename | `solution-candidates-<YYYY-MM-DD>.{json,md}` per cross-cutting datakontrakt. |
 | Output format | Paired JSON + markdown. JSON is the contract for assist 7; markdown is for human eyeballing if a trio wants to peek before clustering. |
-| Schema location | New knowledge anchor `knowledge/discovery/solution-brainstorm.md` (mirrors the comparator, selector, and experience-map precedents). Schema is v0.1. |
+| Schema location | New knowledge anchor `../knowledge/discovery/solution-brainstorm.md` (mirrors the comparator, selector, and experience-map precedents). Schema is v0.1. |
 | Slug name | `OST-brainstorm-solutions`. Verb-first matches `OST-validate-opportunities`, `OST-cluster-opportunities`, `OST-compare-opportunities`, `OST-select-opportunity`, `OST-extract-experience-map`. Plural noun reflects that the output is multiple solutions. |
 | Role-anchor paths | **Generic role anchors in `knowledge/foundations/`.** Three new files created during this build: `role-product-manager.md`, `role-ux-designer.md`, `role-tech-lead.md`. English, generic, applicable to any product trio practicing this method. The skill has zero coupling to any specific company, product, or tech stack. Per-team overrides are a v0.2 follow-up (e.g., `workspace/context/role-*.md` shadowing the foundations defaults). |
 | Body language | English, matching precedent. Ratified files may be Swedish (the trio's working language); the skill body, new knowledge anchor, and role anchors are English so the skill is reusable across teams. |
@@ -70,18 +70,18 @@ This follows the "for X, when Y, output Z" pattern. It is generic and company-ag
 |---|---|---|
 | `workspace/context/chosen-opportunity.md` | Trio-ratified, fixed path | Chosen opp's id, phase, quote, source, rationale, score profile |
 | `workspace/context/product-outcome.md` | Trio-authored, fixed path | Outcome formulation; team name |
-| `knowledge/foundations/role-product-manager.md` | Generic role anchor (created during this build) | PM sub-agent's lens |
-| `knowledge/foundations/role-ux-designer.md` | Generic role anchor (created during this build) | UX sub-agent's lens |
-| `knowledge/foundations/role-tech-lead.md` | Generic role anchor (created during this build) | Tech Lead sub-agent's lens |
+| `../knowledge/foundations/role-product-manager.md` | Generic role anchor (created during this build) | PM sub-agent's lens |
+| `../knowledge/foundations/role-ux-designer.md` | Generic role anchor (created during this build) | UX sub-agent's lens |
+| `../knowledge/foundations/role-tech-lead.md` | Generic role anchor (created during this build) | Tech Lead sub-agent's lens |
 
 **File-resolution rules:** Both input files are at fixed paths with no date suffix. The role anchors are at fixed paths.
 
 **Knowledge anchors read at runtime:**
 
-- `knowledge/discovery/solution-brainstorm.md` (NEW, created as part of this build) - the JSON schema, the three-round structure, the role-diversification framing, the anti-duplication convention, the broad-solution-scope definition.
-- `knowledge/foundations/tech-product-trio-responsibility-split.md` - cross-role framing baseline; reinforces the role lenses.
-- `knowledge/foundations/product-trio-operational-practices.md` - cross-role framing baseline.
-- `knowledge/discovery/opportunity-solution-tree-teresa-torres.md` - solution-space principles, especially "Choose three solutions to explore in parallel" (which motivates the divergent generation here) and the cautious framing on idea quality vs. quantity.
+- `../knowledge/discovery/solution-brainstorm.md` (NEW, created as part of this build) - the JSON schema, the three-round structure, the role-diversification framing, the anti-duplication convention, the broad-solution-scope definition.
+- `../knowledge/foundations/tech-product-trio-responsibility-split.md` - cross-role framing baseline; reinforces the role lenses.
+- `../knowledge/foundations/product-trio-operational-practices.md` - cross-role framing baseline.
+- `../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` - solution-space principles, especially "Choose three solutions to explore in parallel" (which motivates the divergent generation here) and the cautious framing on idea quality vs. quantity.
 
 Per the cross-cutting datakontrakt decision, anchors are read at runtime rather than hard-coded into the prompt.
 
@@ -95,7 +95,7 @@ Per the cross-cutting datakontrakt decision, anchors are read at runtime rather 
 
 **Role anchors are generic by default.** Three new role-anchor files are created in `knowledge/foundations/` as part of this build (see "Knowledge-doc updates required before ship"). They describe the PM, UX, and Tech Lead lenses in company-agnostic terms, drawing on the same discipline knowledge that already lives in `knowledge/foundations/` (product-trio-operational-practices, tech-product-trio-responsibility-split, Cagan's empowered-team writing). The skill body, the new `solution-brainstorm.md` anchor, and the role anchors contain zero references to any specific company, product, tooling, or domain. Per-team override of role anchors (a future v0.2 follow-up) would let trios shadow these defaults from `workspace/context/role-*.md` if they want a tighter local frame.
 
-## The new knowledge anchor: `knowledge/discovery/solution-brainstorm.md`
+## The new knowledge anchor: `../knowledge/discovery/solution-brainstorm.md`
 
 This anchor carries the same role for the brainstormer that `opportunity-comparison.md` carries for the comparator and `opportunity-selection.md` carries for the selector: it owns the schema, the three-round structure, the role-diversification framing, the anti-duplication convention, and the broad solution-scope definition. Created as a one-time write during this skill's build; not modified at runtime.
 
@@ -166,7 +166,7 @@ Sections in the anchor:
 - `generation_summary` is the fixed v0.1 block.
 - No `build_on`, `assumptions`, `risk_level`, or other extension fields anywhere.
 
-## Companion knowledge-anchor update: `knowledge/discovery/opportunity-selection.md`
+## Companion knowledge-anchor update: `../knowledge/discovery/opportunity-selection.md`
 
 This skill is the first to consume `workspace/context/chosen-opportunity.md`. The selector explicitly does NOT write that file; the trio ratifies into it manually. The shape of that ratified file was not previously documented anywhere. As part of this build, add a **"Ratification format"** section to `opportunity-selection.md` documenting the contract the brainstormer hard-requires.
 
@@ -192,9 +192,9 @@ The skill follows the same numbered-step pattern as `OST-select-opportunity` and
 2. **Locate inputs:**
    - `workspace/context/chosen-opportunity.md` (fixed path).
    - `workspace/context/product-outcome.md` (fixed path).
-   - `knowledge/foundations/role-product-manager.md` (fixed path).
-   - `knowledge/foundations/role-ux-designer.md` (fixed path).
-   - `knowledge/foundations/role-tech-lead.md` (fixed path).
+   - `../knowledge/foundations/role-product-manager.md` (fixed path).
+   - `../knowledge/foundations/role-ux-designer.md` (fixed path).
+   - `../knowledge/foundations/role-tech-lead.md` (fixed path).
 
 3. **Hard-exit checks** (see Error handling). Do not write any output files when these fire.
 
@@ -255,7 +255,7 @@ workspace/4-solution-brainstorm/solution-candidates-<YYYY-MM-DD>.json
 workspace/4-solution-brainstorm/solution-candidates-<YYYY-MM-DD>.md
 ```
 
-**The JSON** is strict schema v0.1 from `knowledge/discovery/solution-brainstorm.md`. No extra fields beyond the schema.
+**The JSON** is strict schema v0.1 from `../knowledge/discovery/solution-brainstorm.md`. No extra fields beyond the schema.
 
 **The markdown** is generated deterministically from the JSON via an embedded template in the prompt:
 
@@ -319,15 +319,15 @@ Generation summary: 3 rounds × 3 roles × 2 ideas = 18 total. Roles: Product Ma
 
 As part of building this skill:
 
-- **Create `knowledge/discovery/solution-brainstorm.md`** (the new anchor). Sections per "The new knowledge anchor" above. This is the canonical source for the schema, the three-round structure, the role-diversification framing, the anti-duplication rule, and the broad-solution-scope definition.
-- **Create `knowledge/foundations/role-product-manager.md`**, **`role-ux-designer.md`**, and **`role-tech-lead.md`**. Three new generic role anchors that describe each role's lens for solution brainstorming. Written in English and applicable to any product trio practicing this method. Each file follows the same shape: frontmatter (title, date, purpose, tags), a short framing paragraph on the role within a product trio, a "Lens for solution brainstorming" section describing how this role frames the solution space, a "Solution surfaces this role naturally explores" bullet list with concrete examples (features, flows, integrations, automation, processes, policies, removed steps - whichever fit the role), and an "Anti-patterns" bullet list. The files draw on discipline knowledge already represented in `knowledge/foundations/` (Cagan's empowered-team writing, product-trio-operational-practices, tech-product-trio-responsibility-split) but contain zero references to any specific company, product, tooling, or domain.
-- **Update `knowledge/discovery/opportunity-selection.md`** with a new "Ratification format" section documenting the structure of `workspace/context/chosen-opportunity.md`. Schema version stays at v0.1; this is a prose addition.
+- **Create `../knowledge/discovery/solution-brainstorm.md`** (the new anchor). Sections per "The new knowledge anchor" above. This is the canonical source for the schema, the three-round structure, the role-diversification framing, the anti-duplication rule, and the broad-solution-scope definition.
+- **Create `../knowledge/foundations/role-product-manager.md`**, **`role-ux-designer.md`**, and **`role-tech-lead.md`**. Three new generic role anchors that describe each role's lens for solution brainstorming. Written in English and applicable to any product trio practicing this method. Each file follows the same shape: frontmatter (title, date, purpose, tags), a short framing paragraph on the role within a product trio, a "Lens for solution brainstorming" section describing how this role frames the solution space, a "Solution surfaces this role naturally explores" bullet list with concrete examples (features, flows, integrations, automation, processes, policies, removed steps - whichever fit the role), and an "Anti-patterns" bullet list. The files draw on discipline knowledge already represented in `knowledge/foundations/` (Cagan's empowered-team writing, product-trio-operational-practices, tech-product-trio-responsibility-split) but contain zero references to any specific company, product, tooling, or domain.
+- **Update `../knowledge/discovery/opportunity-selection.md`** with a new "Ratification format" section documenting the structure of `workspace/context/chosen-opportunity.md`. Schema version stays at v0.1; this is a prose addition.
 
 What is NOT updated:
 
 - `workspace/README.md` - the staging-subdirectory documentation update is the same follow-up TODO already opened by `OST-compare-opportunities` and `OST-select-opportunity`. The brainstormer's `workspace/4-solution-brainstorm/` is another data point that the README's staging-dir documentation needs to catch up.
-- `knowledge/foundations/tech-product-trio-responsibility-split.md` and `product-trio-operational-practices.md` - the brainstormer reads them at runtime; they aren't extended.
-- `knowledge/discovery/opportunity-solution-tree-teresa-torres.md` - referenced but not extended.
+- `../knowledge/foundations/tech-product-trio-responsibility-split.md` and `product-trio-operational-practices.md` - the brainstormer reads them at runtime; they aren't extended.
+- `../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` - referenced but not extended.
 - `skills-design/skill-template.md` Bygg-status - that gets updated in the implementation plan as a final task (mark `OST-brainstorm-solutions` built, "7 of 13"), not in this design.
 
 ## Error handling
@@ -336,9 +336,9 @@ What is NOT updated:
 
 | Trigger | Looked for | Remedy |
 |---|---|---|
-| `workspace/context/chosen-opportunity.md` missing | Trio's ratified chosen-opportunity file | Review the proposal in `workspace/3-opportunity-select/`, ratify into `workspace/context/chosen-opportunity.md` per the format in `knowledge/discovery/opportunity-selection.md` |
+| `workspace/context/chosen-opportunity.md` missing | Trio's ratified chosen-opportunity file | Review the proposal in `workspace/3-opportunity-select/`, ratify into `workspace/context/chosen-opportunity.md` per the format in `../knowledge/discovery/opportunity-selection.md` |
 | `workspace/context/product-outcome.md` missing | Trio's product outcome file | Restore from git or re-author using the template structure |
-| chosen-opportunity.md missing `## Chosen opportunity` section with parseable id/quote/source line | The bold-id line: `**<opp-id>** (Phase: <phase-id>) - "<quote>" - *<source>*` | Re-ratify using the format in `knowledge/discovery/opportunity-selection.md` |
+| chosen-opportunity.md missing `## Chosen opportunity` section with parseable id/quote/source line | The bold-id line: `**<opp-id>** (Phase: <phase-id>) - "<quote>" - *<source>*` | Re-ratify using the format in `../knowledge/discovery/opportunity-selection.md` |
 | chosen-opportunity.md missing `## Product outcome` blockquote | An outcome formulation in the ratified file | Re-ratify; copy outcome from `workspace/context/product-outcome.md` |
 | Product outcome file has no extractable `## Outcome` or `## Team` section | Headings `## Outcome` and `## Team` followed by content | Re-author `workspace/context/product-outcome.md` using the template structure |
 | Any of the three role anchors missing | All three role anchors at `knowledge/foundations/role-{product-manager,ux-designer,tech-lead}.md` | Restore from git |
@@ -415,9 +415,9 @@ Inputs:
     (Norrsken Licenstilldelning, opp-5-1 Delfi licens-upplägg)
   workspace/context/product-outcome.md
     (Norrsken licens-tilldelning outcome)
-  knowledge/foundations/role-product-manager.md
-  knowledge/foundations/role-ux-designer.md
-  knowledge/foundations/role-tech-lead.md
+  ../knowledge/foundations/role-product-manager.md
+  ../knowledge/foundations/role-ux-designer.md
+  ../knowledge/foundations/role-tech-lead.md
 
 Expect:
   - schema_version "0.1" in the output JSON

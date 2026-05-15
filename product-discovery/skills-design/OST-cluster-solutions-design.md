@@ -1,7 +1,7 @@
 ---
 title: "OST-cluster-solutions: design spec"
 date: 2026-05-11
-purpose: Locked design for assist 7 in opportunity-solution-tree-agents.md - takes the 18 paired JSON+markdown solution candidates from OST-brainstorm-solutions (assist 6) plus chosen-opportunity and product-outcome context, runs a single-pass LLM clustering call to group candidates into 3-5 thematic clusters with full member embed and LLM-generated title + summary per cluster, and produces a paired JSON + markdown clustered solution map conforming to a new schema v0.1 in knowledge/discovery/solution-cluster.md. Input to the implementation plan.
+purpose: Locked design for assist 7 in opportunity-solution-tree-agents.md - takes the 18 paired JSON+markdown solution candidates from OST-brainstorm-solutions (assist 6) plus chosen-opportunity and product-outcome context, runs a single-pass LLM clustering call to group candidates into 3-5 thematic clusters with full member embed and LLM-generated title + summary per cluster, and produces a paired JSON + markdown clustered solution map conforming to a new schema v0.1 in ../knowledge/discovery/solution-cluster.md. Input to the implementation plan.
 tags: [skill-design, workshop-3, ost, solution-clustering, schema-v0.1]
 
 ---
@@ -14,7 +14,7 @@ This is the locked design for **assist 7** in `opportunity-solution-tree-agents.
 
 For product trios and researchers, when grouping 18 divergent solution candidates from a brainstorm pass into 3-5 thematic clusters so duplicates collapse and unique ideas surface, output a paired JSON + markdown clustered solution map. Each cluster has a title, a 2-4 sentence summary, and a full embed of its member solutions (id, title, generating role, round, description). Input to assist 8 (top-3 selector).
 
-Input is the v0.1 solution-candidates JSON from `OST-brainstorm-solutions` and the trio's chosen-opportunity + product-outcome context. Output is two files in `workspace/5-solution-cluster/` with the same root name: a clustered-solutions JSON conforming to schema v0.1 in a new knowledge anchor `knowledge/discovery/solution-cluster.md`, and a markdown rendering generated deterministically from the JSON.
+Input is the v0.1 solution-candidates JSON from `OST-brainstorm-solutions` and the trio's chosen-opportunity + product-outcome context. Output is two files in `workspace/5-solution-cluster/` with the same root name: a clustered-solutions JSON conforming to schema v0.1 in a new knowledge anchor `../knowledge/discovery/solution-cluster.md`, and a markdown rendering generated deterministically from the JSON.
 
 The skill produces a **proposal**, not a decision-of-record. Assist 8 (top-3 selector) consumes the cluster map; the trio reviews assist 8's top-3 proposal, not this intermediate cluster map. The clusterer itself does not write to `workspace/context/`.
 
@@ -33,7 +33,7 @@ The brainstorm resolved four open questions from `opportunity-solution-tree-agen
 | Cluster ordering | **By member count descending; tiebreak first-appearing member id.** Signals which themes dominated the brainstorm. Cluster ids `c1, c2, ...` assigned post-sort. |
 | Member ordering within cluster | **Lead-idea first, then round ascending, then role (PM, UX, TL).** Soft convention in the prompt; not a hard invariant. |
 | HITL flow | **AI-driven HITL** per the steg 6-8 pattern in the workshop-3 cross-cutting decisions. Trio reviews at the top-3 stage (assist 8), not at this intermediate clusterer stage. |
-| Schema location | **New knowledge anchor `knowledge/discovery/solution-cluster.md` v0.1.** Per the cross-cutting datakontrakt; mirrors `opportunity-comparison.md`, `opportunity-selection.md`, `solution-brainstorm.md`. |
+| Schema location | **New knowledge anchor `../knowledge/discovery/solution-cluster.md` v0.1.** Per the cross-cutting datakontrakt; mirrors `opportunity-comparison.md`, `opportunity-selection.md`, `solution-brainstorm.md`. |
 | Body language | **English.** Matches `OST-validate-opportunities`, `OST-extract-experience-map`, `OST-cluster-opportunities`, `OST-compare-opportunities`, `OST-select-opportunity`, `OST-brainstorm-solutions`. |
 | Output location | `workspace/5-solution-cluster/` (created lazily if absent). Stage-numbered convention continuing `1-opportunity-val/`, `2-opportunity-compare/`, `3-opportunity-select/`, `4-solution-brainstorm/`. The workspace-folder-convention follow-up TODO opened by `OST-compare-opportunities` / `OST-select-opportunity` / `OST-brainstorm-solutions` was closed 2026-05-11. |
 | Output filename | `clustered-solutions-<YYYY-MM-DD>.{json,md}` per cross-cutting datakontrakt. |
@@ -69,8 +69,8 @@ This follows the "for X, when Y, output Z" pattern. Distinct from `OST-cluster-o
 
 **Knowledge anchors read at runtime:**
 
-- `knowledge/discovery/solution-cluster.md` (NEW, created as part of this build) - the JSON schema v0.1, the four locked decisions, the clustering-axis convention, the field-notes section.
-- `knowledge/discovery/solution-brainstorm.md` - source schema (v0.1) so the clusterer can parse what `OST-brainstorm-solutions` produced.
+- `../knowledge/discovery/solution-cluster.md` (NEW, created as part of this build) - the JSON schema v0.1, the four locked decisions, the clustering-axis convention, the field-notes section.
+- `../knowledge/discovery/solution-brainstorm.md` - source schema (v0.1) so the clusterer can parse what `OST-brainstorm-solutions` produced.
 
 Per the cross-cutting datakontrakt, anchors are read at runtime rather than hard-coded into the prompt.
 
@@ -83,7 +83,7 @@ Per the cross-cutting datakontrakt, anchors are read at runtime rather than hard
 - The comparison matrix.
 - A separate schema file. The schema lives in the new knowledge anchor.
 
-## The new knowledge anchor: `knowledge/discovery/solution-cluster.md`
+## The new knowledge anchor: `../knowledge/discovery/solution-cluster.md`
 
 This anchor carries the same role for the clusterer that `opportunity-selection.md` carries for the selector: it owns the schema, the four locked decisions, the clustering-axis convention, and the framework prose. Created as a one-time write during this skill's build; not modified at runtime.
 

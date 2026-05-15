@@ -14,7 +14,7 @@ This is the locked design for **assist 4** in `opportunity-solution-tree-agents.
 
 For product trios and researchers, when comparing approved opportunities against a product outcome and Torres criteria, output a paired JSON + markdown rendering with a qualitative comparison matrix (5 criteria × N approved opportunities) plus an evidence-gap list of `unknown` cells.
 
-Input is the clustered experience-map JSON (v0.2 from `OST-cluster-opportunities`) and the trio's product outcome at `workspace/context/product-outcome.md`. Output is two files in `workspace/2-opportunity-compare/` with the same root name: a comparison-matrix JSON conforming to schema v0.1 in a new knowledge anchor `knowledge/discovery/opportunity-comparison.md`, and a markdown rendering generated deterministically from the JSON.
+Input is the clustered experience-map JSON (v0.2 from `OST-cluster-opportunities`) and the trio's product outcome at `workspace/context/product-outcome.md`. Output is two files in `workspace/2-opportunity-compare/` with the same root name: a comparison-matrix JSON conforming to schema v0.1 in a new knowledge anchor `../knowledge/discovery/opportunity-comparison.md`, and a markdown rendering generated deterministically from the JSON.
 
 The skill enriches the trio's discovery artifacts with a comparison view; it does not replace any upstream file. Upstream files stay immutable. The matrix and gap list live alongside them at a stage-numbered subdirectory.
 
@@ -33,7 +33,7 @@ The brainstorm narrowed scope from the open questions in `opportunity-solution-t
 | Skill vs agent | Plain skill. Single-pass composition over a regular matrix structure (5 criteria × N opportunities); each cell is computed independently with no agent-style state or pairwise N×N loops. The "pairwise" framing in the brainstorm-input was misleading: the brainstorm-input's own output spec is criterion × opportunity, not opportunity × opportunity. |
 | Output directory | `workspace/2-opportunity-compare/`. Stage-numbered convention continuing `1-opportunity-val/`. The flat workspace-root convention in the workspace README has drifted; updating the README is a follow-up TODO. |
 | Output filename | `comparison-matrix-<YYYY-MM-DD>.{json,md}` per cross-cutting datakontrakt. |
-| Schema location | New knowledge anchor `knowledge/discovery/opportunity-comparison.md` (mirrors the experience-mapping precedent). Schema is v0.1. |
+| Schema location | New knowledge anchor `../knowledge/discovery/opportunity-comparison.md` (mirrors the experience-mapping precedent). Schema is v0.1. |
 | Evidence-gap list | Rendered as a section in the same markdown file as the matrix, derived from `unknown` cells. Not a separate file. |
 
 ## Skill identity
@@ -64,9 +64,9 @@ This follows the "for X, when Y, output Z" pattern. It is generic, not Metria-sp
 
 **Knowledge anchors read at runtime:**
 
-- `knowledge/discovery/opportunity-comparison.md` (NEW, created as part of this build) - the matrix schema, the criteria definitions, the score vocabulary, the trace-back rule, the no-effort rule.
-- `knowledge/discovery/opportunity-solution-tree-teresa-torres.md` - Torres principles, with the explicit "Don't assess effort during opportunity selection" line as the comparator's lens.
-- `knowledge/discovery/experience-mapping.md` - schema v0.2 of the input JSON, so the skill can read clustered files.
+- `../knowledge/discovery/opportunity-comparison.md` (NEW, created as part of this build) - the matrix schema, the criteria definitions, the score vocabulary, the trace-back rule, the no-effort rule.
+- `../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` - Torres principles, with the explicit "Don't assess effort during opportunity selection" line as the comparator's lens.
+- `../knowledge/discovery/experience-mapping.md` - schema v0.2 of the input JSON, so the skill can read clustered files.
 
 Per the cross-cutting datakontrakt decision, anchors are read at runtime rather than hard-coded into the prompt.
 
@@ -77,7 +77,7 @@ Per the cross-cutting datakontrakt decision, anchors are read at runtime rather 
 - A separate markdown file alongside the clustered JSON. JSON-only on the cluster side.
 - A schema file. The schema lives in the new knowledge anchor.
 
-## The new knowledge anchor: `knowledge/discovery/opportunity-comparison.md`
+## The new knowledge anchor: `../knowledge/discovery/opportunity-comparison.md`
 
 This anchor carries the same role for the comparator that `experience-mapping.md` carries for the clusterer: it owns the schema, the field semantics, and the framework prose. Created as a one-time write during this skill's build; not modified at runtime.
 
@@ -194,7 +194,7 @@ workspace/2-opportunity-compare/comparison-matrix-<YYYY-MM-DD>.json
 workspace/2-opportunity-compare/comparison-matrix-<YYYY-MM-DD>.md
 ```
 
-**The JSON** is strict schema v0.1 from `knowledge/discovery/opportunity-comparison.md`. No extra fields beyond the schema.
+**The JSON** is strict schema v0.1 from `../knowledge/discovery/opportunity-comparison.md`. No extra fields beyond the schema.
 
 **The markdown** is generated deterministically from the JSON via an embedded template in the prompt:
 
@@ -291,13 +291,13 @@ Cells where evidence was thin and an honest score wasn't defensible. Each gap na
 
 As part of building this skill:
 
-- **Create `knowledge/discovery/opportunity-comparison.md`** (the new anchor). Sections per Inputs and prerequisites above. This is the canonical source for the schema, criteria, score vocabulary, trace-back rule, and no-effort rule.
+- **Create `../knowledge/discovery/opportunity-comparison.md`** (the new anchor). Sections per Inputs and prerequisites above. This is the canonical source for the schema, criteria, score vocabulary, trace-back rule, and no-effort rule.
 
 What is NOT updated:
 
 - `workspace/README.md` - the staged-subdirectory documentation update is a follow-up TODO, not part of this build.
-- `knowledge/discovery/opportunity-solution-tree-teresa-torres.md` - the comparator references it but doesn't extend it. Torres's content is canonical and the comparator just leans on it.
-- `knowledge/discovery/experience-mapping.md` - the comparator reads schema v0.2 unchanged. No bump.
+- `../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` - the comparator references it but doesn't extend it. Torres's content is canonical and the comparator just leans on it.
+- `../knowledge/discovery/experience-mapping.md` - the comparator reads schema v0.2 unchanged. No bump.
 - `skills-design/skill-template.md` Bygg-status - that gets updated in the implementation plan as a final task (mark `OST-compare-opportunities` built, "5 of 13"), not in this design.
 
 ## Error handling

@@ -1,7 +1,7 @@
 ---
 title: "OST-generate-assumptions: design spec"
 date: 2026-05-11
-purpose: Locked design for assist 9 in opportunity-solution-tree-agents.md - takes the trio-ratified top-three-solutions v0.2 JSON (located via the ratification-flag pattern in workspace/context/ratifications.md), the chosen-opportunity, the product outcome, and the extracted experience map; spawns 9 method-pass sub-agents (3 methods x 3 solutions) in parallel via the Agent tool, then runs 3 per-solution LLM dedup-passes that merge similar assumptions across methods with source-method attribution preserved as an array; produces paired JSON + markdown per a new schema v0.1 in knowledge/discovery/assumption-generation.md. Input to the implementation plan.
+purpose: Locked design for assist 9 in opportunity-solution-tree-agents.md - takes the trio-ratified top-three-solutions v0.2 JSON (located via the ratification-flag pattern in workspace/context/ratifications.md), the chosen-opportunity, the product outcome, and the extracted experience map; spawns 9 method-pass sub-agents (3 methods x 3 solutions) in parallel via the Agent tool, then runs 3 per-solution LLM dedup-passes that merge similar assumptions across methods with source-method attribution preserved as an array; produces paired JSON + markdown per a new schema v0.1 in ../knowledge/discovery/assumption-generation.md. Input to the implementation plan.
 tags: [skill-design, workshop-3, ost, assumption-generation, schema-v0.1, agent-orchestration]
 
 ---
@@ -14,7 +14,7 @@ This is the locked design for **assist 9** in `opportunity-solution-tree-agents.
 
 For product trios and researchers, when generating the assumptions that must hold for the top 3 solutions to move the product outcome, output a paired JSON + markdown rendering with three method-passes (storymap, pre-mortem, outcome-impact) per solution, deduped across methods with source-method attribution preserved as an array. Input to assist 10 (OST-assumption-categorizer).
 
-Input is the trio-ratified `top-three-solutions-*.json` (located via the ratification-flag pattern in `workspace/context/ratifications.md`), the `chosen-opportunity.md`, the `product-outcome.md`, and the latest `experience-map-extracted-*.json`. Output is two files in `workspace/7-assumptions/` with the same root name: an assumptions JSON conforming to schema v0.1 in a new knowledge anchor `knowledge/discovery/assumption-generation.md`, and a markdown rendering generated deterministically from the JSON.
+Input is the trio-ratified `top-three-solutions-*.json` (located via the ratification-flag pattern in `workspace/context/ratifications.md`), the `chosen-opportunity.md`, the `product-outcome.md`, and the latest `experience-map-extracted-*.json`. Output is two files in `workspace/7-assumptions/` with the same root name: an assumptions JSON conforming to schema v0.1 in a new knowledge anchor `../knowledge/discovery/assumption-generation.md`, and a markdown rendering generated deterministically from the JSON.
 
 The orchestration uses the **Agent tool** to spawn 9 sub-agents in parallel (3 methods x 3 solutions). Within the 9-call block the sub-agents are blind to each other; each sees only its assigned solution, the chosen opportunity, the product outcome, and its method's framing. Storymap sub-agents additionally receive the extracted experience map as anchoring context. After collection, the orchestrator runs **3 per-solution LLM dedup-passes** (one per solution) that merge similar assumptions across the 3 methods and tag each surviving entry with a `source_methods` array. Each sub-agent produces exactly **6 assumptions**. There is no cross-solution dedup. There is no in-skill HITL banner - the trio's gate for phase 3 is downstream at assist 11 (OST-riskiest-assumptions).
 
@@ -31,12 +31,12 @@ The brainstorm narrowed the six open questions in `opportunity-solution-tree-age
 | Cross-solution dedup | **None.** Each solution gets its own independent deduped list. No `shared_with` marking. Per-solution structure mirrors the workshop wall and matches the downstream categorizer contract. Cross-solution patterns are a future concern, not this skill's job. |
 | Source-method attribution | **Visible in JSON as `source_methods` array; rendered in markdown as inline tag.** Not a hidden internal field. Preserves traceability and surfaces triangulation strength. |
 | Experience map for storymap | **Yes, passed to storymap sub-agents only.** Provides anchoring context for inferring the future user-flow the solution implies. Prompt instructs sub-agent that the map is today's flow and to reason about the future. Hard-exit if missing (the workshop-3 pipeline assumes it exists from assist 3). |
-| Input source for top-3 | **Ratification-flag pattern.** Read `workspace/context/ratifications.md`, find the latest entry whose artifact filename matches `top-three-solutions-*.json`, read that JSON from `workspace/6-top-three/`. Hard-exit if no matching ratification entry. Pattern defined in `knowledge/discovery/top-three-selection.md` (v2 introduced; this skill is the first consumer). |
+| Input source for top-3 | **Ratification-flag pattern.** Read `workspace/context/ratifications.md`, find the latest entry whose artifact filename matches `top-three-solutions-*.json`, read that JSON from `workspace/6-top-three/`. Hard-exit if no matching ratification entry. Pattern defined in `../knowledge/discovery/top-three-selection.md` (v2 introduced; this skill is the first consumer). |
 | HITL flavor | **No in-skill HITL banner.** Trio gate for phase 3 is downstream at assist 11 (OST-riskiest-assumptions output). Matches the OST-brainstorm-solutions precedent (trio gate downstream at top-3 selector). |
 | Output location | `workspace/7-assumptions/`. Stage-numbered convention continuing `1-opportunity-val/`, `2-opportunity-compare/`, `3-opportunity-select/`, `4-solution-brainstorm/`, `5-solution-cluster/`, `6-top-three/`. |
 | Output filename | `assumptions-<YYYY-MM-DD>.{json,md}` per cross-cutting datakontrakt. |
 | Output format | Paired JSON + markdown. JSON is the contract for assist 10; markdown is for human eyeballing if a trio wants to peek before categorization. |
-| Schema location | New knowledge anchor `knowledge/discovery/assumption-generation.md`. Schema is v0.1. |
+| Schema location | New knowledge anchor `../knowledge/discovery/assumption-generation.md`. Schema is v0.1. |
 | Slug name | `OST-generate-assumptions`. Verb-first matches `OST-validate-opportunities`, `OST-cluster-opportunities`, `OST-compare-opportunities`, `OST-select-opportunity`, `OST-extract-experience-map`, `OST-brainstorm-solutions`, `OST-select-top-three-solutions`. Plural noun reflects multiple output. |
 | Body language | English, matching precedent. Inputs and output prose may be Swedish (the trio's working language); the skill body and the new knowledge anchor are English so the skill is reusable across teams. |
 
@@ -72,10 +72,10 @@ This follows the "for X, when Y, output Z" pattern. Generic and company-agnostic
 
 **Knowledge anchors read at runtime:**
 
-- **`knowledge/discovery/assumption-generation.md`** (NEW, created as part of this build) - owns the schema, the three-method definitions, the parallel-blind orchestration, the dedup-pass convention, the source-method attribution rule, the count-per-pass rule.
-- `knowledge/discovery/assumption-types.md` - the 5-category taxonomy. Read for reference only; this skill does NOT classify (that is assist 10). Sub-agents read the "Definition" and "Application notes" sections to know what counts as an assumption.
-- `knowledge/discovery/opportunity-solution-tree-teresa-torres.md` - the decompose-into-assumptions framing (CDH ch 8).
-- `knowledge/discovery/top-three-selection.md` - the source schema (v0.2) and the ratification-flag pattern so the skill can parse the upstream output and find the ratified version.
+- **`../knowledge/discovery/assumption-generation.md`** (NEW, created as part of this build) - owns the schema, the three-method definitions, the parallel-blind orchestration, the dedup-pass convention, the source-method attribution rule, the count-per-pass rule.
+- `../knowledge/discovery/assumption-types.md` - the 5-category taxonomy. Read for reference only; this skill does NOT classify (that is assist 10). Sub-agents read the "Definition" and "Application notes" sections to know what counts as an assumption.
+- `../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` - the decompose-into-assumptions framing (CDH ch 8).
+- `../knowledge/discovery/top-three-selection.md` - the source schema (v0.2) and the ratification-flag pattern so the skill can parse the upstream output and find the ratified version.
 
 Per the cross-cutting datakontrakt decision, anchors are read at runtime rather than hard-coded into the prompt.
 
@@ -87,7 +87,7 @@ Per the cross-cutting datakontrakt decision, anchors are read at runtime rather 
 - The comparison matrix, validated opportunities, or the clustered experience map (the storymap method wants today's raw journey, not the opportunity overlay).
 - Role anchors (`role-product-manager.md`, `role-ux-designer.md`, `role-tech-lead.md`). The role abbreviation is carried as data only; this skill does not apply a role lens to assumption generation.
 
-## The new knowledge anchor: `knowledge/discovery/assumption-generation.md`
+## The new knowledge anchor: `../knowledge/discovery/assumption-generation.md`
 
 This anchor carries the same role for the generator that `solution-brainstorm.md` carries for the brainstormer and `top-three-selection.md` carries for the selector: it owns the schema, the three-method definitions, the parallel-blind orchestration, the dedup-pass convention, the source-method attribution rule, and the count-per-pass rule. Created as a one-time write during this skill's build; not modified at runtime.
 
@@ -240,7 +240,7 @@ workspace/7-assumptions/assumptions-<YYYY-MM-DD>.json
 workspace/7-assumptions/assumptions-<YYYY-MM-DD>.md
 ```
 
-**The JSON** is strict schema v0.1 from `knowledge/discovery/assumption-generation.md`. No extra fields beyond the schema.
+**The JSON** is strict schema v0.1 from `../knowledge/discovery/assumption-generation.md`. No extra fields beyond the schema.
 
 **The markdown** is generated deterministically from the JSON via an embedded template in the prompt:
 
@@ -311,15 +311,15 @@ Generation summary: 3 methods (storymap, pre-mortem, outcome-impact) x 3 solutio
 
 As part of building this skill:
 
-- **Create `knowledge/discovery/assumption-generation.md`** (the new anchor). Sections per "The new knowledge anchor" above. This is the canonical source for the schema, the three-method definitions, the parallel-blind orchestration, the dedup-pass convention, the source-method attribution rule, and the count-per-pass rule.
+- **Create `../knowledge/discovery/assumption-generation.md`** (the new anchor). Sections per "The new knowledge anchor" above. This is the canonical source for the schema, the three-method definitions, the parallel-blind orchestration, the dedup-pass convention, the source-method attribution rule, and the count-per-pass rule.
 - **Update `skills-design/skill-template.md` Bygg-status** - mark `OST-generate-assumptions` as built. Final task in the implementation plan, not in this design. Counting subject to confirmation against current template state when implementing.
 - **Update `skills-design/opportunity-solution-tree-agents.md`** - replace the six open design questions in section 9 (lines 608-615) with a reference to the locked decisions in `skills-design/OST-generate-assumptions-design.md`. Update the "Föreslagen typ: agent" line to "skill that spawns 9 sub-agents" to match the actual decision.
 
 What is NOT updated:
 
-- `knowledge/discovery/assumption-types.md` - read as reference; the taxonomy stays for assist 10. Untouched.
-- `knowledge/discovery/opportunity-solution-tree-teresa-torres.md` - referenced but not extended.
-- `knowledge/discovery/top-three-selection.md` - read for schema and ratification-flag pattern; no changes.
+- `../knowledge/discovery/assumption-types.md` - read as reference; the taxonomy stays for assist 10. Untouched.
+- `../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` - referenced but not extended.
+- `../knowledge/discovery/top-three-selection.md` - read for schema and ratification-flag pattern; no changes.
 - `workspace/README.md` - the staging-dir-documentation follow-up is the same TODO already opened by `OST-compare-opportunities` and others; `workspace/7-assumptions/` adds another data point but is not a separate update here.
 
 ## Error handling
@@ -328,13 +328,13 @@ What is NOT updated:
 
 | Trigger | Looked for | Remedy |
 |---|---|---|
-| `workspace/context/ratifications.md` missing | The ratification log file | Create the file with `# Ratifications` heading + intro, append a line for the latest `top-three-solutions-*.json` per the format in `knowledge/discovery/top-three-selection.md` |
+| `workspace/context/ratifications.md` missing | The ratification log file | Create the file with `# Ratifications` heading + intro, append a line for the latest `top-three-solutions-*.json` per the format in `../knowledge/discovery/top-three-selection.md` |
 | No matching `top-three-solutions-*.json` line in ratifications | An append-only line of the form `- <date> top-three-solutions-*.json ratified by <approver> (<note>)` | Review the proposal in `workspace/6-top-three/`, append a ratification line |
 | The referenced `top-three-solutions-*.json` missing in `workspace/6-top-three/` | The JSON file named in the ratification line | Run `OST-select-top-three-solutions`, or correct the filename in ratifications |
 | Source JSON does not parse | Valid JSON conforming to `top-three-selection.md` v0.2 | Re-run `OST-select-top-three-solutions` |
 | Source JSON `schema_version` is not `"0.2"` | The exact string `"0.2"` | Re-run `OST-select-top-three-solutions` against v0.2 |
 | Source `picks[]` length != 3 | 3 picks (Torres canon) | Re-run `OST-select-top-three-solutions` |
-| `workspace/context/chosen-opportunity.md` missing | Trio-ratified chosen-opportunity file | Restore from git or re-ratify per `knowledge/discovery/opportunity-selection.md` |
+| `workspace/context/chosen-opportunity.md` missing | Trio-ratified chosen-opportunity file | Restore from git or re-ratify per `../knowledge/discovery/opportunity-selection.md` |
 | `chosen-opportunity.md` missing parseable bold-id row under `## Chosen opportunity` | `**<opp-id>** (Phase: <phase-id>) - "<quote>" - *<source>*` | Re-ratify using the format in `opportunity-selection.md` |
 | `workspace/context/product-outcome.md` missing or no `## Outcome` section | Heading `## Outcome` followed by content | Re-author per template |
 | No `experience-map-extracted-*.json` in `workspace/1-opportunity-val/` | At least one extracted experience map | Run `OST-extract-experience-map` (assist 3) |
@@ -397,7 +397,7 @@ Pre-step (one-time fixture creation):
     - # Ratifications heading
     - One-paragraph intro
     - One ratification line for top-three-solutions-2026-05-11.json per the
-      format in knowledge/discovery/top-three-selection.md (e.g.,
+      format in ../knowledge/discovery/top-three-selection.md (e.g.,
       "- 2026-05-11 top-three-solutions-2026-05-11.json ratified by Norrsken
       trio (no overrides)")
   Save and commit.

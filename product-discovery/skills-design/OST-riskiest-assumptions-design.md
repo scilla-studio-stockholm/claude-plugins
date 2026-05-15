@@ -14,7 +14,7 @@ This is the locked design for **assist 11** in `opportunity-solution-tree-agents
 
 For product trios and researchers, when identifying the riskiest assumptions among the categorized assumptions for the top 3 solutions, output a paired JSON + markdown rendering with each assumption scored on importance (high/low) and evidence (strong/weak), and flagged as riskiest when importance=high AND evidence=weak. Phase-3 trio review gate; input to assist 12 (OST-validation-experiment-designer).
 
-Input is the latest `assumptions-categorized-*.json` in `workspace/8-assumptions-categorized/` by date in filename (assist 10's output). Output is two files in `workspace/9-riskiest-assumptions/` with the same root name: a OST-riskiest-assumptions JSON conforming to schema v0.2 in the **extended** knowledge anchor `knowledge/discovery/assumption-risk-mapping.md` (existing v0.1 bumped to v0.2), and a markdown rendering generated deterministically from the JSON.
+Input is the latest `assumptions-categorized-*.json` in `workspace/8-assumptions-categorized/` by date in filename (assist 10's output). Output is two files in `workspace/9-riskiest-assumptions/` with the same root name: a OST-riskiest-assumptions JSON conforming to schema v0.2 in the **extended** knowledge anchor `../knowledge/discovery/assumption-risk-mapping.md` (existing v0.1 bumped to v0.2), and a markdown rendering generated deterministically from the JSON.
 
 The orchestration is a **single cross-solution LLM scoring pass**. One LLM call sees all ~30-42 assumptions across the three solutions (each tagged with its solution_id, id, category, and text) plus the solution context, the chosen opportunity, and the product outcome. The LLM returns one `{id, importance, evidence, rationale}` object per assumption. The skill then computes `is_riskiest` deterministically and merges the four new fields into the upstream structure. The skill enforces strict **identity-mapping** over the upstream assumptions: every upstream field carries through byte-identical; the skill adds exactly four new per-assumption fields and nothing else.
 
@@ -79,14 +79,14 @@ That is the only input. The skill does NOT read:
 
 **Knowledge anchors read at runtime:**
 
-- **`knowledge/discovery/assumption-risk-mapping.md`** (EXISTING, bumped to v0.2 as part of this build) - owns the 2x2 framework, the two scoring questions, the binary axes semantics, the soft-evidence rule (NEW in v0.2), the rationale format rule (NEW in v0.2), the identity-mapping + 4-new-fields contract (NEW in v0.2), the carry-forward rules (NEW in v0.2), the schema v0.2 (NEW), and the renderer template with HITL banner (NEW in v0.2).
-- **`knowledge/discovery/assumption-types.md`** - the 5-category taxonomy. Read for reference only; categorization is upstream from assist 10 and carries through unchanged.
-- **`knowledge/discovery/opportunity-solution-tree-teresa-torres.md`** - the "test the riskiest assumptions" framing (Torres CDH ch 9).
-- **`knowledge/discovery/assumption-categorization.md`** - the upstream schema v0.1 so the skill can parse the input cleanly.
+- **`../knowledge/discovery/assumption-risk-mapping.md`** (EXISTING, bumped to v0.2 as part of this build) - owns the 2x2 framework, the two scoring questions, the binary axes semantics, the soft-evidence rule (NEW in v0.2), the rationale format rule (NEW in v0.2), the identity-mapping + 4-new-fields contract (NEW in v0.2), the carry-forward rules (NEW in v0.2), the schema v0.2 (NEW), and the renderer template with HITL banner (NEW in v0.2).
+- **`../knowledge/discovery/assumption-types.md`** - the 5-category taxonomy. Read for reference only; categorization is upstream from assist 10 and carries through unchanged.
+- **`../knowledge/discovery/opportunity-solution-tree-teresa-torres.md`** - the "test the riskiest assumptions" framing (Torres CDH ch 9).
+- **`../knowledge/discovery/assumption-categorization.md`** - the upstream schema v0.1 so the skill can parse the input cleanly.
 
 Per the cross-cutting datakontrakt, anchors are read at runtime rather than hard-coded into the prompt.
 
-## The knowledge anchor extension: `knowledge/discovery/assumption-risk-mapping.md` → v0.2
+## The knowledge anchor extension: `../knowledge/discovery/assumption-risk-mapping.md` → v0.2
 
 The existing v0.1 anchor (committed 2026-05-06) stays intact as historical reference. Five new sections are appended; an Evolution entry is added. No v0.1 content is rewritten.
 
@@ -342,15 +342,15 @@ Total assumptions: <N>. Total riskiest: <M>.
 
 As part of building this skill:
 
-- **Bump `knowledge/discovery/assumption-risk-mapping.md` to v0.2.** Append five new sections per "The knowledge anchor extension" above; existing v0.1 content stays intact. Add an Evolution entry at the bottom: `v0.2 / 2026-05-12 / "Extended for the OST-riskiest-assumptions skill: identity-mapping over upstream assist-10 output, soft-evidence rule, structured rationale format, schema v0.2 with full carry-forward + 4 new per-assumption fields, renderer template with Trio HITL banner."` and update the front-matter date to 2026-05-12.
+- **Bump `../knowledge/discovery/assumption-risk-mapping.md` to v0.2.** Append five new sections per "The knowledge anchor extension" above; existing v0.1 content stays intact. Add an Evolution entry at the bottom: `v0.2 / 2026-05-12 / "Extended for the OST-riskiest-assumptions skill: identity-mapping over upstream assist-10 output, soft-evidence rule, structured rationale format, schema v0.2 with full carry-forward + 4 new per-assumption fields, renderer template with Trio HITL banner."` and update the front-matter date to 2026-05-12.
 - **Update `skills-design/skill-template.md` Bygg-status** - mark `OST-riskiest-assumptions` as built. Final task in the implementation plan, not in this design.
 - **Update `skills-design/opportunity-solution-tree-agents.md`** - replace section 11's four open design questions with a reference to the locked decisions in `skills-design/OST-riskiest-assumptions-design.md`. Update the "Föreslagen typ" line from "Agent" to "Skill (single-pass classification against locked 2x2)" to match the actual decision.
 
 What is NOT updated:
 
-- `knowledge/discovery/assumption-types.md` - read as reference; categorization is upstream and untouched.
-- `knowledge/discovery/opportunity-solution-tree-teresa-torres.md` - referenced but not extended.
-- `knowledge/discovery/assumption-categorization.md` - read for upstream schema; no changes.
+- `../knowledge/discovery/assumption-types.md` - read as reference; categorization is upstream and untouched.
+- `../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` - referenced but not extended.
+- `../knowledge/discovery/assumption-categorization.md` - read for upstream schema; no changes.
 - `workspace/context/ratifications.md` - intentionally NOT appended. The HITL gate is markdown-banner-only.
 
 ## Error handling

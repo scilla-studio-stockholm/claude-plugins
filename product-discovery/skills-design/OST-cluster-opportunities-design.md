@@ -14,7 +14,7 @@ This is the locked design for **assist 3b** in `opportunity-solution-tree-agents
 
 For product trios and researchers, when clustering validated opportunities against an experience map, output a paired JSON + markdown rendering where each opportunity is tagged with `phase_id` (and optionally `step_id`), parent-child grouped within phase (max 2 levels), with a separate `fas-0-unphased` bucket for opportunities that don't fit any journey phase.
 
-Input is the extracted experience map (v0.1 JSON), the validated-opportunities table from assist 3a, and the extracted-opportunities markdown (full quotes). Output is two files in `workspace/1-opportunity-val/` with the same root name: an enriched experience-map JSON conforming to schema v0.2 in `knowledge/discovery/experience-mapping.md`, and a markdown rendering generated deterministically from the JSON.
+Input is the extracted experience map (v0.1 JSON), the validated-opportunities table from assist 3a, and the extracted-opportunities markdown (full quotes). Output is two files in `workspace/1-opportunity-val/` with the same root name: an enriched experience-map JSON conforming to schema v0.2 in `../knowledge/discovery/experience-mapping.md`, and a markdown rendering generated deterministically from the JSON.
 
 The skill enriches the experience map; it does not replace the upstream extracted file. The upstream file stays immutable. The clustered file lives alongside it, with a different root name.
 
@@ -63,9 +63,9 @@ This follows the "for X, when Y, output Z" pattern. It is generic, not Metria-sp
 
 **Knowledge anchors read at runtime:**
 
-- `knowledge/discovery/experience-mapping.md` — schema v0.2 and the structural pattern.
-- `knowledge/discovery/opportunity-citation-format.md` — citation conventions, used to read the source/quote structure.
-- `knowledge/discovery/opportunity-solution-tree-teresa-torres.md` — opportunity-space principles, used as the lens for parent-child grouping.
+- `../knowledge/discovery/experience-mapping.md` — schema v0.2 and the structural pattern.
+- `../knowledge/discovery/opportunity-citation-format.md` — citation conventions, used to read the source/quote structure.
+- `../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` — opportunity-space principles, used as the lens for parent-child grouping.
 
 Per the cross-cutting datakontrakt decision, anchors are read at runtime rather than hard-coded into the prompt.
 
@@ -77,7 +77,7 @@ Per the cross-cutting datakontrakt decision, anchors are read at runtime rather 
 
 ## Schema bump v0.1 → v0.2
 
-The skill writes JSON conforming to v0.2 of the schema in `knowledge/discovery/experience-mapping.md`. v0.2 adds four optional fields and widens one constraint. It is backward-compatible: any well-formed v0.1 file with non-empty `steps[]` is also valid v0.2.
+The skill writes JSON conforming to v0.2 of the schema in `../knowledge/discovery/experience-mapping.md`. v0.2 adds four optional fields and widens one constraint. It is backward-compatible: any well-formed v0.1 file with non-empty `steps[]` is also valid v0.2.
 
 **New optional fields on `phases[].opportunities[]` items:**
 
@@ -123,7 +123,7 @@ workspace/1-opportunity-val/experience-map-clustered-<YYYY-MM-DD>.json
 workspace/1-opportunity-val/experience-map-clustered-<YYYY-MM-DD>.md
 ```
 
-**The JSON** is strict schema v0.2 from `knowledge/discovery/experience-mapping.md`. No extra fields beyond the v0.2 additions. `phases[].opportunities[]` is populated for every real phase that received any opportunity (and for `fas-0-unphased` if it exists); per the missing-optional-fields convention, the key is omitted from any phase that received zero opportunities.
+**The JSON** is strict schema v0.2 from `../knowledge/discovery/experience-mapping.md`. No extra fields beyond the v0.2 additions. `phases[].opportunities[]` is populated for every real phase that received any opportunity (and for `fas-0-unphased` if it exists); per the missing-optional-fields convention, the key is omitted from any phase that received zero opportunities.
 
 **The markdown** is generated deterministically from the JSON via an embedded template in the prompt:
 
@@ -220,7 +220,7 @@ The frontmatter on the markdown output complies with the Metria global rule that
 
 ## Knowledge-doc updates required before ship
 
-As part of building this skill, `knowledge/discovery/experience-mapping.md` is updated to:
+As part of building this skill, `../knowledge/discovery/experience-mapping.md` is updated to:
 
 - Replace the "JSON schema (v0.1)" code block with v0.2 (adds the four optional fields, widens the `steps[]` rule).
 - Extend the "Field notes" list to cover the four new fields and the new `steps[]` rule.
@@ -274,7 +274,7 @@ Three pieces in order: what failed, what the skill saw, what to do about it. No 
 - **Ask the trio for clustering choices interactively.** Multi-phase ambiguity is resolved silently by highest confidence. The trio's parallel manual clustering catches misclassifications at the HITL checkpoint.
 - **Iterate, retry, or run multiple passes.** One pass over the inputs, one pair of output files. No incremental state across runs.
 - **Write to Miro or any external surface.** JSON + markdown in `workspace/1-opportunity-val/` only.
-- **Update `knowledge/discovery/experience-mapping.md` at runtime.** The doc bump to v0.2 is a one-time edit done as part of building this skill, not something the skill performs.
+- **Update `../knowledge/discovery/experience-mapping.md` at runtime.** The doc bump to v0.2 is a one-time edit done as part of building this skill, not something the skill performs.
 - **Audit global parent-child consistency.** Within-phase parent-child is enforced inline during composition (depth ≤ 2, parent in same phase). The skill does not run a second sweep over the finished JSON to re-check invariants.
 
 ## Testing

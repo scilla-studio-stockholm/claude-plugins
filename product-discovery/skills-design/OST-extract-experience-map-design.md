@@ -13,7 +13,7 @@ This is the locked design for **assist 2** in `opportunity-solution-tree-agents.
 
 For product trios and researchers, when extracting a screenshot of an experience map into structured form, output paired JSON (per the experience-mapping schema) plus markdown rendering of the journey structure (phases, steps, friction levels, decision branches, team-specific extensions).
 
-Input is a single PNG or JPG screenshot of an experience map. Output is two files in `workspace/1-opportunity-val/` with the same root name: a JSON file conforming to schema v0.1 in `knowledge/discovery/experience-mapping.md`, and a markdown rendering generated deterministically from the JSON.
+Input is a single PNG or JPG screenshot of an experience map. Output is two files in `workspace/1-opportunity-val/` with the same root name: a JSON file conforming to schema v0.1 in `../knowledge/discovery/experience-mapping.md`, and a markdown rendering generated deterministically from the JSON.
 
 **Out of scope for this skill:** reading or populating `phases[].opportunities[]`. At the stage where this skill runs, opportunity citat-stickies have not yet been clustered onto the map. Opportunities are added to the journey by a separate workflow downstream. The schema retains `phases[].opportunities[]` as an optional slot that downstream skills or manual processes populate; this skill always omits the key.
 
@@ -51,7 +51,7 @@ This follows the "for X, when Y, output Z" pattern. It is generic, not Metria-sp
 
 **Optional fallback file:** `workspace/context/product-outcome.md`. Used only if the `product_outcome` field cannot be extracted from the screenshot header. When the fallback is used, the skill emits a warning in the markdown output.
 
-**Knowledge anchor read at runtime:** `knowledge/discovery/experience-mapping.md` for schema v0.1 and the structural pattern. Per the cross-cutting datakontrakt decision, this is read at runtime rather than hard-coded into the prompt.
+**Knowledge anchor read at runtime:** `../knowledge/discovery/experience-mapping.md` for schema v0.1 and the structural pattern. Per the cross-cutting datakontrakt decision, this is read at runtime rather than hard-coded into the prompt.
 
 **What the skill does NOT extract or validate:**
 
@@ -62,7 +62,7 @@ This follows the "for X, when Y, output Z" pattern. It is generic, not Metria-sp
 
 The skill follows the same numbered-step pattern as `OST-validate-opportunities`:
 
-1. **Read the knowledge anchor** at `knowledge/discovery/experience-mapping.md` for schema v0.1 and the structural pattern.
+1. **Read the knowledge anchor** at `../knowledge/discovery/experience-mapping.md` for schema v0.1 and the structural pattern.
 2. **Get input from the user.** Default to `workspace/context/experience-map.png`, falling back to `workspace/context/experience-map.jpg` if the PNG is absent. If neither exists, ask for the path.
 3. **Read the screenshot** via the Read tool (vision).
 4. **Extract journey-structure fields** from the image in a single vision pass against schema v0.1: `team`, `title`, `product_outcome`, `narrativ`, `phases[].name/order/friction_level`, `phases[].steps[].description/decision_branches`, `extensions`. Do NOT extract `phases[].opportunities[]` — that key is always omitted from the output JSON. Extract required fields with confidence; extract optional fields best-effort.
@@ -82,7 +82,7 @@ workspace/1-opportunity-val/experience-map-extracted-<YYYY-MM-DD>.json
 workspace/1-opportunity-val/experience-map-extracted-<YYYY-MM-DD>.md
 ```
 
-**The JSON** is strict schema v0.1 from `knowledge/discovery/experience-mapping.md`. No extra fields. `phases[].opportunities` is always omitted: OST-extract-experience-map does not populate it, and per the missing-optional-fields convention, absent keys signal absence rather than empty arrays.
+**The JSON** is strict schema v0.1 from `../knowledge/discovery/experience-mapping.md`. No extra fields. `phases[].opportunities` is always omitted: OST-extract-experience-map does not populate it, and per the missing-optional-fields convention, absent keys signal absence rather than empty arrays.
 
 **The markdown** is generated deterministically from the JSON via an embedded template in the prompt:
 
@@ -138,7 +138,7 @@ The frontmatter on the markdown output complies with the Metria global rule that
 
 ## Knowledge-doc updates required before ship
 
-The skill formalizes optionality on two fields that the existing v0.1 schema doc treats ambiguously. As part of building this skill, `knowledge/discovery/experience-mapping.md` is updated to:
+The skill formalizes optionality on two fields that the existing v0.1 schema doc treats ambiguously. As part of building this skill, `../knowledge/discovery/experience-mapping.md` is updated to:
 
 - Mark `phases[].friction_level` and `phases[].steps[].description` as optional, with the convention that an absent key means the field could not be observed.
 - State the missing-key convention explicitly so downstream skills handle it consistently.

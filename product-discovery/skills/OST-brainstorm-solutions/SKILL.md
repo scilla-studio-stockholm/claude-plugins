@@ -15,24 +15,24 @@ The output is a **divergent candidate set**, not a recommendation. There is no c
 
 ## Steps
 
-1. **Resolve scope.** Follow the scope-resolution protocol in `knowledge/discovery/workspace-scope.md`. The resolved scope is a discovery scope of the form `workspace/<team>/<product>/opportunities/<opp>/<YYYY-MM-DD>/`. Hard-exit if the resolved scope contains `/portfolio/` (this skill runs in phase B only).
+1. **Resolve scope.** Follow the scope-resolution protocol in `../../knowledge/discovery/workspace-scope.md`. The resolved scope is a discovery scope of the form `workspace/<team>/<product>/opportunities/<opp>/<YYYY-MM-DD>/`. Hard-exit if the resolved scope contains `/portfolio/` (this skill runs in phase B only).
 
-2. **Load context via parent walk-up.** Per `knowledge/discovery/workspace-scope.md`:
+2. **Load context via parent walk-up.** Per `../../knowledge/discovery/workspace-scope.md`:
    - `<scope>/../chosen-opportunity.md` — the ratified chosen opportunity
    - `<scope>/../../../_product-context/product-outcome.md` — the product outcome
 
 3. **Read the knowledge anchors:**
-   - `knowledge/discovery/solution-brainstorm.md` - the schema (v0.1), the three-round structure, the role-diversification framing, the anti-duplication rule, the broad-solution-scope definition.
-   - `knowledge/foundations/tech-product-trio-responsibility-split.md` - cross-role framing baseline.
-   - `knowledge/foundations/product-trio-operational-practices.md` - cross-role framing baseline.
-   - `knowledge/discovery/opportunity-solution-tree-teresa-torres.md` - Torres principle "explore multiple solutions for one opportunity".
+   - `../../knowledge/discovery/solution-brainstorm.md` - the schema (v0.1), the three-round structure, the role-diversification framing, the anti-duplication rule, the broad-solution-scope definition.
+   - `../../knowledge/foundations/tech-product-trio-responsibility-split.md` - cross-role framing baseline.
+   - `../../knowledge/foundations/product-trio-operational-practices.md` - cross-role framing baseline.
+   - `../../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` - Torres principle "explore multiple solutions for one opportunity".
 
 4. **Locate inputs:**
    - `<scope>/../chosen-opportunity.md`
    - `<scope>/../../../_product-context/product-outcome.md`
-   - `knowledge/foundations/role-product-manager.md`
-   - `knowledge/foundations/role-ux-designer.md`
-   - `knowledge/foundations/role-tech-lead.md`
+   - `../../knowledge/foundations/role-product-manager.md`
+   - `../../knowledge/foundations/role-ux-designer.md`
+   - `../../knowledge/foundations/role-tech-lead.md`
 
 5. **Hard-exit checks** (see Hard-exit format below). Do not write any output files when these fire:
    - `<scope>/../chosen-opportunity.md` missing.
@@ -61,14 +61,14 @@ The output is a **divergent candidate set**, not a recommendation. There is no c
    - The Torres "explore multiple solutions" framing.
    - The role anchor (full content of the role's `knowledge/foundations/role-*.md` file).
    - The cross-role framing baselines.
-   - The broad solution-scope definition (verbatim from `knowledge/discovery/solution-brainstorm.md`).
+   - The broad solution-scope definition (verbatim from `../../knowledge/discovery/solution-brainstorm.md`).
    - Round-1 task: "Produce 2 solution candidates from your role's frame. Each candidate has a short title (5-12 words) and a 1-3 sentence description. Range freely across user-facing features, process redesigns, policy changes, integration changes, automation, internal tooling, removed steps, or org-level changes - whatever your role's lens suggests would plausibly move the product outcome on this opportunity. Return a JSON array of 2 objects with shape `{title, description}` and nothing else."
 
    Collect the three sub-agent responses; parse each as a JSON array of 2 candidates; assign deterministic ids (`sol-r1-pm-1..2`, `sol-r1-ux-1..2`, `sol-r1-tl-1..2`); attach `round_number: 1` and `generating_role` to each. Total: 6 ideas.
 
 10. **Round 2: same orchestration as round 1, with these additions:**
    - The full pool of 6 round-1 ideas (id, role, title, description) provided as the "do not duplicate" context.
-   - The anti-duplication rule (from `knowledge/discovery/solution-brainstorm.md`, with inner quotes single-escaped): "Each idea must be either NEW (different core mechanism / target / surface from any prior idea in the pool) OR an explicit build-on of a specific prior idea (cite the prior idea by id or title in your description, e.g., 'Builds on sol-r1-pm-2 by ...'). Paraphrases or rewordings of prior ideas are not allowed."
+   - The anti-duplication rule (from `../../knowledge/discovery/solution-brainstorm.md`, with inner quotes single-escaped): "Each idea must be either NEW (different core mechanism / target / surface from any prior idea in the pool) OR an explicit build-on of a specific prior idea (cite the prior idea by id or title in your description, e.g., 'Builds on sol-r1-pm-2 by ...'). Paraphrases or rewordings of prior ideas are not allowed."
    - Round-2 task: same JSON-array-of-2 instruction as round 1.
 
    Collect, parse, assign ids `sol-r2-{role-prefix}-1..2`, attach `round_number: 2`. Total: 6 more (running total: 12).
@@ -76,7 +76,7 @@ The output is a **divergent candidate set**, not a recommendation. There is no c
 11. **Round 3: same orchestration as round 2, with the pool now 12 ideas (round 1 + round 2).**
    Collect, parse, assign ids `sol-r3-{role-prefix}-1..2`, attach `round_number: 3`. Total: 6 more (running total: 18).
 
-12. **Compose the v0.1 JSON.** Top-level fields per the schema in `knowledge/discovery/solution-brainstorm.md`. Specifically: `schema_version` is the literal `"0.1"`; `team` carries from Step 5 (`## Team` heading in `product-outcome.md`); `title` carries from Step 4 (extracted from chosen-opportunity frontmatter); `product_outcome` carries from Step 5 (`## Outcome` heading); `chosen_opportunity` carries the four fields from Step 4 (id, phase_id, quote, source); `source_chosen_opportunity_file` is the repo-root-relative path to the ratified chosen-opportunity at `<scope>/../chosen-opportunity.md` (resolve to a literal path before writing). `solutions[]` is the concatenation of the three rounds in order (rounds 1, 2, 3). Within each round the order is PM ideas (1..2), then UX (1..2), then TL (1..2). Always write `generation_summary` as the fixed v0.1 block: `{"rounds": 3, "roles": ["product-manager", "ux-designer", "tech-lead"], "ideas_per_role_per_round": 2, "total_solutions": 18}`.
+12. **Compose the v0.1 JSON.** Top-level fields per the schema in `../../knowledge/discovery/solution-brainstorm.md`. Specifically: `schema_version` is the literal `"0.1"`; `team` carries from Step 5 (`## Team` heading in `product-outcome.md`); `title` carries from Step 4 (extracted from chosen-opportunity frontmatter); `product_outcome` carries from Step 5 (`## Outcome` heading); `chosen_opportunity` carries the four fields from Step 4 (id, phase_id, quote, source); `source_chosen_opportunity_file` is the repo-root-relative path to the ratified chosen-opportunity at `<scope>/../chosen-opportunity.md` (resolve to a literal path before writing). `solutions[]` is the concatenation of the three rounds in order (rounds 1, 2, 3). Within each round the order is PM ideas (1..2), then UX (1..2), then TL (1..2). Always write `generation_summary` as the fixed v0.1 block: `{"rounds": 3, "roles": ["product-manager", "ux-designer", "tech-lead"], "ideas_per_role_per_round": 2, "total_solutions": 18}`.
 
 13. **Verify chosen-opp consistency** (defensive post-composition check). The just-composed JSON's `chosen_opportunity.id`, `chosen_opportunity.phase_id`, `chosen_opportunity.quote`, and `chosen_opportunity.source` must each equal the values parsed from the bold-id line in Step 4. Mismatch → hard-exit per the format below; do not write any output files.
 
@@ -105,9 +105,9 @@ The hard-exit triggers:
 
 | Trigger | Looked for | Remedy |
 |---|---|---|
-| Chosen-opportunity file missing at `<scope>/../chosen-opportunity.md` | Trio's ratified chosen-opportunity file in the opportunity folder | Review the proposal in `<scope>/../../portfolio/<round>/chosen-opportunity-proposal.md`, ratify into `<scope>/../chosen-opportunity.md` per the format in `knowledge/discovery/opportunity-selection.md` |
+| Chosen-opportunity file missing at `<scope>/../chosen-opportunity.md` | Trio's ratified chosen-opportunity file in the opportunity folder | Review the proposal in `<scope>/../../portfolio/<round>/chosen-opportunity-proposal.md`, ratify into `<scope>/../chosen-opportunity.md` per the format in `../../knowledge/discovery/opportunity-selection.md` |
 | Product outcome file missing at `<scope>/../../../_product-context/product-outcome.md` | Trio's product outcome file | Restore from git or re-author using the template structure |
-| chosen-opportunity.md missing `## Chosen opportunity` section with parseable id/quote/source line | The bold-id line `**<opp-id>** (Phase: <phase-id>) - "<quote>" - *<source>*` | Re-ratify using the format in `knowledge/discovery/opportunity-selection.md` |
+| chosen-opportunity.md missing `## Chosen opportunity` section with parseable id/quote/source line | The bold-id line `**<opp-id>** (Phase: <phase-id>) - "<quote>" - *<source>*` | Re-ratify using the format in `../../knowledge/discovery/opportunity-selection.md` |
 | chosen-opp consistency check failed (composed JSON's `chosen_opportunity.*` does not match Step 6 parse) | Composed JSON `chosen_opportunity.{id, phase_id, quote, source}` equals the values from chosen-opportunity.md bold-id line | Re-run the skill; if persistent, the composition step is rewriting the id (inspect prompt for ambiguity around chosen-opp handling) |
 | chosen-opportunity.md missing `## Product outcome` blockquote | An outcome formulation in the ratified file | Re-ratify; copy outcome from `<scope>/../../../_product-context/product-outcome.md` |
 | Product outcome file missing `## Outcome` or `## Team` section | Headings `## Outcome` and `## Team` followed by content | Re-author `<scope>/../../../_product-context/product-outcome.md` using the template structure |

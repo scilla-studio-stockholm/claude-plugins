@@ -14,7 +14,7 @@ This is the locked design for **assist 5** in `opportunity-solution-tree-agents.
 
 For product trios and researchers, when selecting one opportunity from an approved set already compared against a product outcome and Torres criteria, output a paired JSON + markdown proposal with the chosen opportunity, its rationale, every other approved opportunity as an alternative-considered (with reason not picked), and an AI-judged subset of the chosen opportunity's evidence gaps to carry into phase 2.
 
-Input is the comparison-matrix JSON (v0.1 from `OST-compare-opportunities`) and the trio's product outcome at `workspace/context/product-outcome.md`. Output is two files in `workspace/3-opportunity-select/` with the same root name: a chosen-opportunity JSON conforming to schema v0.1 in a new knowledge anchor `knowledge/discovery/opportunity-selection.md`, and a markdown rendering generated deterministically from the JSON.
+Input is the comparison-matrix JSON (v0.1 from `OST-compare-opportunities`) and the trio's product outcome at `workspace/context/product-outcome.md`. Output is two files in `workspace/3-opportunity-select/` with the same root name: a chosen-opportunity JSON conforming to schema v0.1 in a new knowledge anchor `../knowledge/discovery/opportunity-selection.md`, and a markdown rendering generated deterministically from the JSON.
 
 The skill produces a **proposal**, not a decision-of-record. The trio reviews the proposal, overrides if it disagrees, and ratifies the final pick into `workspace/context/chosen-opportunity.md` (which assist 6 reads). The selector itself does not write to `workspace/context/`.
 
@@ -30,7 +30,7 @@ The brainstorm narrowed scope from the open questions in `opportunity-solution-t
 | Calibration tone | Confident rationale on clean wins, transparent rationale on close calls (implied by tie handling). |
 | Output location | `workspace/3-opportunity-select/`. Stage-numbered convention continuing `1-opportunity-val/` and `2-opportunity-compare/`. The workspace README's `workspace/context/chosen-opportunity.md` is the trio's ratification target, not the skill's write target. The staging-convention README update is the same follow-up TODO already opened by OST-compare-opportunities. |
 | Output format | Paired JSON + markdown. JSON gives assist 6 a parseable contract; markdown is the trio's review surface. |
-| Schema location | New knowledge anchor `knowledge/discovery/opportunity-selection.md` (mirrors the comparator and experience-mapping precedents). Schema is v0.1. |
+| Schema location | New knowledge anchor `../knowledge/discovery/opportunity-selection.md` (mirrors the comparator and experience-mapping precedents). Schema is v0.1. |
 | Evidence-gap carry-forward | AI-judged subset of the chosen opportunity's `unknown` cells from the matrix. Symmetric `evidence_gaps_carried[]` / `evidence_gaps_excluded[]` lists, both with reason fields, so the AI's filter judgement is auditable rather than a black box. `n/a` cells are structural, not gaps; they appear in neither list. |
 | Skill vs agent | Plain skill. Single-pass over a small structured input. No agent-style state, no retries, no tool-use beyond Read. The decision rule is deterministic enough that a single composition pass suffices. |
 | Slug name | `OST-select-opportunity`. Verb-first matches `OST-validate-opportunities`, `OST-cluster-opportunities`, `OST-compare-opportunities`, `OST-extract-experience-map`. Singular noun reflects that the output is one chosen opportunity (mirrors `OST-extract-experience-map`'s singular-noun pattern). |
@@ -66,9 +66,9 @@ This follows the "for X, when Y, output Z" pattern. It is generic, not Metria-sp
 
 **Knowledge anchors read at runtime:**
 
-- `knowledge/discovery/opportunity-selection.md` (NEW, created as part of this build) - the JSON schema, the decision rule, the tie-handling convention, the evidence-gap-filter convention, the no-effort reminder.
-- `knowledge/discovery/opportunity-comparison.md` - the matrix schema (v0.1) so the selector can read the comparator's output, and the criteria/score-vocabulary definitions used in the rationale prose.
-- `knowledge/discovery/opportunity-solution-tree-teresa-torres.md` - Torres principles, especially "Don't assess effort during opportunity selection" (carried from the comparator and reinforced for selector rationale prose).
+- `../knowledge/discovery/opportunity-selection.md` (NEW, created as part of this build) - the JSON schema, the decision rule, the tie-handling convention, the evidence-gap-filter convention, the no-effort reminder.
+- `../knowledge/discovery/opportunity-comparison.md` - the matrix schema (v0.1) so the selector can read the comparator's output, and the criteria/score-vocabulary definitions used in the rationale prose.
+- `../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` - Torres principles, especially "Don't assess effort during opportunity selection" (carried from the comparator and reinforced for selector rationale prose).
 
 Per the cross-cutting datakontrakt decision, anchors are read at runtime rather than hard-coded into the prompt.
 
@@ -79,7 +79,7 @@ Per the cross-cutting datakontrakt decision, anchors are read at runtime rather 
 - Interview transcripts.
 - A schema file. The schema lives in the new knowledge anchor.
 
-## The new knowledge anchor: `knowledge/discovery/opportunity-selection.md`
+## The new knowledge anchor: `../knowledge/discovery/opportunity-selection.md`
 
 This anchor carries the same role for the selector that `opportunity-comparison.md` carries for the comparator: it owns the schema, the decision rule, the tie-handling convention, the gap-filter convention, and the framework prose. Created as a one-time write during this skill's build; not modified at runtime.
 
@@ -211,7 +211,7 @@ workspace/3-opportunity-select/chosen-opportunity-<YYYY-MM-DD>.json
 workspace/3-opportunity-select/chosen-opportunity-<YYYY-MM-DD>.md
 ```
 
-**The JSON** is strict schema v0.1 from `knowledge/discovery/opportunity-selection.md`. No extra fields beyond the schema.
+**The JSON** is strict schema v0.1 from `../knowledge/discovery/opportunity-selection.md`. No extra fields beyond the schema.
 
 **The markdown** is generated deterministically from the JSON via an embedded template in the prompt:
 
@@ -304,14 +304,14 @@ These gaps from the chosen opportunity were judged not to affect phase-2 solutio
 
 As part of building this skill:
 
-- **Create `knowledge/discovery/opportunity-selection.md`** (the new anchor). Sections per The new knowledge anchor above. This is the canonical source for the schema, decision rule, tie-handling convention, gap-filter convention, and no-effort reminder.
+- **Create `../knowledge/discovery/opportunity-selection.md`** (the new anchor). Sections per The new knowledge anchor above. This is the canonical source for the schema, decision rule, tie-handling convention, gap-filter convention, and no-effort reminder.
 - **Fix the typo on `skills-design/opportunity-solution-tree-agents.md` line 464.** Currently reads `"Vald opportunity plus rationale (från assist 7)"`. Should read `"Vald opportunity plus rationale (från assist 5)"` (assist 6 reads from the selector, which is assist 5; assist 7 is the downstream solution clusterer). Trivial Edit, included in this build.
 
 What is NOT updated:
 
 - `workspace/README.md` - the staging-subdirectory documentation update is the same follow-up TODO already opened by OST-compare-opportunities. The README's `workspace/context/chosen-opportunity.md` line is correct as the trio's ratification target; only the staging-dir convention needs catch-up.
-- `knowledge/discovery/opportunity-comparison.md` - the selector reads schema v0.1 unchanged. No bump.
-- `knowledge/discovery/opportunity-solution-tree-teresa-torres.md` - the selector references it but doesn't extend it.
+- `../knowledge/discovery/opportunity-comparison.md` - the selector reads schema v0.1 unchanged. No bump.
+- `../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` - the selector references it but doesn't extend it.
 - `skills-design/skill-template.md` Bygg-status - that gets updated in the implementation plan as a final task (mark `OST-select-opportunity` built, "6 of 13"), not in this design.
 
 ## Error handling

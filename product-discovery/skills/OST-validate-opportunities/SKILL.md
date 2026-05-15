@@ -11,14 +11,14 @@ This skill is assist 3a (validator) in `skills-design/opportunity-solution-tree-
 
 ## Steps
 
-1. **Resolve scope.** Follow `knowledge/discovery/workspace-scope.md`. Portfolio scope only.
+1. **Resolve scope.** Follow `../../knowledge/discovery/workspace-scope.md`. Portfolio scope only.
 
 2. **Resolve input path:**
    - Default to `<scope>/opportunities-extracted.md` if it exists; otherwise ask the user for a path.
 
 3. **Read the knowledge anchors:**
-   - `knowledge/discovery/opportunity-citation-format.md` — the citation-format rules (what a valid citation contains, when and when not to tweak, examples).
-   - `knowledge/discovery/opportunity-solution-tree-teresa-torres.md` — OST opportunity-space principles, used to detect solutions in disguise.
+   - `../../knowledge/discovery/opportunity-citation-format.md` — the citation-format rules (what a valid citation contains, when and when not to tweak, examples).
+   - `../../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` — OST opportunity-space principles, used to detect solutions in disguise.
 
 4. **Parse the markdown** to extract individual opportunities. Each opportunity in citation format has:
    - The verbatim quote (optionally with bracketed tweaks like `[interruption]` or `[...]`)

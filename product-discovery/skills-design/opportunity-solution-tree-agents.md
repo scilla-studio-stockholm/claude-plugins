@@ -333,13 +333,13 @@ End-to-end-tråd kan testas tidigt med syntetisk data om vi bygger comparator + 
 
 Trio skriver sitt product outcome i `workspace/context/product-outcome.md` med eventuella kända begränsningar (saknad baseline, osatt tidsram osv). Trio accepterar att outcomet kan ha luckor om de är medvetna och dokumenterade. Outcomet är input till downstream-skills, inte output från en AI-assist.
 
-Anchors: `knowledge/discovery/product-outcomes-i-olika-skeden.md` och `knowledge/discovery/product-outcomes-vs-business-outcomes.md` finns för trio att konsultera vid skrivning, men det är trios ansvar, inte en AI-uppgift.
+Anchors: `../knowledge/discovery/product-outcomes-i-olika-skeden.md` och `../knowledge/discovery/product-outcomes-vs-business-outcomes.md` finns för trio att konsultera vid skrivning, men det är trios ansvar, inte en AI-uppgift.
 
 ---
 
 ### 2. Experience map importer och validator
 
-**Jobb (en mening):** Läs trios experience map och producera JSON enligt `knowledge/discovery/experience-mapping.md`-schemat plus en mänskligt läsbar markdown-rendering, och flagga journey-steg som saknar transkriptstöd.
+**Jobb (en mening):** Läs trios experience map och producera JSON enligt `../knowledge/discovery/experience-mapping.md`-schemat plus en mänskligt läsbar markdown-rendering, och flagga journey-steg som saknar transkriptstöd.
 
 **Input:**
 
@@ -360,7 +360,7 @@ Anchors: `knowledge/discovery/product-outcomes-i-olika-skeden.md` och `knowledge
 
 **Nedströms-konsumenter:** Steg 3b (clusterer) använder JSON. Steg 4 och 5 indirekt.
 
-**Knowledge-anchors:** `knowledge/discovery/experience-mapping.md`.
+**Knowledge-anchors:** `../knowledge/discovery/experience-mapping.md`.
 
 **Öppna designfrågor:**
 
@@ -375,7 +375,7 @@ Anchors: `knowledge/discovery/product-outcomes-i-olika-skeden.md` och `knowledge
 
 ### 3a. Opportunity format-validator
 
-**Jobb (en mening):** Granska varje opportunity mot reglerna i `knowledge/discovery/opportunity-citation-format.md` och flagga den som godkänd, behöver tweak, eller solution in disguise.
+**Jobb (en mening):** Granska varje opportunity mot reglerna i `../knowledge/discovery/opportunity-citation-format.md` och flagga den som godkänd, behöver tweak, eller solution in disguise.
 
 **Input:** Lista av opportunities i citatformat (text + källa + ev. tweaks).
 
@@ -389,12 +389,12 @@ Anchors: `knowledge/discovery/product-outcomes-i-olika-skeden.md` och `knowledge
 
 **Nedströms-konsumenter:** Trio själv. Renade opportunities går vidare till 3b.
 
-**Knowledge-anchors:** `knowledge/discovery/opportunity-citation-format.md`, `knowledge/discovery/opportunity-solution-tree-teresa-torres.md`.
+**Knowledge-anchors:** `../knowledge/discovery/opportunity-citation-format.md`, `../knowledge/discovery/opportunity-solution-tree-teresa-torres.md`.
 
 **Öppna designfrågor (låsta 2026-05-09):**
 
 - Format för input. Plain markdown, JSON, en specifik fil-konvention?  
-  svar: Plain markdown enligt `knowledge/discovery/opportunity-citation-format.md`. En fil per körning. Default-filsökväg `workspace/1-opportunity-val/opportunities-extracted-<date>.md`; operatören kan ange annan.
+  svar: Plain markdown enligt `../knowledge/discovery/opportunity-citation-format.md`. En fil per körning. Default-filsökväg `workspace/1-opportunity-val/opportunities-extracted-<date>.md`; operatören kan ange annan.
 - Ska assisten kunna föreslå konkreta omformuleringar, eller bara flagga?  
   svar: Bara flagga. Trios egen formulering är canonical text. Lärupplevelsen är starkare när trio själv hittar formuleringen utifrån motiveringen.
 
@@ -420,7 +420,7 @@ Anchors: `knowledge/discovery/product-outcomes-i-olika-skeden.md` och `knowledge
 
 **Nedströms-konsumenter:** Format-validator (3a) eller direkt trio.
 
-**Knowledge-anchors:** `knowledge/discovery/opportunity-citation-format.md`.
+**Knowledge-anchors:** `../knowledge/discovery/opportunity-citation-format.md`.
 
 **Öppna designfrågor:**
 
@@ -448,7 +448,7 @@ Anchors: `knowledge/discovery/product-outcomes-i-olika-skeden.md` och `knowledge
 
 **Nedströms-konsumenter:** Steg 4 (comparator).
 
-**Knowledge-anchors:** `knowledge/discovery/opportunity-solution-tree-teresa-torres.md`, sektion "Opportunity space".
+**Knowledge-anchors:** `../knowledge/discovery/opportunity-solution-tree-teresa-torres.md`, sektion "Opportunity space".
 
 **Öppna designfrågor:**
 
@@ -480,7 +480,7 @@ svar: opportunities kan hamna utanför en phase, behöver bara en tydlig klassif
 
 **Nedströms-konsumenter:** Steg 5.
 
-**Knowledge-anchors:** `knowledge/discovery/opportunity-solution-tree-teresa-torres.md`, Torres "Continuous Discovery Habits" kapitel 7.
+**Knowledge-anchors:** `../knowledge/discovery/opportunity-solution-tree-teresa-torres.md`, Torres "Continuous Discovery Habits" kapitel 7.
 
 **Öppna designfrågor:**
 
@@ -508,7 +508,7 @@ svar: opportunities kan hamna utanför en phase, behöver bara en tydlig klassif
 
 **Nedströms-konsumenter:** Trio själv. Output är slutartefakten.
 
-**Knowledge-anchors:** `knowledge/discovery/opportunity-solution-tree-teresa-torres.md`, principen "Don't assess effort during opportunity selection".
+**Knowledge-anchors:** `../knowledge/discovery/opportunity-solution-tree-teresa-torres.md`, principen "Don't assess effort during opportunity selection".
 
 **Öppna designfrågor:**
 
@@ -555,9 +555,9 @@ Designfilosofin är inspirerad av workshop-loops som tvingar deltagare bortom de
 - `docs/underlag-fran-metria/documents/roll-product-manager.md`
 - `docs/underlag-fran-metria/documents/roll-ux-designer.md`
 - `docs/underlag-fran-metria/documents/roll-tech-lead.md`
-- `knowledge/foundations/tech-product-trio-responsibility-split.md`
-- `knowledge/foundations/product-trio-operational-practices.md`
-- `knowledge/discovery/opportunity-solution-tree-teresa-torres.md` (solution space-principerna)
+- `../knowledge/foundations/tech-product-trio-responsibility-split.md`
+- `../knowledge/foundations/product-trio-operational-practices.md`
+- `../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` (solution space-principerna)
 
 **Öppna designfrågor:**
 
@@ -614,7 +614,7 @@ Designfilosofin är inspirerad av workshop-loops som tvingar deltagare bortom de
 - `workspace/context/chosen-opportunity.md` (trio-ratificerad)
 - `workspace/context/product-outcome.md`
 
-**Output:** Top 3 specifika lösningar (inga clusters, ingen discriminator). Per lösning: id, title, generating_role, round_number, description (verbatim från source), plus 2-3 meningar outcome-mapping rationale. Ingen alternatives-sektion (trio läser brainstormer-markdown om de vill överrida). Schema v0.2 i `knowledge/discovery/top-three-selection.md`.
+**Output:** Top 3 specifika lösningar (inga clusters, ingen discriminator). Per lösning: id, title, generating_role, round_number, description (verbatim från source), plus 2-3 meningar outcome-mapping rationale. Ingen alternatives-sektion (trio läser brainstormer-markdown om de vill överrida). Schema v0.2 i `../knowledge/discovery/top-three-selection.md`.
 
 **Föreslagen typ:** Skill, single-pass.
 
@@ -624,7 +624,7 @@ Designfilosofin är inspirerad av workshop-loops som tvingar deltagare bortom de
 
 **Nedströms-konsumenter:** Trio (granskar, ratificerar via `workspace/context/ratifications.md`), steg 9 (Assumption generator) som läser ratifications.md för att hitta godkänd version.
 
-**Knowledge-anchors:** `knowledge/discovery/top-three-selection.md` (schema v0.2, fyra v2 låsta beslut), `knowledge/discovery/solution-brainstorm.md` (source schema), `knowledge/discovery/opportunity-solution-tree-teresa-torres.md` (Torres-principer).
+**Knowledge-anchors:** `../knowledge/discovery/top-three-selection.md` (schema v0.2, fyra v2 låsta beslut), `../knowledge/discovery/solution-brainstorm.md` (source schema), `../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` (Torres-principer).
 
 **Låsta beslut (v2):**
 
@@ -675,8 +675,8 @@ Tre oberoende frames ger bredare täckning än en. Rolldiversifiering (PM, UX, T
 
 **Knowledge-anchors:**
 
-- `knowledge/discovery/assumption-types.md` (taxonomin för senare kategorisering)
-- `knowledge/discovery/opportunity-solution-tree-teresa-torres.md` (decompose-into-assumptions-fasen)
+- `../knowledge/discovery/assumption-types.md` (taxonomin för senare kategorisering)
+- `../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` (decompose-into-assumptions-fasen)
 - Skärmdumpsreferens: `plans/Session 3_ Opportunities, Solutions & Assumptions - Identifiera antaganden 60 min.jpg` för metodbeskrivningarna
 
 **Locked design:** See `skills-design/OST-generate-assumptions-design.md` (committed 2026-05-11). The six open questions above are resolved as:
@@ -694,7 +694,7 @@ Tre oberoende frames ger bredare täckning än en. Rolldiversifiering (PM, UX, T
 
 ### 10. Assumption categorizer
 
-**Jobb (en mening):** Klassificera varje antagande in i en av fem kategorier (desirability, usability, feasibility, viability, other) enligt taxonomin i `knowledge/discovery/assumption-types.md`.
+**Jobb (en mening):** Klassificera varje antagande in i en av fem kategorier (desirability, usability, feasibility, viability, other) enligt taxonomin i `../knowledge/discovery/assumption-types.md`.
 
 **Input:** Deduperad antagande-lista per lösning från assist 9 (`OST-generate-assumptions`).
 
@@ -708,7 +708,7 @@ Tre oberoende frames ger bredare täckning än en. Rolldiversifiering (PM, UX, T
 
 **Nedströms-konsumenter:** Steg 11 (Riskiest-assumptions agent) som läser kategoriserade antaganden från `workspace/8-assumptions-categorized/`.
 
-**Knowledge-anchors:** `knowledge/discovery/assumption-types.md` (taxonomin med definitioner och exempel), `knowledge/foundations/product-operating-model-marty-cagan.md` (Cagan five product risks som ankrar taxonomin).
+**Knowledge-anchors:** `../knowledge/discovery/assumption-types.md` (taxonomin med definitioner och exempel), `../knowledge/foundations/product-operating-model-marty-cagan.md` (Cagan five product risks som ankrar taxonomin).
 
 **Locked design:** See `skills-design/OST-assumption-categorizer-design.md` (committed 2026-05-12). The four open questions above are resolved as:
 
@@ -737,7 +737,7 @@ Efter att antagandena är genererade och kategoriserade i fas 3 ska de mest risk
 
 **Input:** Kategoriserade antaganden per lösning (från assist 12), product outcome (från assist 1), top 3-lösningar med rationale (från assist 10).
 
-**Output:** JSON enligt schemat i `knowledge/discovery/assumption-risk-mapping.md`. Per antagande: text, kategori, importance, evidence, is_riskiest, rationale.
+**Output:** JSON enligt schemat i `../knowledge/discovery/assumption-risk-mapping.md`. Per antagande: text, kategori, importance, evidence, is_riskiest, rationale.
 
 **Föreslagen typ:** Skill, single-pass scoring against låst 2x2-ramverk. Workshop-3-serien har konvergerat på skill-mönstret (även för multi-agent-orchestration som OST-generate-assumptions); en agent-paketering hade duplicerat operativ overhead utan att förbättra kapabilitet. Locked 2026-05-12.
 
@@ -749,9 +749,9 @@ Efter att antagandena är genererade och kategoriserade i fas 3 ska de mest risk
 
 **Knowledge-anchors:**
 
-- `knowledge/discovery/assumption-risk-mapping.md` (metod, frågor, JSON-schema)
-- `knowledge/discovery/assumption-types.md` (kategorierna som följer med)
-- `knowledge/discovery/opportunity-solution-tree-teresa-torres.md` (test-the-riskiest-assumptions-principen)
+- `../knowledge/discovery/assumption-risk-mapping.md` (metod, frågor, JSON-schema)
+- `../knowledge/discovery/assumption-types.md` (kategorierna som följer med)
+- `../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` (test-the-riskiest-assumptions-principen)
 - Skärmdumpsreferens: `plans/Session 3_ Opportunities, Solutions & Assumptions - Mest riskfyllda antaganden, 10 min.jpg`
 
 **Locked design:** See `skills-design/OST-riskiest-assumptions-design.md` (committed 2026-05-12). The four open questions above are resolved as:
@@ -761,7 +761,7 @@ Efter att antagandena är genererade och kategoriserade i fas 3 ska de mest risk
 - Not_sure-fallback: ingen. Binary axes only, no graded scale (carried from v0.1 anchor).
 - Pass-struktur: single cross-solution pass (matches assist-10 precedent). LLM returnerar `{id, importance, evidence, rationale}`; skill beräknar `is_riskiest = (importance=high AND evidence=weak)` deterministically.
 
-Schema bumpat till v0.2 i `knowledge/discovery/assumption-risk-mapping.md` (extension, inte replacement): full identity-mapping över upstream assist-10 output (varje upstream-fält byte-identical) plus 4 nya per-antagande-fält. Output paired JSON + markdown till `workspace/9-riskiest-assumptions/`. Markdown öppnar med Trio HITL gate banner (per-solution `Riskiest:` summary-rad + inline `[RISKIEST]`-tagg). Ingen `ratifications.md`-entry; assist 12 läser latest-by-date.
+Schema bumpat till v0.2 i `../knowledge/discovery/assumption-risk-mapping.md` (extension, inte replacement): full identity-mapping över upstream assist-10 output (varje upstream-fält byte-identical) plus 4 nya per-antagande-fält. Output paired JSON + markdown till `workspace/9-riskiest-assumptions/`. Markdown öppnar med Trio HITL gate banner (per-solution `Riskiest:` summary-rad + inline `[RISKIEST]`-tagg). Ingen `ratifications.md`-entry; assist 12 läser latest-by-date.
 
 **Prio:** Medium. Beroende av 12 (categorizer). Tekniskt enklare än fas 3-genereraren men producerar den artefakt som assumption testing kommer hänga på, så kvalitet är viktig.
 
@@ -785,7 +785,7 @@ Efter att de mest riskfyllda antagandena är flaggade i fas 4 ska de valideras. 
 
 **Output:**
 
-- **JSON** enligt schemat i `knowledge/discovery/assumption-validation.md`. Per antagande: recommended_test (med Test Card-fälten) plus alternative_tests
+- **JSON** enligt schemat i `../knowledge/discovery/assumption-validation.md`. Per antagande: recommended_test (med Test Card-fälten) plus alternative_tests
 - **Markdown Test Cards** för trio att läsa, en per antagande. Båda härleds från samma underliggande extraktion
 
 **Föreslagen typ:** Skill, single-pass Test Card design against låst category-default mapping. Workshop-3-serien har konvergerat på skill-mönstret; terminal-assist (ingen downstream-skill) gör packaging-skillnaden mellan skill och agent ännu mindre meaningful här. Locked 2026-05-12.
@@ -798,9 +798,9 @@ Efter att de mest riskfyllda antagandena är flaggade i fas 4 ska de valideras. 
 
 **Knowledge-anchors:**
 
-- `knowledge/discovery/assumption-validation.md` (Test Card-strukturen, test-typ-katalogen, JSON-schemat, markdown-formatet)
-- `knowledge/discovery/assumption-risk-mapping.md` (för att förstå inputens semantik)
-- `knowledge/discovery/opportunity-solution-tree-teresa-torres.md` (assumption testing-principerna)
+- `../knowledge/discovery/assumption-validation.md` (Test Card-strukturen, test-typ-katalogen, JSON-schemat, markdown-formatet)
+- `../knowledge/discovery/assumption-risk-mapping.md` (för att förstå inputens semantik)
+- `../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` (assumption testing-principerna)
 
 **Locked design:** See `skills-design/OST-validation-experiment-designer-design.md` (committed 2026-05-12). The six open questions above are resolved as:
 
@@ -811,7 +811,7 @@ Efter att de mest riskfyllda antagandena är flaggade i fas 4 ska de valideras. 
 - Customer-access flagging: ingen structured field; trio catcher access-needs vid HITL via test_type-inference.
 - Learning Card: deferred till v0.3 / framtida capture-skill. v1 stoppar vid "designed the test".
 
-Schema bumpat till v0.2 i `knowledge/discovery/assumption-validation.md` (extension): filtered identity-mapping över upstream assist-11 output (is_riskiest=true only; varje retained upstream-fält byte-identical) plus 2 nya per-antagande-fält. Output paired JSON + markdown till `workspace/10-validation-experiments/`. Markdown öppnar med Trio run-list handoff banner (terminal-assist framing; ingen review-and-approve gate). Ingen `ratifications.md`-entry. Twelfth and final assist in workshop-3 critical path.
+Schema bumpat till v0.2 i `../knowledge/discovery/assumption-validation.md` (extension): filtered identity-mapping över upstream assist-11 output (is_riskiest=true only; varje retained upstream-fält byte-identical) plus 2 nya per-antagande-fält. Output paired JSON + markdown till `workspace/10-validation-experiments/`. Markdown öppnar med Trio run-list handoff banner (terminal-assist framing; ingen review-and-approve gate). Ingen `ratifications.md`-entry. Twelfth and final assist in workshop-3 critical path.
 
 **Prio:** Medium. Beroende av 13 (Riskiest-assumptions agent). Sista assisten i nuvarande scope.
 

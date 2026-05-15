@@ -18,7 +18,7 @@ This skill is terminal. There is no downstream skill. The markdown output opens 
 
 ## Steps
 
-1. **Resolve scope.** Follow `knowledge/discovery/workspace-scope.md`. Discovery scope only.
+1. **Resolve scope.** Follow `../../knowledge/discovery/workspace-scope.md`. Discovery scope only.
 
 2. **Load context via parent walk-up:**
    - `<scope>/../chosen-opportunity.md`
@@ -26,10 +26,10 @@ This skill is terminal. There is no downstream skill. The markdown output opens 
    - Same-round predecessor: `<scope>/riskiest-assumptions.json` (with sibling-round fallback)
 
 3. **Read the knowledge anchors:**
-   - `knowledge/discovery/assumption-validation.md` (v0.2; Test Card structure, 12-test-type catalog, 5 selection principles, category-default mapping, success_criteria regex rule, filter + identity-mapping invariants, schema v0.2, renderer template).
-   - `knowledge/discovery/assumption-risk-mapping.md` (v0.2; upstream schema and semantics).
-   - `knowledge/discovery/assumption-types.md` (5-category taxonomy; reference for category-default mapping).
-   - `knowledge/discovery/opportunity-solution-tree-teresa-torres.md` (Torres "test the riskiest assumptions" framing, CDH ch 9).
+   - `../../knowledge/discovery/assumption-validation.md` (v0.2; Test Card structure, 12-test-type catalog, 5 selection principles, category-default mapping, success_criteria regex rule, filter + identity-mapping invariants, schema v0.2, renderer template).
+   - `../../knowledge/discovery/assumption-risk-mapping.md` (v0.2; upstream schema and semantics).
+   - `../../knowledge/discovery/assumption-types.md` (5-category taxonomy; reference for category-default mapping).
+   - `../../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` (Torres "test the riskiest assumptions" framing, CDH ch 9).
 
 4. **Locate input.** List `<scope>/riskiest-assumptions.json` (with sibling-round fallback), take the latest. Hard-exit if zero matches.
 

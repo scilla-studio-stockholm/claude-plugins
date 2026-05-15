@@ -80,7 +80,7 @@ This skill is assist <N> in `skills-design/opportunity-solution-tree-agents.md`.
 
 **Tysta degradationer.** Om en dependency saknas, säg det och exit. Inte improvisera fram ett halvbra resultat.
 
-**Egna tolkningar i citat.** För skills som hanterar kund-citat (OST-opportunity-extractor, opportunity-clusterer, comparator), bevara verbatim eller markera tweaks per `knowledge/discovery/opportunity-citation-format.md`. Inga paraphraseringar.
+**Egna tolkningar i citat.** För skills som hanterar kund-citat (OST-opportunity-extractor, opportunity-clusterer, comparator), bevara verbatim eller markera tweaks per `../knowledge/discovery/opportunity-citation-format.md`. Inga paraphraseringar.
 
 ## När mallen ska revideras
 

@@ -17,7 +17,7 @@ This skill IS the phase-3 trio HITL gate. The markdown output opens with a `Trio
 
 ## Steps
 
-1. **Resolve scope.** Follow `knowledge/discovery/workspace-scope.md`. Discovery scope only.
+1. **Resolve scope.** Follow `../../knowledge/discovery/workspace-scope.md`. Discovery scope only.
 
 2. **Load context via parent walk-up:**
    - `<scope>/../chosen-opportunity.md`
@@ -25,10 +25,10 @@ This skill IS the phase-3 trio HITL gate. The markdown output opens with a `Trio
    - Same-round predecessor: `<scope>/assumptions-categorized.json` (with sibling-round fallback)
 
 3. **Read the knowledge anchors:**
-   - `knowledge/discovery/assumption-risk-mapping.md` (v0.2; the 2x2 framework, the Swedish scoring questions, the soft-evidence rule, the rationale format rule, the carry-forward rules, the schema v0.2, the renderer template; this is the canonical source for everything below).
-   - `knowledge/discovery/assumption-types.md` (reference only; categorization is upstream).
-   - `knowledge/discovery/opportunity-solution-tree-teresa-torres.md` (the "test the riskiest assumptions" framing, CDH ch 9).
-   - `knowledge/discovery/assumption-categorization.md` (the upstream schema v0.1; parse the input JSON against this).
+   - `../../knowledge/discovery/assumption-risk-mapping.md` (v0.2; the 2x2 framework, the Swedish scoring questions, the soft-evidence rule, the rationale format rule, the carry-forward rules, the schema v0.2, the renderer template; this is the canonical source for everything below).
+   - `../../knowledge/discovery/assumption-types.md` (reference only; categorization is upstream).
+   - `../../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` (the "test the riskiest assumptions" framing, CDH ch 9).
+   - `../../knowledge/discovery/assumption-categorization.md` (the upstream schema v0.1; parse the input JSON against this).
 
 4. **Locate input.** List `<scope>/assumptions-categorized.json` (with sibling-round fallback), sort by the date in the filename descending, take the latest. Hard-exit if zero matches.
 

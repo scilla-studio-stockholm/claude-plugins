@@ -14,7 +14,7 @@ This is the locked design for **assist 12** in `opportunity-solution-tree-agents
 
 For product trios and researchers, when designing validation experiments for the riskiest assumptions surfaced in phase 4, output a paired JSON + markdown rendering with one Bland Test Card per riskiest assumption (hypothesis, test, metric, success criteria with required numeric anchor) plus 2 alternative tests. Terminal assist; trio reads, picks execution order, and runs.
 
-Input is the latest `riskiest-assumptions-*.json` in `workspace/9-riskiest-assumptions/` by date in filename (assist 11's output). Output is two files in `workspace/10-validation-experiments/` with the same root name: a validation-experiments JSON conforming to schema v0.2 in the extended knowledge anchor `knowledge/discovery/assumption-validation.md` (existing v0.1 bumped to v0.2), and a markdown rendering generated deterministically from the JSON.
+Input is the latest `riskiest-assumptions-*.json` in `workspace/9-riskiest-assumptions/` by date in filename (assist 11's output). Output is two files in `workspace/10-validation-experiments/` with the same root name: a validation-experiments JSON conforming to schema v0.2 in the extended knowledge anchor `../knowledge/discovery/assumption-validation.md` (existing v0.1 bumped to v0.2), and a markdown rendering generated deterministically from the JSON.
 
 The orchestration is a **single cross-solution LLM Test Card design pass**. One LLM call sees the filtered set of riskiest assumptions (typically 15-25 across the three solutions) plus the solution context, chosen opportunity, product outcome, the v0.1 anchor's test-type catalog and selection principles, and the v0.2 anchor's category-default mapping + success_criteria regex rule. The LLM returns one `{id, recommended_test, alternative_tests}` object per assumption. The skill then merges these 2 new fields into the filtered upstream structure.
 
@@ -79,12 +79,12 @@ That is the only input. The skill does NOT read:
 
 **Knowledge anchors read at runtime:**
 
-- **`knowledge/discovery/assumption-validation.md`** (EXISTING v0.1, bumped to v0.2 as part of this build) — owns the Test Card structure (v0.1), 12-test-type catalog (v0.1), 5 selection principles (v0.1), category-default mapping (NEW in v0.2), success_criteria regex rule (NEW in v0.2), carry-forward + filtered-identity-mapping invariants (NEW in v0.2), schema v0.2 (NEW), renderer template with run-list HITL banner (NEW in v0.2).
-- **`knowledge/discovery/assumption-risk-mapping.md`** (v0.2) — for input semantics (importance/evidence/is_riskiest definitions; schema v0.2 carry-forward shape).
-- **`knowledge/discovery/assumption-types.md`** — the 5-category taxonomy. Read for the category→default-test mapping in the new v0.2 anchor section.
-- **`knowledge/discovery/opportunity-solution-tree-teresa-torres.md`** — Torres "test the riskiest assumptions" framing (CDH ch 9).
+- **`../knowledge/discovery/assumption-validation.md`** (EXISTING v0.1, bumped to v0.2 as part of this build) — owns the Test Card structure (v0.1), 12-test-type catalog (v0.1), 5 selection principles (v0.1), category-default mapping (NEW in v0.2), success_criteria regex rule (NEW in v0.2), carry-forward + filtered-identity-mapping invariants (NEW in v0.2), schema v0.2 (NEW), renderer template with run-list HITL banner (NEW in v0.2).
+- **`../knowledge/discovery/assumption-risk-mapping.md`** (v0.2) — for input semantics (importance/evidence/is_riskiest definitions; schema v0.2 carry-forward shape).
+- **`../knowledge/discovery/assumption-types.md`** — the 5-category taxonomy. Read for the category→default-test mapping in the new v0.2 anchor section.
+- **`../knowledge/discovery/opportunity-solution-tree-teresa-torres.md`** — Torres "test the riskiest assumptions" framing (CDH ch 9).
 
-## The knowledge anchor extension: `knowledge/discovery/assumption-validation.md` → v0.2
+## The knowledge anchor extension: `../knowledge/discovery/assumption-validation.md` → v0.2
 
 The existing v0.1 anchor (committed 2026-05-06) stays intact. Five new sections appended; Evolution table updated.
 
@@ -421,15 +421,15 @@ Total riskiest: <N>. Total Test Cards: <N>.
 
 As part of building this skill:
 
-- **Bump `knowledge/discovery/assumption-validation.md` to v0.2.** Append 5 new sections (category-default mapping, success_criteria regex rule, carry-forward + filter + identity-mapping invariants, schema v0.2, renderer template). Append Evolution row dated 2026-05-12 ("Extended for OST-validation-experiment-designer skill: filtered identity-mapping over upstream assist-11 output, category-default + named-override selection rule, regex-anchored success_criteria, schema v0.2 with full carry-forward + 2 new per-assumption fields, renderer template with run-list HITL banner."). Update frontmatter date to 2026-05-12. v0.1 content stays intact.
+- **Bump `../knowledge/discovery/assumption-validation.md` to v0.2.** Append 5 new sections (category-default mapping, success_criteria regex rule, carry-forward + filter + identity-mapping invariants, schema v0.2, renderer template). Append Evolution row dated 2026-05-12 ("Extended for OST-validation-experiment-designer skill: filtered identity-mapping over upstream assist-11 output, category-default + named-override selection rule, regex-anchored success_criteria, schema v0.2 with full carry-forward + 2 new per-assumption fields, renderer template with run-list HITL banner."). Update frontmatter date to 2026-05-12. v0.1 content stays intact.
 - **Update `skills-design/skill-template.md` Bygg-status** — mark `OST-validation-experiment-designer` as built. Update the tail count from `en` to `0` or remove the "Övriga … återstår" line entirely (workshop-3 critical path complete). Final task in the implementation plan.
 - **Update `skills-design/opportunity-solution-tree-agents.md`** — replace section 12's six open design questions with a reference to the locked design at `skills-design/OST-validation-experiment-designer-design.md`. Update "Föreslagen typ" from "Agent" to "Skill (single-pass Test Card design against locked category-default mapping)" to match the actual decision.
 
 What is NOT updated:
 
-- `knowledge/discovery/assumption-types.md` — read for category mapping; no changes.
-- `knowledge/discovery/assumption-risk-mapping.md` — read for upstream schema; no changes.
-- `knowledge/discovery/opportunity-solution-tree-teresa-torres.md` — referenced but not extended.
+- `../knowledge/discovery/assumption-types.md` — read for category mapping; no changes.
+- `../knowledge/discovery/assumption-risk-mapping.md` — read for upstream schema; no changes.
+- `../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` — referenced but not extended.
 - `workspace/context/ratifications.md` — intentionally NOT appended. Terminal assist; no ratification mechanism.
 
 ## Error handling
