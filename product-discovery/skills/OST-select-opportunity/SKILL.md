@@ -21,16 +21,16 @@ The output is a **proposal**, not a decision-of-record. The trio reviews and rat
 
 ## Steps
 
-1. **Resolve scope.** Follow `../../knowledge/discovery/workspace-scope.md`. Portfolio scope only.
+1. **Resolve scope.** Follow `references/workspace-scope.md`. Portfolio scope only.
 
 2. **Load context via parent walk-up:**
    - `<scope>/../../_product-context/product-outcome.md`
    - Same-round predecessor: `<scope>/comparison-matrix.json`
 
 3. **Read the knowledge anchors:**
-   - `../../knowledge/discovery/opportunity-selection.md` - the chosen-opportunity schema (v0.1), the three-step decision rule, the tie-handling convention, the evidence-gap-filter convention, the no-effort reminder.
-   - `../../knowledge/discovery/opportunity-comparison.md` - the matrix schema (v0.1), the criteria definitions, the score vocabulary.
-   - `../../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` - Torres principles, especially "Don't assess effort during opportunity selection".
+   - `references/opportunity-selection.md` - the chosen-opportunity schema (v0.1), the three-step decision rule, the tie-handling convention, the evidence-gap-filter convention, the no-effort reminder.
+   - `references/opportunity-comparison.md` - the matrix schema (v0.1), the criteria definitions, the score vocabulary.
+   - `references/opportunity-solution-tree-teresa-torres.md` - Torres principles, especially "Don't assess effort during opportunity selection".
 
 4. **Locate inputs:**
    - `<scope>/comparison-matrix.json` (same-round predecessor).
@@ -78,7 +78,7 @@ The output is a **proposal**, not a decision-of-record. The trio reviews and rat
       - **Excluded:** the gap is real but doesn't affect solution work (e.g., political/governance unknowns, market-size unknowns when the chosen opp is internal-only). Add to `evidence_gaps_excluded[]` with a 1-sentence `why_excluded`.
     - The two lists together cover every chosen-opp `unknown` cell. `n/a` cells are not gaps and appear in neither list.
 
-14. **Compose the v0.1 JSON.** All fields per the schema in `../../knowledge/discovery/opportunity-selection.md`. Top-level scalar fields are carried, not invented:
+14. **Compose the v0.1 JSON.** All fields per the schema in `references/opportunity-selection.md`. Top-level scalar fields are carried, not invented:
     - `schema_version`: literal `"0.1"`.
     - `team`: carry from the comparison matrix's top-level `team` field.
     - `title`: carry from the comparison matrix's top-level `title` field. Do NOT derive from the chosen opportunity's quote.
@@ -137,7 +137,7 @@ Source product outcome: `<scope>/../../_product-context/product-outcome.md`
 Schema version: 0.1
 Paired JSON: `chosen-opportunity-proposal.json`
 
-> **Trio HITL:** This is the AI's proposal. Review the rationale, override if you disagree, then create a new opportunity folder at `workspace/<team>/<product>/opportunities/<opp-slug>/` (slug from the chosen opportunity's title per `../../knowledge/discovery/workspace-scope.md`) and ratify into `<that folder>/chosen-opportunity.md`.
+> **Trio HITL:** This is the AI's proposal. Review the rationale, override if you disagree, then create a new opportunity folder at `workspace/<team>/<product>/opportunities/<opp-slug>/` (slug from the chosen opportunity's title per `references/workspace-scope.md`) and ratify into `<that folder>/chosen-opportunity.md`.
 
 ## Product outcome
 

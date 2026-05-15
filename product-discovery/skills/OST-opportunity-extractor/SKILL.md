@@ -21,12 +21,12 @@ If a transcript is long enough that you would be tempted to skim or sample, disp
 
 ## Steps
 
-1. **Resolve scope.** Follow `../../knowledge/discovery/workspace-scope.md`. Portfolio scope only — the resolved path must contain `/portfolio/`. If no portfolio round exists for the target product yet, create a new round folder dated today: `workspace/<team>/<product>/portfolio/<YYYY-MM-DD>/`.
+1. **Resolve scope.** Follow `references/workspace-scope.md`. Portfolio scope only — the resolved path must contain `/portfolio/`. If no portfolio round exists for the target product yet, create a new round folder dated today: `workspace/<team>/<product>/portfolio/<YYYY-MM-DD>/`.
 
 2. **Load context via parent walk-up (optional):**
    - `<scope>/../../_product-context/product-outcome.md` (if it exists; the extractor can run without it)
 
-3. **Read the format anchor:** `../../knowledge/discovery/opportunity-citation-format.md` — for citat-stickie format, tweak rules, and when to tweak.
+3. **Read the format anchor:** `references/opportunity-citation-format.md` — for citat-stickie format, tweak rules, and when to tweak.
 
 4. **Confirm transcript inputs.** If the user gave file paths, use them. If they gave a folder, list the transcript files and confirm. Skip non-transcript siblings in the same folder (synthesis docs, coaching notes, interviewer-technique feedback). If a transcript file has a feedback or coaching preamble before the actual conversation, identify where the conversation starts and only extract from the conversation portion.
 

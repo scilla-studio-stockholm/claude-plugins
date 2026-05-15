@@ -13,7 +13,7 @@ This skill is assist 2 in `skills-design/opportunity-solution-tree-agents.md`. T
 
 ## Steps
 
-1. **Resolve scope.** Follow `../../knowledge/discovery/workspace-scope.md`. Portfolio scope only.
+1. **Resolve scope.** Follow `references/workspace-scope.md`. Portfolio scope only.
 
 2. **Resolve target paths:**
    - Output: `<scope>/experience-map-extracted.{md,json}`
@@ -21,7 +21,7 @@ This skill is assist 2 in `skills-design/opportunity-solution-tree-agents.md`. T
 3. **Load context (optional):**
    - `<scope>/../../_product-context/product-outcome.md` — fallback for the `product_outcome` field if it's missing from the screenshot.
 
-4. **Read the knowledge anchor** at `../../knowledge/discovery/experience-mapping.md` for schema v0.1 and the structural pattern.
+4. **Read the knowledge anchor** at `references/experience-mapping.md` for schema v0.1 and the structural pattern.
 
 5. **Get input from the user.** Ask for a screenshot path. Default to `<scope>/../../_product-context/experience-map.png` if present, otherwise check for `<scope>/../../_product-context/experience-map.jpg`. If neither exists, prompt the user explicitly. If both exist, use the PNG and emit a warning that both were present.
 

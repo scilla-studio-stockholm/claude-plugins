@@ -15,7 +15,7 @@ The output is a **proposal** that assist 8 (top-3 selector) consumes. The trio r
 
 ## Steps
 
-1. **Resolve scope.** Follow `../../knowledge/discovery/workspace-scope.md`. Discovery scope only; hard-exit if the resolved scope contains `/portfolio/`.
+1. **Resolve scope.** Follow `references/workspace-scope.md`. Discovery scope only; hard-exit if the resolved scope contains `/portfolio/`.
 
 2. **Load context via parent walk-up:**
    - `<scope>/../chosen-opportunity.md`
@@ -23,8 +23,8 @@ The output is a **proposal** that assist 8 (top-3 selector) consumes. The trio r
    - Same-round predecessor: `<scope>/solution-candidates.json`. If missing in `<scope>`, walk siblings (other dated rounds under the same opportunity) in date-descending order.
 
 3. **Read the knowledge anchors:**
-   - `../../knowledge/discovery/solution-cluster.md` - the clustered-solutions schema (v0.1), the four locked decisions, the clustering-axis convention, the chosen-opp cross-check rule, the field-notes section.
-   - `../../knowledge/discovery/solution-brainstorm.md` - the source schema (v0.1) so you can parse what `OST-brainstorm-solutions` produced.
+   - `references/solution-cluster.md` - the clustered-solutions schema (v0.1), the four locked decisions, the clustering-axis convention, the chosen-opp cross-check rule, the field-notes section.
+   - `references/solution-brainstorm.md` - the source schema (v0.1) so you can parse what `OST-brainstorm-solutions` produced.
 
 4. **Locate inputs:**
    - `<scope>/solution-candidates.json` (same-round predecessor; walk siblings in date-descending order if missing in `<scope>`).

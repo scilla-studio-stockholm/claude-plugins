@@ -1,0 +1,1 @@
+../../../knowledge/foundations/tech-product-trio-responsibility-split.md

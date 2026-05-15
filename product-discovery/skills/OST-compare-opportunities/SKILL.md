@@ -15,16 +15,16 @@ The comparator filters by verdict before scoring: only `verdict == "approved"` o
 
 ## Steps
 
-1. **Resolve scope.** Follow `../../knowledge/discovery/workspace-scope.md`. Portfolio scope only.
+1. **Resolve scope.** Follow `references/workspace-scope.md`. Portfolio scope only.
 
 2. **Load context via parent walk-up:**
    - `<scope>/../../_product-context/product-outcome.md`
    - Same-round predecessor: `<scope>/experience-map-clustered.json` and `<scope>/opportunities-validated.md`
 
 3. **Read the knowledge anchors:**
-   - `../../knowledge/discovery/opportunity-comparison.md` - the matrix schema (v0.1), the five criteria, the score vocabulary, the trace-back rule, the no-effort rule.
-   - `../../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` - Torres principles, especially "Don't assess effort during opportunity selection".
-   - `../../knowledge/discovery/experience-mapping.md` - schema v0.2 of the input clustered JSON.
+   - `references/opportunity-comparison.md` - the matrix schema (v0.1), the five criteria, the score vocabulary, the trace-back rule, the no-effort rule.
+   - `references/opportunity-solution-tree-teresa-torres.md` - Torres principles, especially "Don't assess effort during opportunity selection".
+   - `references/experience-mapping.md` - schema v0.2 of the input clustered JSON.
 
 4. **Locate inputs:**
    - `<scope>/experience-map-clustered.json` (same-round predecessor).
@@ -74,7 +74,7 @@ The comparator filters by verdict before scoring: only `verdict == "approved"` o
 
    `n/a` cells do not appear here. Empty array if no `unknown` cells.
 
-10. **Compose the v0.1 JSON.** All fields per the schema in `../../knowledge/discovery/opportunity-comparison.md`. Per the missing-optional convention, omit any optional key whose value isn't set; never write `null`. `opportunities_excluded[]` and `evidence_gaps[]` are written as empty arrays when applicable, never as `null` and never omitted.
+10. **Compose the v0.1 JSON.** All fields per the schema in `references/opportunity-comparison.md`. Per the missing-optional convention, omit any optional key whose value isn't set; never write `null`. `opportunities_excluded[]` and `evidence_gaps[]` are written as empty arrays when applicable, never as `null` and never omitted.
 
 11. **Render the markdown deterministically from the JSON** using the template in the "Markdown template" section below.
 

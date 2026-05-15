@@ -9,13 +9,13 @@ You help a product trio pick the 3 specific solutions with the strongest probabi
 
 This skill is assist 8 in `skills-design/opportunity-solution-tree-agents.md`. The full design lives in `skills-design/OST-select-top-three-solutions-design.md` (v2 spec).
 
-The output is a **proposal** that assist 9 (assumption generator) consumes after trio ratification. The trio reviews the markdown, edits if needed, then appends one line to `<scope>/../ratifications.md` (the ratification-flag pattern defined in `../../knowledge/discovery/top-three-selection.md`). This skill does NOT write outside `<scope>/`.
+The output is a **proposal** that assist 9 (assumption generator) consumes after trio ratification. The trio reviews the markdown, edits if needed, then appends one line to `<scope>/../ratifications.md` (the ratification-flag pattern defined in `references/top-three-selection.md`). This skill does NOT write outside `<scope>/`.
 
 **Out of scope:** clustering or grouping solutions (`OST-cluster-solutions` is a separate optional skill, not consumed here), generating assumptions per pick (assist 9), re-brainstorming (assist 6), reading interview transcripts or the comparison matrix (everything needed is in the brainstormer JSON + the two parent-walk-up context files), surfacing alternatives or runners-up as a structured field (trio reads brainstormer markdown directly), scoring or ranking numerically, weighing effort or feasibility (Torres principle, carried), applying mechanism diversification as a constraint.
 
 ## Steps
 
-1. **Resolve scope.** Follow `../../knowledge/discovery/workspace-scope.md`. Discovery scope only.
+1. **Resolve scope.** Follow `references/workspace-scope.md`. Discovery scope only.
 
 2. **Load context via parent walk-up:**
    - `<scope>/../chosen-opportunity.md`
@@ -23,9 +23,9 @@ The output is a **proposal** that assist 9 (assumption generator) consumes after
    - Same-round predecessor: `<scope>/solution-candidates.json` (with sibling-round fallback)
 
 3. **Read the knowledge anchors:**
-   - `../../knowledge/discovery/top-three-selection.md` - the v0.2 schema, the four v2 locked decisions, the no-effort rule, the ratification-flag pattern, the field-notes section.
-   - `../../knowledge/discovery/solution-brainstorm.md` - the source schema (v0.1) so you can parse what `OST-brainstorm-solutions` produced.
-   - `../../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` - Torres principles. The canonical anchor is "Choose three solutions to explore in parallel" (CDH ch 7 step 6). The "Don't assess effort during opportunity selection" rule is carried to solution selection prose.
+   - `references/top-three-selection.md` - the v0.2 schema, the four v2 locked decisions, the no-effort rule, the ratification-flag pattern, the field-notes section.
+   - `references/solution-brainstorm.md` - the source schema (v0.1) so you can parse what `OST-brainstorm-solutions` produced.
+   - `references/opportunity-solution-tree-teresa-torres.md` - Torres principles. The canonical anchor is "Choose three solutions to explore in parallel" (CDH ch 7 step 6). The "Don't assess effort during opportunity selection" rule is carried to solution selection prose.
 
 4. **Locate inputs:**
    - Latest `solution-candidates.json` in `<scope>/` (with sibling-round fallback).

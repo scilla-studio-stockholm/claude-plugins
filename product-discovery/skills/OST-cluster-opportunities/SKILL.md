@@ -13,16 +13,16 @@ This skill is assist 3b in `skills-design/opportunity-solution-tree-agents.md`. 
 
 ## Steps
 
-1. **Resolve scope.** Follow `../../knowledge/discovery/workspace-scope.md`. Portfolio scope only.
+1. **Resolve scope.** Follow `references/workspace-scope.md`. Portfolio scope only.
 
 2. **Load context via parent walk-up:**
    - `<scope>/../../_product-context/product-outcome.md`
    - Same-round predecessor: `<scope>/experience-map-extracted.{md,json}` and `<scope>/opportunities-extracted.md`
 
 3. **Read the knowledge anchors:**
-   - `../../knowledge/discovery/experience-mapping.md` — schema v0.2 and the structural pattern.
-   - `../../knowledge/discovery/opportunity-citation-format.md` — citation conventions, used to read the source/quote structure.
-   - `../../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` — opportunity-space principles, used as the lens for parent-child grouping.
+   - `references/experience-mapping.md` — schema v0.2 and the structural pattern.
+   - `references/opportunity-citation-format.md` — citation conventions, used to read the source/quote structure.
+   - `references/opportunity-solution-tree-teresa-torres.md` — opportunity-space principles, used as the lens for parent-child grouping.
 
 4. **Locate the three input files** in `<scope>/`:
    - `<scope>/experience-map-extracted.json` — the extracted experience map (v0.1 from `OST-extract-experience-map`).
@@ -86,7 +86,7 @@ The five hard-exit triggers:
 
 | Trigger | Looked for | Remedy |
 |---|---|---|
-| `<scope>/experience-map-extracted.json` not found | The extracted experience map at the resolved scope path | Run `OST-extract-experience-map` and confirm scope resolution via `../../knowledge/discovery/workspace-scope.md` |
+| `<scope>/experience-map-extracted.json` not found | The extracted experience map at the resolved scope path | Run `OST-extract-experience-map` and confirm scope resolution via `references/workspace-scope.md` |
 | `<scope>/opportunities-validated.md` not found | The validated opportunity table at the resolved scope path | Run `OST-validate-opportunities` |
 | `<scope>/opportunities-extracted.md` not found | The extracted opportunities (full quotes) at the resolved scope path | Run `OST-opportunity-extractor` or capture opportunities manually in citat-stickie format |
 | Experience-map JSON does not parse, or required v0.1 fields missing/empty | Schema-conformant `product_outcome`, `title`, `team`, non-empty `phases[]` with `name`/`order`/non-empty `steps[]` per phase | Re-run `OST-extract-experience-map` against the source screenshot |

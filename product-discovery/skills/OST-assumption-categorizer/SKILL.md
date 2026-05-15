@@ -15,7 +15,7 @@ The skill is an identity map over upstream assumptions plus one new `category` f
 
 ## Steps
 
-1. **Resolve scope.** Follow `../../knowledge/discovery/workspace-scope.md`. Discovery scope only.
+1. **Resolve scope.** Follow `references/workspace-scope.md`. Discovery scope only.
 
 2. **Load context via parent walk-up:**
    - `<scope>/../chosen-opportunity.md`
@@ -23,10 +23,10 @@ The skill is an identity map over upstream assumptions plus one new `category` f
    - Same-round predecessor: `<scope>/assumptions.json` (with sibling-round fallback)
 
 3. **Read the knowledge anchors:**
-   - `../../knowledge/discovery/assumption-categorization.md` (the schema, the category enum, the risk-falls tiebreaker rule, the 'other'-reservation rule, the carry-forward rules, the renderer template; this is the canonical source for everything below).
-   - `../../knowledge/discovery/assumption-types.md` (read the full "Definition" and "Application notes" sections per category; this is the authoritative taxonomy source the classification pass applies).
-   - `../../knowledge/foundations/product-operating-model-marty-cagan.md` (the Cagan-five framing that anchors the taxonomy).
-   - `../../knowledge/discovery/assumption-generation.md` (the upstream schema v0.1; parse the input JSON against this).
+   - `references/assumption-categorization.md` (the schema, the category enum, the risk-falls tiebreaker rule, the 'other'-reservation rule, the carry-forward rules, the renderer template; this is the canonical source for everything below).
+   - `references/assumption-types.md` (read the full "Definition" and "Application notes" sections per category; this is the authoritative taxonomy source the classification pass applies).
+   - `references/product-operating-model-marty-cagan.md` (the Cagan-five framing that anchors the taxonomy).
+   - `references/assumption-generation.md` (the upstream schema v0.1; parse the input JSON against this).
 
 4. **Locate input.** List `<scope>/assumptions.json` (with sibling-round fallback), take the latest. Hard-exit if zero matches.
 

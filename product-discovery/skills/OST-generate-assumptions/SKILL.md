@@ -9,7 +9,7 @@ You help a product trio decompose their 3 chosen solutions into the assumptions 
 
 ## Prerequisites
 
-- The trio has ratified a top-three-solutions proposal by appending a line to `<scope>/../ratifications.md` per the format in `../../knowledge/discovery/top-three-selection.md`.
+- The trio has ratified a top-three-solutions proposal by appending a line to `<scope>/../ratifications.md` per the format in `references/top-three-selection.md`.
 - `<scope>/../chosen-opportunity.md` exists with a parseable bold-id row.
 - `<scope>/../../../_product-context/product-outcome.md` exists with a `## Outcome` section.
 - `<scope>/../../../_product-context/experience-map.json` (or `.md`) exists.
@@ -17,7 +17,7 @@ You help a product trio decompose their 3 chosen solutions into the assumptions 
 
 ## Steps
 
-1. **Resolve scope.** Follow `../../knowledge/discovery/workspace-scope.md`. Discovery scope only.
+1. **Resolve scope.** Follow `references/workspace-scope.md`. Discovery scope only.
 
 2. **Load context via parent walk-up:**
    - `<scope>/../chosen-opportunity.md`
@@ -27,10 +27,10 @@ You help a product trio decompose their 3 chosen solutions into the assumptions 
    - `<scope>/../../../_product-context/experience-map.json` (or `.md`) — the experience map for context
 
 3. **Read the knowledge anchors:**
-   - `../../knowledge/discovery/assumption-generation.md` (the schema and the three-method definitions; this is the canonical source for everything below).
-   - `../../knowledge/discovery/assumption-types.md` (read the "Definition" and "Application notes" sections for the meaning of "assumption". Do NOT apply the 5-category taxonomy here; that is assist 10's job).
-   - `../../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` (the decompose-into-assumptions framing, CDH ch 8).
-   - `../../knowledge/discovery/top-three-selection.md` (the source schema v0.2 and the ratification-flag pattern).
+   - `references/assumption-generation.md` (the schema and the three-method definitions; this is the canonical source for everything below).
+   - `references/assumption-types.md` (read the "Definition" and "Application notes" sections for the meaning of "assumption". Do NOT apply the 5-category taxonomy here; that is assist 10's job).
+   - `references/opportunity-solution-tree-teresa-torres.md` (the decompose-into-assumptions framing, CDH ch 8).
+   - `references/top-three-selection.md` (the source schema v0.2 and the ratification-flag pattern).
 
 4. **Locate inputs:**
 

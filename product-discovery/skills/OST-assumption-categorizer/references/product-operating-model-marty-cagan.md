@@ -1,0 +1,1 @@
+../../../knowledge/foundations/product-operating-model-marty-cagan.md

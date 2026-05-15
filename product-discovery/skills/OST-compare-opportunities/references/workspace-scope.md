@@ -1,0 +1,1 @@
+../../../knowledge/discovery/workspace-scope.md
