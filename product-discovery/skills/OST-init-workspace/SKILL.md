@@ -1,0 +1,63 @@
+---
+name: OST-init-workspace
+description: For product trios setting up a new repo for OST discovery work, when the workspace/ tree does not yet exist or a new product/opportunity needs scaffolding, output the team/product directory layout, context templates (product-outcome.md, experience-map.md), and a .current-scope pointer so all OST-* skills resolve paths correctly. Use when teammates outside the original Metria layout want to run OST skills and the workspace conventions need to be bootstrapped.
+user_invocable: true
+---
+
+# OST-init-workspace
+
+Scaffolds the `workspace/<team>/<product>/...` directory tree, context templates, and `.current-scope` pointer that every other OST-* skill in this plugin depends on. Without this scaffold, downstream skills hard-exit on missing files (`product-outcome.md`, `experience-map.{md,json}`, etc.).
+
+This skill is the entry point to the OST collection in any repo that is not already structured like the original Metria workspace.
+
+## Prerequisites
+
+- Run from the repo root where the `workspace/` directory should live.
+- No other skills required.
+
+## Steps
+
+1. **Read the knowledge anchor** at `references/workspace-scope.md`. It defines the directory hierarchy, the scope-resolution protocol, canonical filenames, and slug rules. Apply these — do not invent.
+
+2. **Get input from the user.** Required:
+   - `team` slug (short, lowercase, ASCII; transliterate Swedish chars: `å→a, ä→a, ö→o`)
+   - `product` slug (same slug rules)
+
+   Optional:
+   - `opportunity` slug — if given, also scaffolds `opportunities/<opp>/chosen-opportunity.md` plus an empty discovery round folder dated today, and points `.current-scope` at that round.
+   - `portfolio` flag — if set, scaffolds `portfolio/<today>/` and points `.current-scope` there. Mutually exclusive with `opportunity`.
+   - `date` (YYYY-MM-DD) — overrides today for the round folder name. Useful for back-dating.
+
+   If the user passes a Swedish name (e.g. "Sök på karta"), transliterate it to a slug (`sok-pa-karta`) and confirm with the user before scaffolding. The full Swedish title belongs in the file frontmatter, not the path.
+
+3. **Run the scaffold script:**
+
+   ```bash
+   bash "${CLAUDE_PLUGIN_ROOT}/skills/OST-init-workspace/scripts/init_workspace.sh" \
+     --team <team> --product <product> \
+     [--opportunity <opp>] [--portfolio] [--date YYYY-MM-DD]
+   ```
+
+   The script is idempotent: existing files are never overwritten, only created if missing. Each action prints `CREATED`, `SKIPPED (exists)`, or `ERROR`. The summary at the end lists every path touched.
+
+4. **Print the script's stdout verbatim.** Do not paraphrase paths or rename files. The script is the source of truth for what was scaffolded.
+
+5. **Tell the user what to do next.** Pick the relevant pointer:
+   - If `_product-context/product-outcome.md` was newly created: "Open `workspace/<team>/<product>/_product-context/product-outcome.md` and write the product outcome before running any other OST skill. Skills hard-exit when this file is empty or contains the TBD placeholder."
+   - If `_product-context/experience-map.md` was newly created and no `.png/.jpg` is present: "Either save an experience-map screenshot at `_product-context/experience-map.png` and run `OST-extract-experience-map`, or write the journey into `experience-map.md` directly."
+   - If `.current-scope` was set: "Scope is set to `<path>`. Subsequent OST-* skills will read/write inside that folder unless you pass `scope=` explicitly."
+
+## Output principles
+
+- **Idempotent always.** Re-running the skill on an existing workspace must be safe. Never overwrite files. Print `SKIPPED (exists)` for anything already present.
+- **No silent decisions.** If the user gives a non-slug input (uppercase, spaces, non-ASCII), transliterate to a slug and confirm before scaffolding. Do not scaffold under a wrong path and let the user discover it later.
+- **Templates prompt for action.** Every template file written contains a `TBD` marker and a one-line instruction for what the human needs to fill in and why. Downstream OST skills already hard-exit on missing content; the TBD marker signals "this file exists but is not ready yet."
+- **One scaffold per invocation.** If the user wants to add a second opportunity later, they re-invoke with the new `opportunity=` value. Do not try to scaffold multiple opportunities in one call.
+
+## What this skill does NOT do
+
+- Write the product outcome, experience map, or opportunity citation. Those are the human's job; templates only prompt for them.
+- Run downstream OST skills. After scaffolding, the user picks the next skill themselves.
+- Migrate existing non-conforming directories into the workspace convention. Out of scope; if the user has prior artifacts in a different layout, they move them manually.
+- Set up the `product-discovery` plugin itself. That happens via `/plugin install product-discovery@scilla-studio` and is a prerequisite for this skill being available at all.
+- Initialize git, create README.md at repo root, or touch anything outside `workspace/`. The skill scopes its writes to `workspace/` only.
