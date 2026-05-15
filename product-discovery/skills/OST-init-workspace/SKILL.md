@@ -1,6 +1,6 @@
 ---
 name: OST-init-workspace
-description: For product trios setting up a new repo for OST discovery work, when the workspace/ tree does not yet exist or a new product/opportunity needs scaffolding, output the team/product directory layout, context templates (product-outcome.md, experience-map.md), and a .current-scope pointer so all OST-* skills resolve paths correctly. Use when teammates outside the original Metria layout want to run OST skills and the workspace conventions need to be bootstrapped.
+description: Low-level scaffolding for the OST workspace tree. Use when an existing workspace needs a new product, opportunity, or portfolio round folder added without running the full guided setup, or when invoked as a building block by OST-setup-product. For first-time setup of a new product, prefer OST-setup-product, which wraps this skill and also walks the trio through filling in product-outcome.md, experience-map.md, and chosen-opportunity.md.
 user_invocable: true
 ---
 

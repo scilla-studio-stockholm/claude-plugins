@@ -4,7 +4,7 @@ Scilla Studio Claude Code skills/plugins library. Four collections:
 - `scilla-research/` — 9 PM/research skills (competitive teardown, CSV summarizer, feedback triage, JTBD interview planner, knowledge capture/finder, research docs, transcript cleaner, **cost-review**)
 - `scilla-writing/` — 2 writing skills (case study, LinkedIn post)
 - `prototype-kit/` — 4 prototype skills (add-component, add-prototype, design-system, setup-kit)
-- `product-discovery/` — 14 OST (Opportunity Solution Tree) skills for workshop-driven discovery (13 phase assists + `OST-init-workspace` for scaffolding)
+- `product-discovery/` — 15 OST (Opportunity Solution Tree) skills for workshop-driven discovery (13 phase assists + `OST-init-workspace` for scaffolding + `OST-setup-product` as the guided entrypoint)
 
 Marketplace: `scilla-studio` (GitHub source: `scilla-studio-stockholm/claude-plugins`, `autoUpdate: true`). Plugin cache mirrors at `~/.claude/plugins/cache/scilla-studio/<plugin-name>/1.0.0/`. With autoUpdate on, the marketplace clone (`~/.claude/plugins/marketplaces/scilla-studio/`) pulls from GitHub on session start; force-sync within a session by copying `<plugin>/skills/<skill>/` into the cache path.
 
@@ -30,7 +30,16 @@ Teammates need GitHub auth (`gh auth login`) since the repo is private.
 
 ## Current State
 
-**In progress:** Nothing active. Last shipped: `OST-init-workspace` skill (2026-05-15), merged to `master`.
+**In progress:** Nothing active. Last shipped: `OST-setup-product` skill (2026-05-15), merged to `master`. Same day: `OST-init-workspace`.
+
+**Recent decisions (OST-setup-product build, 2026-05-15):**
+- Sits above `OST-init-workspace` as the guided entrypoint. Wraps init's script and adds an interview that fills `product-outcome.md`, `experience-map.md`, and (optional) `chosen-opportunity.md`. Closes the "templates exist but no one fills them" gap — without this skill, the user has to infer where the files live and write them by hand.
+- Orchestrator-wraps-primitive pattern over linear-pipeline-with-pointer. Reason: the inference problem we were solving was "users don't read 'next steps' output and act on it." A printed pointer keeps the inference problem; wrapping removes it. Init is still independently invokable for advanced users; the NL trigger for "set up OST" routes to the orchestrator.
+- Interview is one-question-at-a-time, read-anchor-before-drafting, show-confirm-write. Three interviews in fixed order: product outcome → experience map → chosen opportunity. Each can be skipped/deferred.
+- Experience map has a three-way fork: screenshot exists → defer to `OST-extract-experience-map`; user writes inline → walk through schema v0.1; defer → leave TBD with remedy printed in final summary.
+- Re-running on a filled workspace short-circuits (init's script is idempotent; orchestrator's step-4 content detection handles the rest). No re-interviewing already-filled files.
+- Bundles 5 knowledge anchors in `references/` (workspace-scope, two product-outcome refs, experience-mapping, opportunity-citation-format). Matches the per-skill `references/` duplication pattern that the 13 phase assists already use.
+- Init's description rewritten to scope it down to "low-level scaffolding / building block." Orchestrator owns "set up OST" / "kick off discovery" NL triggers.
 
 **Recent decisions (OST-init-workspace build, 2026-05-15):**
 - Closes the "OST skills assume Metria layout" gap. The 13 phase-assist skills reference `<scope>/../../_product-context/...` and `workspace/<team>/<product>/...` paths but no skill bundled the scaffold — teammates outside the original repo hit hard-exits on missing files. This skill bootstraps the structure.
@@ -50,6 +59,7 @@ Teammates need GitHub auth (`gh auth login`) since the repo is private.
 - API list pricing (April 2026), not actual Pro/Max bill. Stated as caveat everywhere.
 
 **Next steps (when picked up):**
+- `OST-setup-product`: not yet tested with a real trio — only static review. First live use is the real test (does the interview flow feel natural, does the experience-map fork land cleanly, does the orchestrator route to the right next OST-* skill in its final summary). Watch for friction points and tighten.
 - `OST-init-workspace`: no known issues from smoke testing. Watch for teammate feedback on whether the `--opportunity`/`--portfolio` split is intuitive or whether a single round-type flag reads better.
 - `cost-review`: output-heavy detector tip "use Edit instead of Write" overfit in observed sessions — actual driver was subagent dispatches and Edit volume, not Write. Consider adding a sub-detector or rephrasing the tip.
 - `cost-review`: daily timeline bar scale uses all-time max, not 30-day max — recent bars get compressed when older days dominated. Minor cosmetic.
