@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build the `cost-review` skill — a repo-agnostic Claude Code cost analyzer + cost-reduction coach — per spec at `joni-skills/skills/cost-review/DESIGN.md`.
+**Goal:** Build the `cost-review` skill — a repo-agnostic Claude Code cost analyzer + cost-reduction coach — per spec at `scilla-research/skills/cost-review/DESIGN.md`.
 
 **Architecture:** Single Python 3.8+ script (`scripts/analyze_costs.py`) with no third-party dependencies (stdlib only). Walks JSONL transcripts under `~/.claude/projects/<encoded-cwd>/`, aggregates token usage, applies hardcoded API list pricing, runs 6 signal detectors, prints a human report or emits JSON. SKILL.md frames invocation and follow-up. Reference doc explains each signal in depth.
 
@@ -13,7 +13,7 @@
 ## File Structure
 
 ```
-joni-skills/skills/cost-review/
+scilla-research/skills/cost-review/
 ├── SKILL.md                                # Task 13
 ├── DESIGN.md                               # already done
 ├── PLAN.md                                 # this file
@@ -53,20 +53,20 @@ All Python lives in `analyze_costs.py` as module-level functions (no classes; YA
 ### Task 1: Project skeleton + path encoder
 
 **Files:**
-- Create: `joni-skills/skills/cost-review/scripts/analyze_costs.py`
-- Create: `joni-skills/skills/cost-review/tests/__init__.py`
-- Create: `joni-skills/skills/cost-review/tests/test_analyze_costs.py`
+- Create: `scilla-research/skills/cost-review/scripts/analyze_costs.py`
+- Create: `scilla-research/skills/cost-review/tests/__init__.py`
+- Create: `scilla-research/skills/cost-review/tests/test_analyze_costs.py`
 
 - [ ] **Step 1: Create empty package init for tests**
 
 ```bash
-mkdir -p joni-skills/skills/cost-review/tests/fixtures
-touch joni-skills/skills/cost-review/tests/__init__.py
+mkdir -p scilla-research/skills/cost-review/tests/fixtures
+touch scilla-research/skills/cost-review/tests/__init__.py
 ```
 
 - [ ] **Step 2: Write the failing test for path encoding**
 
-Create `joni-skills/skills/cost-review/tests/test_analyze_costs.py`:
+Create `scilla-research/skills/cost-review/tests/test_analyze_costs.py`:
 
 ```python
 """Tests for cost-review analyze_costs.py. Stdlib unittest only."""
@@ -107,14 +107,14 @@ if __name__ == "__main__":
 - [ ] **Step 3: Run test to verify it fails**
 
 ```bash
-cd joni-skills/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestPathEncoding -v
+cd scilla-research/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestPathEncoding -v
 ```
 
 Expected: ImportError (no `analyze_costs.py`) or AttributeError (`encode_cwd_to_transcript_dir` not defined).
 
 - [ ] **Step 4: Implement path encoder (minimal)**
 
-Create `joni-skills/skills/cost-review/scripts/analyze_costs.py`:
+Create `scilla-research/skills/cost-review/scripts/analyze_costs.py`:
 
 ```python
 #!/usr/bin/env python3
@@ -144,7 +144,7 @@ def encode_cwd_to_transcript_dir(cwd: Path) -> Path:
 - [ ] **Step 5: Run test to verify it passes**
 
 ```bash
-cd joni-skills/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestPathEncoding -v
+cd scilla-research/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestPathEncoding -v
 ```
 
 Expected: 3 passed.
@@ -153,9 +153,9 @@ Expected: 3 passed.
 
 ```bash
 cd /Users/jonilindgren/claude-projects/claude-plugins
-git add joni-skills/skills/cost-review/scripts/analyze_costs.py \
-        joni-skills/skills/cost-review/tests/__init__.py \
-        joni-skills/skills/cost-review/tests/test_analyze_costs.py
+git add scilla-research/skills/cost-review/scripts/analyze_costs.py \
+        scilla-research/skills/cost-review/tests/__init__.py \
+        scilla-research/skills/cost-review/tests/test_analyze_costs.py
 git commit -m "cost-review: scaffold + path encoder
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
@@ -166,8 +166,8 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
 ### Task 2: JSONL message parser
 
 **Files:**
-- Modify: `joni-skills/skills/cost-review/scripts/analyze_costs.py`
-- Modify: `joni-skills/skills/cost-review/tests/test_analyze_costs.py`
+- Modify: `scilla-research/skills/cost-review/scripts/analyze_costs.py`
+- Modify: `scilla-research/skills/cost-review/tests/test_analyze_costs.py`
 
 - [ ] **Step 1: Write the failing test**
 
@@ -219,7 +219,7 @@ class TestParseMessage(unittest.TestCase):
 - [ ] **Step 2: Run test to verify it fails**
 
 ```bash
-cd joni-skills/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestParseMessage -v
+cd scilla-research/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestParseMessage -v
 ```
 
 Expected: AttributeError (`parse_message` not defined).
@@ -267,7 +267,7 @@ def parse_message(line: str) -> Optional[dict]:
 - [ ] **Step 4: Run test to verify it passes**
 
 ```bash
-cd joni-skills/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestParseMessage -v
+cd scilla-research/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestParseMessage -v
 ```
 
 Expected: 5 passed.
@@ -276,8 +276,8 @@ Expected: 5 passed.
 
 ```bash
 cd /Users/jonilindgren/claude-projects/claude-plugins
-git add joni-skills/skills/cost-review/scripts/analyze_costs.py \
-        joni-skills/skills/cost-review/tests/test_analyze_costs.py
+git add scilla-research/skills/cost-review/scripts/analyze_costs.py \
+        scilla-research/skills/cost-review/tests/test_analyze_costs.py
 git commit -m "cost-review: parse_message — extract sid/model/usage/ts from JSONL line
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
@@ -288,13 +288,13 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
 ### Task 3: Transcript folder walker
 
 **Files:**
-- Modify: `joni-skills/skills/cost-review/scripts/analyze_costs.py`
-- Modify: `joni-skills/skills/cost-review/tests/test_analyze_costs.py`
-- Create: `joni-skills/skills/cost-review/tests/fixtures/sample_session.jsonl`
+- Modify: `scilla-research/skills/cost-review/scripts/analyze_costs.py`
+- Modify: `scilla-research/skills/cost-review/tests/test_analyze_costs.py`
+- Create: `scilla-research/skills/cost-review/tests/fixtures/sample_session.jsonl`
 
 - [ ] **Step 1: Create fixture**
 
-Create `joni-skills/skills/cost-review/tests/fixtures/sample_session.jsonl`:
+Create `scilla-research/skills/cost-review/tests/fixtures/sample_session.jsonl`:
 
 ```
 {"type":"permission-mode","sessionId":"abc-123","permissionMode":"default"}
@@ -345,7 +345,7 @@ class TestWalkTranscripts(unittest.TestCase):
 - [ ] **Step 3: Run test to verify it fails**
 
 ```bash
-cd joni-skills/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestWalkTranscripts -v
+cd scilla-research/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestWalkTranscripts -v
 ```
 
 Expected: AttributeError (`walk_transcripts` not defined).
@@ -382,7 +382,7 @@ def walk_transcripts(transcript_dir: Path) -> dict:
 - [ ] **Step 5: Run test to verify it passes**
 
 ```bash
-cd joni-skills/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestWalkTranscripts -v
+cd scilla-research/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestWalkTranscripts -v
 ```
 
 Expected: 3 passed.
@@ -391,9 +391,9 @@ Expected: 3 passed.
 
 ```bash
 cd /Users/jonilindgren/claude-projects/claude-plugins
-git add joni-skills/skills/cost-review/scripts/analyze_costs.py \
-        joni-skills/skills/cost-review/tests/test_analyze_costs.py \
-        joni-skills/skills/cost-review/tests/fixtures/sample_session.jsonl
+git add scilla-research/skills/cost-review/scripts/analyze_costs.py \
+        scilla-research/skills/cost-review/tests/test_analyze_costs.py \
+        scilla-research/skills/cost-review/tests/fixtures/sample_session.jsonl
 git commit -m "cost-review: walk_transcripts — top-level + subagent JSONL aggregation by sessionId
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
@@ -404,8 +404,8 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
 ### Task 4: Pricing table + cost computation
 
 **Files:**
-- Modify: `joni-skills/skills/cost-review/scripts/analyze_costs.py`
-- Modify: `joni-skills/skills/cost-review/tests/test_analyze_costs.py`
+- Modify: `scilla-research/skills/cost-review/scripts/analyze_costs.py`
+- Modify: `scilla-research/skills/cost-review/tests/test_analyze_costs.py`
 
 - [ ] **Step 1: Write the failing test**
 
@@ -459,7 +459,7 @@ class TestPricing(unittest.TestCase):
 - [ ] **Step 2: Run test to verify it fails**
 
 ```bash
-cd joni-skills/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestPricing -v
+cd scilla-research/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestPricing -v
 ```
 
 Expected: AttributeError (`family_for_model`, `compute_cost` not defined).
@@ -503,7 +503,7 @@ def compute_cost(usage: dict, family: str) -> float:
 - [ ] **Step 4: Run test to verify it passes**
 
 ```bash
-cd joni-skills/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestPricing -v
+cd scilla-research/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestPricing -v
 ```
 
 Expected: 8 passed.
@@ -512,8 +512,8 @@ Expected: 8 passed.
 
 ```bash
 cd /Users/jonilindgren/claude-projects/claude-plugins
-git add joni-skills/skills/cost-review/scripts/analyze_costs.py \
-        joni-skills/skills/cost-review/tests/test_analyze_costs.py
+git add scilla-research/skills/cost-review/scripts/analyze_costs.py \
+        scilla-research/skills/cost-review/tests/test_analyze_costs.py
 git commit -m "cost-review: pricing table + family detection + cost computation
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
@@ -524,8 +524,8 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
 ### Task 5: Aggregate (per-session and per-model totals)
 
 **Files:**
-- Modify: `joni-skills/skills/cost-review/scripts/analyze_costs.py`
-- Modify: `joni-skills/skills/cost-review/tests/test_analyze_costs.py`
+- Modify: `scilla-research/skills/cost-review/scripts/analyze_costs.py`
+- Modify: `scilla-research/skills/cost-review/tests/test_analyze_costs.py`
 
 - [ ] **Step 1: Write the failing test**
 
@@ -596,7 +596,7 @@ class TestAggregate(unittest.TestCase):
 - [ ] **Step 2: Run test to verify it fails**
 
 ```bash
-cd joni-skills/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestAggregate -v
+cd scilla-research/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestAggregate -v
 ```
 
 Expected: AttributeError (`aggregate` not defined).
@@ -733,7 +733,7 @@ def aggregate(sessions: dict) -> dict:
 - [ ] **Step 4: Run test to verify it passes**
 
 ```bash
-cd joni-skills/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestAggregate -v
+cd scilla-research/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestAggregate -v
 ```
 
 Expected: 3 passed.
@@ -742,8 +742,8 @@ Expected: 3 passed.
 
 ```bash
 cd /Users/jonilindgren/claude-projects/claude-plugins
-git add joni-skills/skills/cost-review/scripts/analyze_costs.py \
-        joni-skills/skills/cost-review/tests/test_analyze_costs.py
+git add scilla-research/skills/cost-review/scripts/analyze_costs.py \
+        scilla-research/skills/cost-review/tests/test_analyze_costs.py
 git commit -m "cost-review: aggregate — totals, per-model, per-session, daily
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
@@ -754,8 +754,8 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
 ### Task 6: Topic filter
 
 **Files:**
-- Modify: `joni-skills/skills/cost-review/scripts/analyze_costs.py`
-- Modify: `joni-skills/skills/cost-review/tests/test_analyze_costs.py`
+- Modify: `scilla-research/skills/cost-review/scripts/analyze_costs.py`
+- Modify: `scilla-research/skills/cost-review/tests/test_analyze_costs.py`
 
 - [ ] **Step 1: Write the failing test**
 
@@ -817,7 +817,7 @@ import json
 - [ ] **Step 2: Run test to verify it fails**
 
 ```bash
-cd joni-skills/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestFilterByTopic -v
+cd scilla-research/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestFilterByTopic -v
 ```
 
 Expected: AttributeError (`filter_by_topic` not defined).
@@ -872,7 +872,7 @@ def filter_by_topic(sessions: dict, transcript_dir: Path, topic: str) -> dict:
 - [ ] **Step 4: Run test to verify it passes**
 
 ```bash
-cd joni-skills/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestFilterByTopic -v
+cd scilla-research/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestFilterByTopic -v
 ```
 
 Expected: 3 passed.
@@ -881,8 +881,8 @@ Expected: 3 passed.
 
 ```bash
 cd /Users/jonilindgren/claude-projects/claude-plugins
-git add joni-skills/skills/cost-review/scripts/analyze_costs.py \
-        joni-skills/skills/cost-review/tests/test_analyze_costs.py
+git add scilla-research/skills/cost-review/scripts/analyze_costs.py \
+        scilla-research/skills/cost-review/tests/test_analyze_costs.py
 git commit -m "cost-review: filter_by_topic — case-insensitive, >=3 hits across files
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
@@ -893,8 +893,8 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
 ### Task 7: Signal detectors
 
 **Files:**
-- Modify: `joni-skills/skills/cost-review/scripts/analyze_costs.py`
-- Modify: `joni-skills/skills/cost-review/tests/test_analyze_costs.py`
+- Modify: `scilla-research/skills/cost-review/scripts/analyze_costs.py`
+- Modify: `scilla-research/skills/cost-review/tests/test_analyze_costs.py`
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1004,7 +1004,7 @@ class TestDetectSignals(unittest.TestCase):
 - [ ] **Step 2: Run test to verify it fails**
 
 ```bash
-cd joni-skills/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestDetectSignals -v
+cd scilla-research/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestDetectSignals -v
 ```
 
 Expected: AttributeError (`detect_signals` not defined).
@@ -1122,7 +1122,7 @@ def detect_signals(agg: dict) -> list:
 - [ ] **Step 4: Run test to verify it passes**
 
 ```bash
-cd joni-skills/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestDetectSignals -v
+cd scilla-research/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestDetectSignals -v
 ```
 
 Expected: 7 passed.
@@ -1131,8 +1131,8 @@ Expected: 7 passed.
 
 ```bash
 cd /Users/jonilindgren/claude-projects/claude-plugins
-git add joni-skills/skills/cost-review/scripts/analyze_costs.py \
-        joni-skills/skills/cost-review/tests/test_analyze_costs.py
+git add scilla-research/skills/cost-review/scripts/analyze_costs.py \
+        scilla-research/skills/cost-review/tests/test_analyze_costs.py
 git commit -m "cost-review: 6 signal detectors (opus-light, cache ratios, output-heavy, fragmentation, direct-input)
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
@@ -1143,8 +1143,8 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
 ### Task 8: Human report formatter
 
 **Files:**
-- Modify: `joni-skills/skills/cost-review/scripts/analyze_costs.py`
-- Modify: `joni-skills/skills/cost-review/tests/test_analyze_costs.py`
+- Modify: `scilla-research/skills/cost-review/scripts/analyze_costs.py`
+- Modify: `scilla-research/skills/cost-review/tests/test_analyze_costs.py`
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1230,7 +1230,7 @@ class TestFormatHumanReport(unittest.TestCase):
 - [ ] **Step 2: Run test to verify it fails**
 
 ```bash
-cd joni-skills/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestFormatHumanReport -v
+cd scilla-research/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestFormatHumanReport -v
 ```
 
 Expected: AttributeError (`format_human_report` not defined).
@@ -1324,7 +1324,7 @@ def format_human_report(agg: dict, signals: list, repo: str, scope_label: str) -
 - [ ] **Step 4: Run test to verify it passes**
 
 ```bash
-cd joni-skills/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestFormatHumanReport -v
+cd scilla-research/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestFormatHumanReport -v
 ```
 
 Expected: 7 passed.
@@ -1333,8 +1333,8 @@ Expected: 7 passed.
 
 ```bash
 cd /Users/jonilindgren/claude-projects/claude-plugins
-git add joni-skills/skills/cost-review/scripts/analyze_costs.py \
-        joni-skills/skills/cost-review/tests/test_analyze_costs.py
+git add scilla-research/skills/cost-review/scripts/analyze_costs.py \
+        scilla-research/skills/cost-review/tests/test_analyze_costs.py
 git commit -m "cost-review: format_human_report — totals, per-model, top sessions, daily, signals
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
@@ -1345,8 +1345,8 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
 ### Task 9: JSON report formatter
 
 **Files:**
-- Modify: `joni-skills/skills/cost-review/scripts/analyze_costs.py`
-- Modify: `joni-skills/skills/cost-review/tests/test_analyze_costs.py`
+- Modify: `scilla-research/skills/cost-review/scripts/analyze_costs.py`
+- Modify: `scilla-research/skills/cost-review/tests/test_analyze_costs.py`
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1386,7 +1386,7 @@ class TestFormatJsonReport(unittest.TestCase):
 - [ ] **Step 2: Run test to verify it fails**
 
 ```bash
-cd joni-skills/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestFormatJsonReport -v
+cd scilla-research/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestFormatJsonReport -v
 ```
 
 Expected: AttributeError (`format_json_report` not defined).
@@ -1414,7 +1414,7 @@ def format_json_report(agg: dict, signals: list, repo: str,
 - [ ] **Step 4: Run test to verify it passes**
 
 ```bash
-cd joni-skills/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestFormatJsonReport -v
+cd scilla-research/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestFormatJsonReport -v
 ```
 
 Expected: 2 passed.
@@ -1423,8 +1423,8 @@ Expected: 2 passed.
 
 ```bash
 cd /Users/jonilindgren/claude-projects/claude-plugins
-git add joni-skills/skills/cost-review/scripts/analyze_costs.py \
-        joni-skills/skills/cost-review/tests/test_analyze_costs.py
+git add scilla-research/skills/cost-review/scripts/analyze_costs.py \
+        scilla-research/skills/cost-review/tests/test_analyze_costs.py
 git commit -m "cost-review: format_json_report — structured output for follow-up reshaping
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
@@ -1435,8 +1435,8 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
 ### Task 10: CLI wiring (argparse + main)
 
 **Files:**
-- Modify: `joni-skills/skills/cost-review/scripts/analyze_costs.py`
-- Modify: `joni-skills/skills/cost-review/tests/test_analyze_costs.py`
+- Modify: `scilla-research/skills/cost-review/scripts/analyze_costs.py`
+- Modify: `scilla-research/skills/cost-review/tests/test_analyze_costs.py`
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1499,7 +1499,7 @@ class TestMain(unittest.TestCase):
 - [ ] **Step 2: Run test to verify it fails**
 
 ```bash
-cd joni-skills/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestMain -v
+cd scilla-research/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestMain -v
 ```
 
 Expected: AttributeError (`main` not defined).
@@ -1572,7 +1572,7 @@ if __name__ == "__main__":
 - [ ] **Step 4: Run test to verify it passes**
 
 ```bash
-cd joni-skills/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestMain -v
+cd scilla-research/skills/cost-review && python3 -m unittest tests.test_analyze_costs.TestMain -v
 ```
 
 Expected: 3 passed.
@@ -1580,7 +1580,7 @@ Expected: 3 passed.
 - [ ] **Step 5: Run full test suite**
 
 ```bash
-cd joni-skills/skills/cost-review && python3 -m unittest discover tests -v
+cd scilla-research/skills/cost-review && python3 -m unittest discover tests -v
 ```
 
 Expected: all tests pass.
@@ -1589,8 +1589,8 @@ Expected: all tests pass.
 
 ```bash
 cd /Users/jonilindgren/claude-projects/claude-plugins
-git add joni-skills/skills/cost-review/scripts/analyze_costs.py \
-        joni-skills/skills/cost-review/tests/test_analyze_costs.py
+git add scilla-research/skills/cost-review/scripts/analyze_costs.py \
+        scilla-research/skills/cost-review/tests/test_analyze_costs.py
 git commit -m "cost-review: CLI wiring (argparse) + main entry point
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
@@ -1605,7 +1605,7 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
 - [ ] **Step 1: Run the script against Metria with --topic OST**
 
 ```bash
-cd /Users/jonilindgren/claude-projects/claude-plugins/joni-skills/skills/cost-review
+cd /Users/jonilindgren/claude-projects/claude-plugins/scilla-research/skills/cost-review
 python3 scripts/analyze_costs.py --cwd /Users/jonilindgren/claude-projects/Metria --topic OST
 ```
 
@@ -1633,7 +1633,7 @@ If the figure is in band, proceed. If not, return to Task 6 (filter) or Task 5 (
 ### Task 12: Reference doc — cost-reduction-patterns.md
 
 **Files:**
-- Create: `joni-skills/skills/cost-review/references/cost-reduction-patterns.md`
+- Create: `scilla-research/skills/cost-review/references/cost-reduction-patterns.md`
 
 - [ ] **Step 1: Write the reference doc**
 
@@ -1732,7 +1732,7 @@ Six signal detectors run on every cost-review invocation. Each gets a one-line t
 
 ```bash
 cd /Users/jonilindgren/claude-projects/claude-plugins
-git add joni-skills/skills/cost-review/references/cost-reduction-patterns.md
+git add scilla-research/skills/cost-review/references/cost-reduction-patterns.md
 git commit -m "cost-review: reference doc — long-form coaching per signal id
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
@@ -1743,11 +1743,11 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
 ### Task 13: SKILL.md
 
 **Files:**
-- Create: `joni-skills/skills/cost-review/SKILL.md`
+- Create: `scilla-research/skills/cost-review/SKILL.md`
 
 - [ ] **Step 1: Write SKILL.md**
 
-Create `joni-skills/skills/cost-review/SKILL.md`:
+Create `scilla-research/skills/cost-review/SKILL.md`:
 
 ```markdown
 ---
@@ -1811,7 +1811,7 @@ When the user asks "save this report" or similar, write it to a markdown file at
 ```bash
 python3 -c "
 import yaml
-with open('joni-skills/skills/cost-review/SKILL.md') as f:
+with open('scilla-research/skills/cost-review/SKILL.md') as f:
     text = f.read()
 parts = text.split('---', 2)
 fm = yaml.safe_load(parts[1])
@@ -1822,7 +1822,7 @@ print('SKILL.md frontmatter OK')
 " 2>&1 || python3 -c "
 # Fallback if PyYAML isn't installed
 import re
-with open('joni-skills/skills/cost-review/SKILL.md') as f:
+with open('scilla-research/skills/cost-review/SKILL.md') as f:
     text = f.read()
 parts = text.split('---', 2)
 fm = parts[1]
@@ -1839,7 +1839,7 @@ Expected: "SKILL.md frontmatter OK".
 
 ```bash
 cd /Users/jonilindgren/claude-projects/claude-plugins
-git add joni-skills/skills/cost-review/SKILL.md
+git add scilla-research/skills/cost-review/SKILL.md
 git commit -m "cost-review: SKILL.md — invocation, presentation, follow-up handling
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
@@ -1853,15 +1853,15 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
 
 - [ ] **Step 1: Refresh the plugin cache**
 
-The plugin source is at `/Users/jonilindgren/claude-projects/claude-plugins/joni-skills/`. The installed cache is at `~/.claude/plugins/cache/joni-local/joniskills/1.0.0/`. The marketplace is registered with `autoUpdate: true` so changes should propagate, but we'll force a sync.
+The plugin source is at `/Users/jonilindgren/claude-projects/claude-plugins/scilla-research/`. The installed cache is at `~/.claude/plugins/cache/scilla-studio/scilla-research/1.0.0/`. The marketplace is registered with `autoUpdate: true` so changes should propagate, but we'll force a sync.
 
 ```bash
 # Inspect current cache state
-ls ~/.claude/plugins/cache/joni-local/joniskills/1.0.0/skills/ | grep cost-review || echo "(not yet present)"
+ls ~/.claude/plugins/cache/scilla-studio/scilla-research/1.0.0/skills/ | grep cost-review || echo "(not yet present)"
 # If not present: copy manually for now
-cp -R /Users/jonilindgren/claude-projects/claude-plugins/joni-skills/skills/cost-review \
-      ~/.claude/plugins/cache/joni-local/joniskills/1.0.0/skills/
-ls ~/.claude/plugins/cache/joni-local/joniskills/1.0.0/skills/cost-review/
+cp -R /Users/jonilindgren/claude-projects/claude-plugins/scilla-research/skills/cost-review \
+      ~/.claude/plugins/cache/scilla-studio/scilla-research/1.0.0/skills/
+ls ~/.claude/plugins/cache/scilla-studio/scilla-research/1.0.0/skills/cost-review/
 ```
 
 Expected: `SKILL.md`, `scripts/`, `references/`.
@@ -1869,7 +1869,7 @@ Expected: `SKILL.md`, `scripts/`, `references/`.
 - [ ] **Step 2: Run a sanity invocation against Metria**
 
 ```bash
-python3 ~/.claude/plugins/cache/joni-local/joniskills/1.0.0/skills/cost-review/scripts/analyze_costs.py \
+python3 ~/.claude/plugins/cache/scilla-studio/scilla-research/1.0.0/skills/cost-review/scripts/analyze_costs.py \
   --cwd /Users/jonilindgren/claude-projects/Metria --topic OST | head -30
 ```
 
@@ -1878,7 +1878,7 @@ Expected: human-readable report with `Repo:`, `Scope:`, `Total:` sections and a 
 - [ ] **Step 3: Run JSON mode and validate it parses**
 
 ```bash
-python3 ~/.claude/plugins/cache/joni-local/joniskills/1.0.0/skills/cost-review/scripts/analyze_costs.py \
+python3 ~/.claude/plugins/cache/scilla-studio/scilla-research/1.0.0/skills/cost-review/scripts/analyze_costs.py \
   --cwd /Users/jonilindgren/claude-projects/Metria --json | python3 -m json.tool > /dev/null && echo "JSON OK"
 ```
 
@@ -1889,7 +1889,7 @@ Expected: `JSON OK`.
 Pick a repo with less Claude usage to confirm the no-topic path:
 
 ```bash
-python3 ~/.claude/plugins/cache/joni-local/joniskills/1.0.0/skills/cost-review/scripts/analyze_costs.py \
+python3 ~/.claude/plugins/cache/scilla-studio/scilla-research/1.0.0/skills/cost-review/scripts/analyze_costs.py \
   --cwd /Users/jonilindgren/claude-projects/claude-plugins
 ```
 

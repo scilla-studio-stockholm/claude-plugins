@@ -1,7 +1,7 @@
 # cost-review — design spec
 
 **Date:** 2026-05-14
-**Plugin:** joniskills
+**Plugin:** scilla-research
 **Status:** approved for implementation
 
 ## Purpose
@@ -33,7 +33,7 @@ Repo-agnostic Claude Code skill that surfaces what a user has spent (in tokens a
 ## Architecture
 
 ```
-joni-skills/skills/cost-review/
+scilla-research/skills/cost-review/
 ├── SKILL.md
 ├── DESIGN.md                          # this file
 ├── scripts/
