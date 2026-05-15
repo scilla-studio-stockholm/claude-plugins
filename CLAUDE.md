@@ -6,7 +6,27 @@ Scilla Studio Claude Code skills/plugins library. Four collections:
 - `prototype-kit/` — 4 prototype skills (add-component, add-prototype, design-system, setup-kit)
 - `product-discovery/` — 13 OST (Opportunity Solution Tree) skills for workshop-driven discovery
 
-Marketplace: `scilla-studio` (registered as `directory` source, `autoUpdate: true`). Plugin cache mirrors at `~/.claude/plugins/cache/scilla-studio/<plugin-name>/1.0.0/`. After changes, the cache auto-updates between sessions; force-sync within a session by copying `<plugin>/skills/<skill>/` into the cache path.
+Marketplace: `scilla-studio` (GitHub source: `scilla-studio-stockholm/claude-plugins`, `autoUpdate: true`). Plugin cache mirrors at `~/.claude/plugins/cache/scilla-studio/<plugin-name>/1.0.0/`. With autoUpdate on, the marketplace clone (`~/.claude/plugins/marketplaces/scilla-studio/`) pulls from GitHub on session start; force-sync within a session by copying `<plugin>/skills/<skill>/` into the cache path.
+
+## Iteration workflow
+
+**Editing a skill locally:**
+1. Edit files in `/Users/jonilindgren/claude-projects/claude-plugins/<plugin>/skills/<skill>/`
+2. `git commit && git push origin master`
+3. To test in the current session: `cp -R <plugin>/skills/<skill>/ ~/.claude/plugins/cache/scilla-studio/<plugin>/1.0.0/skills/` — then restart Claude Code so skill metadata reloads
+4. To test from a fresh session: just restart — autoUpdate will pull from GitHub automatically
+
+**Team install (one-time):**
+```
+/plugin marketplace add scilla-studio-stockholm/claude-plugins
+/plugin install scilla-research@scilla-studio
+/plugin install scilla-writing@scilla-studio
+/plugin install product-discovery@scilla-studio
+/plugin install prototype-kit@scilla-studio
+```
+Teammates need GitHub auth (`gh auth login`) since the repo is private.
+
+**Update propagation:** Each plugin install pins a `gitCommitSha`. With `autoUpdate: true` on the marketplace, the marketplace clone refreshes on session start. To pull a newer pinned commit into a plugin cache, teammates run `/plugin update <plugin>@scilla-studio` or `/plugin marketplace update scilla-studio`. Skills reload on session start, so an in-progress session won't see updates until restart.
 
 ## Current State
 
