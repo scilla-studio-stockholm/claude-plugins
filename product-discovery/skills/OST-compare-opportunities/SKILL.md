@@ -195,7 +195,7 @@ Cells where evidence was thin and an honest score wasn't defensible. Each gap na
 - **No em-dash** anywhere, applied uniformly to Swedish and English prose.
 - **Criterion display names stay in English** even when quotes and rationales are Swedish. The criteria are Torres-canonical; mixing canonical-English criteria with Swedish rationale prose is normal in product orgs and avoids a translation surface.
 - **Output language for prose** (rationales, `what_is_missing`, reasons) matches the source language detected in the clustered JSON's `quote` text and `phases[].name`. Schema field names, JSON key strings, criterion IDs, criterion display names, and score vocabulary stay as defined.
-- **Frontmatter on the markdown output** complies with the Metria global rule that every `.md` file has YAML frontmatter, with a blank line before the closing `---`.
+- **Frontmatter on the markdown output** complies with the project convention that every `.md` file has YAML frontmatter, with a blank line before the closing `---`.
 - **Empty sections are omitted entirely.** "Excluded from comparison", "Evidence gaps", and "Notes" each omit when their underlying list is empty.
 - **Matrix column order** matches `opportunities_compared[]` order in the JSON.
 - **Matrix row order** matches `criteria[]` order in the JSON: outcome-alignment, customer-importance, market-size, strategic-fit, competitive-landscape.

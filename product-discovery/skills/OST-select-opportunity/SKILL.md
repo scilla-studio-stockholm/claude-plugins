@@ -202,7 +202,7 @@ These gaps from the chosen opportunity were judged not to affect phase-2 solutio
 - **No em-dash** anywhere, applied uniformly to Swedish and English prose.
 - **Criterion display names stay in English** even when quotes and rationales are Swedish.
 - **Output language for prose** (`rationale`, `reason_not_picked`, `why_relevant_to_phase_2`, `why_excluded`) matches the source language detected in the matrix's `quote` text and `phase` placement. Schema field names, JSON keys, criterion IDs, criterion display names, and score vocabulary stay as defined.
-- **Frontmatter on the markdown output** complies with the Metria global rule that every `.md` file has YAML frontmatter, with a blank line before the closing `---`.
+- **Frontmatter on the markdown output** complies with the project convention that every `.md` file has YAML frontmatter, with a blank line before the closing `---`.
 - **Empty optional sections are omitted entirely.** "Evidence gaps carried into phase 2" and "Evidence gaps not carried" each omit when their underlying list is empty.
 - **Tie callouts live inline in the rationale prose.** No separate "tie note" or "coin-flip" section.
 - **No `Cites:` line** anywhere. The selector's rationale references opp-ids inline; there is no per-cell trace-back invariant.

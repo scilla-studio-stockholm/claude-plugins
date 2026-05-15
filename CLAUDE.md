@@ -27,7 +27,7 @@ Marketplace: `joni-local` (registered as `directory` source, `autoUpdate: true`)
 **Gotchas:**
 - `joniskills` (plugin name in `plugin.json`) vs `joni-skills` (folder name). Both correct.
 - Plugin cache won't auto-refresh mid-session — copy `joni-skills/skills/<skill>/` into the cache manually if you want to test immediately after changes.
-- `cost-review --topic OST` on Metria reports ~$4.7K, not yesterday's $1.27K manual figure. Not a bug: substring filter is broader than a curated marker list. Document, don't fix.
+- `cost-review --topic OST` on a large project reports ~$4.7K, not yesterday's $1.27K manual figure. Not a bug: substring filter is broader than a curated marker list. Document, don't fix.
 
 ## Session Startup
 - Run `git status` to understand current repo state

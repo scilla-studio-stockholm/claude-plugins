@@ -135,7 +135,7 @@ If the friction line shows `(friction: not recorded)`, the field was omitted fro
 
 - One vision pass. No retries. No multi-screenshot stitching.
 - Output language for body text matches the screenshot's language. Schema field names stay as defined.
-- Frontmatter on the markdown output complies with the Metria global rule that every `.md` file has YAML frontmatter.
+- Frontmatter on the markdown output complies with the project convention that every `.md` file has YAML frontmatter.
 - No silent degradation. Required-field misses always exit with a clear message; do not write partial output.
 - No JSON self-validation pass. Trust the prompt; downstream skills will surface any malformed JSON.
 

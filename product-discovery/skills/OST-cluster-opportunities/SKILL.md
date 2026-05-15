@@ -186,7 +186,7 @@ from the extracted JSON)
 - **Parent-child nesting.** One level of indentation under the parent. Never deeper. The `parent_id` field is the source of truth; the indentation is the rendering of it.
 - **Unphased section heading uses the technical key `fas-0-unphased`** so the JSON↔markdown correspondence is visible.
 - **Output language matches the experience map's body language** (detect from `phases[].name` and quote text). Schema field names, JSON key strings, and verdict emojis stay as defined.
-- **Frontmatter on the markdown output** complies with the Metria global rule that every `.md` file has YAML frontmatter, with a blank line before the closing `---`.
+- **Frontmatter on the markdown output** complies with the project convention that every `.md` file has YAML frontmatter, with a blank line before the closing `---`.
 - **No silent degradation.** Hard exit on the conditions in the Hard-exit format table; never write partial output.
 - **No JSON self-validation pass.** Trust the prompt; downstream skills surface any malformed JSON.
 - **Upstream files are immutable.** Never modify `experience-map-extracted-*`, `opportunities-validated-*`, or `opportunities-extracted-*`. The skill only writes the two `experience-map-clustered-<date>.*` files.
