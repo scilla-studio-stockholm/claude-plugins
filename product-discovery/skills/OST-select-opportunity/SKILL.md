@@ -15,13 +15,13 @@ The selector applies a locked three-step decision rule:
 2. **Rank** the remaining by strongest aggregate profile across the other four criteria.
 3. **Tiebreak** on fewer evidence gaps.
 
-The output is a **proposal**, not a decision-of-record. The trio reviews and ratifies the final pick by creating a new opportunity folder at `workspace/<team>/<product>/opportunities/<opp-slug>/` and placing `chosen-opportunity.md` there (which assist 6 reads). This skill does NOT write to that folder.
+The output is a **proposal**, not a decision-of-record. The trio reviews and ratifies the final pick by creating a new opportunity folder at `discovery/<team>/<product>/opportunities/<opp-slug>/` and placing `chosen-opportunity.md` there (which assist 6 reads). This skill does NOT write to that folder.
 
 **Out of scope:** transcript reading, citation validation (`OST-validate-opportunities` upstream), re-clustering (`OST-cluster-opportunities` upstream), re-comparing (`OST-compare-opportunities` upstream), summing scores, picking more than one opportunity, generating solutions (assist 6 onward), and weighing effort or feasibility (Torres principle).
 
 ## Steps
 
-1. **Resolve scope.** Follow `references/workspace-scope.md`. Portfolio scope only.
+1. **Resolve scope.** Follow `references/workspace-scope.md`. Opportunity-selection scope only.
 
 2. **Load context via parent walk-up:**
    - `<scope>/../../_product-context/product-outcome.md`
@@ -125,7 +125,7 @@ The markdown output is rendered deterministically from the composed JSON using t
 ---
 title: Chosen opportunity - <title> (<team>)
 date: <YYYY-MM-DD>
-purpose: Selector proposal for OST opportunity selection, paired with chosen-opportunity-proposal.json. Trio reviews and ratifies into workspace/<team>/<product>/opportunities/<opp-slug>/chosen-opportunity.md.
+purpose: Selector proposal for OST opportunity selection, paired with chosen-opportunity-proposal.json. Trio reviews and ratifies into discovery/<team>/<product>/opportunities/<opp-slug>/chosen-opportunity.md.
 tags: [opportunity-selection, ost, schema-v0.1]
 
 ---
@@ -137,7 +137,7 @@ Source product outcome: `<scope>/../../_product-context/product-outcome.md`
 Schema version: 0.1
 Paired JSON: `chosen-opportunity-proposal.json`
 
-> **Trio HITL:** This is the AI's proposal. Review the rationale, override if you disagree, then create a new opportunity folder at `workspace/<team>/<product>/opportunities/<opp-slug>/` (slug from the chosen opportunity's title per `references/workspace-scope.md`) and ratify into `<that folder>/chosen-opportunity.md`.
+> **Trio HITL:** This is the AI's proposal. Review the rationale, override if you disagree, then create a new opportunity folder at `discovery/<team>/<product>/opportunities/<opp-slug>/` (slug from the chosen opportunity's title per `references/workspace-scope.md`) and ratify into `<that folder>/chosen-opportunity.md`.
 
 ## Product outcome
 
@@ -220,7 +220,7 @@ These gaps from the chosen opportunity were judged not to affect phase-2 solutio
 - **Read the clustered experience-map JSON, validated table, or extracted opportunities.** All quotes, sources, scores, and rationales the selector needs are already in the matrix.
 - **Re-validate, re-cluster, or re-compare.** Those are upstream skills.
 - **Modify upstream files.** `comparison-matrix-*.json` and `product-outcome.md` stay immutable.
-- **Write to `workspace/<team>/<product>/opportunities/<opp-slug>/chosen-opportunity.md`.** That is the trio's ratification step.
+- **Write to `discovery/<team>/<product>/opportunities/<opp-slug>/chosen-opportunity.md`.** That is the trio's ratification step.
 - **Pick more than one opportunity.** HITL flavor is locked as picks-one + alternatives.
 - **Produce a shortlist.** Even on tied picks, the AI commits to one and names the tie in the rationale.
 - **Produce a free-form recommendation without alternatives.** Every other approved opportunity from the matrix appears in `alternatives_considered[]`.

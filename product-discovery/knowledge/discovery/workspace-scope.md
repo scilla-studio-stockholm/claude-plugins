@@ -1,28 +1,49 @@
 ---
-title: "Workspace scope and path conventions for OST skills"
-date: 2026-05-14
-purpose: Defines the team/product/opportunity workspace hierarchy and the scope-resolution protocol that every OST skill follows. Referenced by all 13 OST-* skills in their input/output sections so the protocol is documented once and reused.
-tags: [workspace, ost, knowledge-anchor]
+title: "Discovery scope and path conventions for OST skills"
+date: 2026-05-15
+purpose: Defines the discovery-workspace hierarchy and the scope-resolution protocol that every OST skill follows. Referenced by all OST-* skills in their input/output sections so the protocol is documented once and reused.
+tags: [discovery, workspace, ost, knowledge-anchor]
 
 ---
 
-# Workspace scope and path conventions
+# Discovery scope and path conventions
 
-OST skills read and write inside the `workspace/` hierarchy:
+OST skills read and write inside the `discovery/` hierarchy. Two layout modes are supported:
+
+## Multi-product mode (default)
+
+For organisations with multiple teams and/or products in one repo:
 
 ```text
-workspace/
-├── .current-scope                       # one-line file; relative path to the active round folder
-├── <team>/                              # e.g., fast, norrsken
-│   ├── _team-context/                   # team-level docs (optional)
-│   └── <product>/                       # e.g., fsok
-│       ├── _product-context/            # product-outcome.md, experience-map.{md,json}
-│       ├── portfolio/<YYYY-MM-DD>/      # phase A round: validate / compare / select
-│       └── opportunities/<opp-slug>/    # ratified opportunity
-│           ├── chosen-opportunity.md    # persistent context
-│           ├── ratifications.md         # optional trio log
-│           └── <YYYY-MM-DD>/            # phase B round: brainstorm → experiments
+discovery/
+├── .current-scope                            # one-line file; relative path to the active round folder
+├── <team>/                                   # e.g., fast, norrsken
+│   ├── _team-context/                        # team-level docs (optional)
+│   └── <product>/                            # e.g., fsok
+│       ├── _product-context/                 # product-outcome.md, experience-map.{md,json}
+│       ├── opportunity-selection/<YYYY-MM-DD>/   # phase A round: validate / compare / select
+│       └── opportunities/<opp-slug>/         # ratified opportunity
+│           ├── chosen-opportunity.md         # persistent context
+│           ├── ratifications.md              # optional trio log
+│           └── <YYYY-MM-DD>/                 # phase B round: brainstorm → experiments
 ```
+
+## Single-product mode
+
+For small repos with exactly one product. The `<team>/<product>/` nesting is dropped:
+
+```text
+discovery/
+├── .current-scope
+├── _product-context/                         # product-outcome.md, experience-map.{md,json}
+├── opportunity-selection/<YYYY-MM-DD>/       # phase A round
+└── opportunities/<opp-slug>/                 # ratified opportunity
+    ├── chosen-opportunity.md
+    ├── ratifications.md                      # optional
+    └── <YYYY-MM-DD>/                         # phase B round
+```
+
+Both modes use the same relative-path math for scope resolution (see below), so phase skills work identically regardless of which mode the repo uses. Only the absolute path differs.
 
 Filenames inside a round folder drop the date suffix (date lives on the round folder). Underscore-prefixed folders (`_team-context/`, `_product-context/`) are read-only context for skills.
 
@@ -31,24 +52,26 @@ Filenames inside a round folder drop the date suffix (date lives on the round fo
 A skill resolves its scope (the round folder it reads and writes inside) in this order, taking the first that exists:
 
 1. Explicit `scope=` argument passed by the user when invoking the skill.
-2. `workspace/.current-scope` — a one-line file containing a relative path from the repo root to the active round folder.
+2. `discovery/.current-scope` — a one-line file containing a relative path from the repo root to the active round folder.
 3. Prompt the user, defaulting to the latest dated round under the most recently touched opportunity, or a new round dated today if no scope exists yet for the target opportunity.
 
-A scope is a portfolio round if its path contains `/portfolio/`, otherwise a discovery round if it contains `/opportunities/`.
+A scope is an **opportunity-selection round** if its path contains `/opportunity-selection/`, otherwise a **discovery round** if it contains `/opportunities/`.
 
 ## Context walk-up
 
-From a discovery scope `workspace/<team>/<product>/opportunities/<opp>/<YYYY-MM-DD>/`:
+From a discovery scope ending in `opportunities/<opp>/<YYYY-MM-DD>/`:
 
 - `chosen-opportunity.md` → `<scope>/..`
 - `ratifications.md` → `<scope>/..` (optional)
 - `product-outcome.md`, `experience-map.{md,json}` → `<scope>/../../../_product-context/`
 - Previous-step artifacts in the same round → `<scope>/<artifact>.{md,json}`; if missing, walk siblings (other dated rounds under the same opportunity) in date-descending order to find the most recent preceding run.
 
-From a portfolio scope `workspace/<team>/<product>/portfolio/<YYYY-MM-DD>/`:
+From an opportunity-selection scope ending in `opportunity-selection/<YYYY-MM-DD>/`:
 
 - `product-outcome.md`, `experience-map.{md,json}` → `<scope>/../../_product-context/`
-- No `chosen-opportunity.md` lookup — portfolio rounds produce the proposal `chosen-opportunity-proposal.{md,json}` inside their own round folder.
+- No `chosen-opportunity.md` lookup — opportunity-selection rounds produce the proposal `chosen-opportunity-proposal.{md,json}` inside their own round folder.
+
+The walk-up depths (three levels for discovery, two for opportunity-selection) are identical in both layout modes because the `<team>/<product>/` nesting (when present) sits above both `_product-context/` and the round folder. Skills do not need to know which mode the repo uses.
 
 ## Canonical filenames inside a round
 
@@ -68,7 +91,7 @@ From a portfolio scope `workspace/<team>/<product>/portfolio/<YYYY-MM-DD>/`:
 | Riskiest assumptions | `riskiest-assumptions.{md,json}` |
 | Validation experiments | `validation-experiments.{md,json}` |
 
-The ratified chosen-opportunity is `chosen-opportunity.md` at the opportunity-folder root. The proposal produced by the selector inside a portfolio round is `chosen-opportunity-proposal.md`. The two file names differ deliberately so a ratified record cannot be silently overwritten.
+The ratified chosen-opportunity is `chosen-opportunity.md` at the opportunity-folder root. The proposal produced by the selector inside an opportunity-selection round is `chosen-opportunity-proposal.md`. The two file names differ deliberately so a ratified record cannot be silently overwritten.
 
 ## Slug convention
 
@@ -76,4 +99,4 @@ Product and opportunity folder names are short, lowercase, ASCII-only slugs. For
 
 ## Round-folder date convention
 
-A round folder is named after the date its **first step** was run. Portfolio: opportunity-extraction date. Discovery: solution-brainstorm date.
+A round folder is named after the date its **first step** was run. Opportunity-selection: opportunity-extraction date. Discovery: solution-brainstorm date.

@@ -30,9 +30,18 @@ Teammates need GitHub auth (`gh auth login`) since the repo is private.
 
 ## Current State
 
-**In progress:** Nothing active. Last shipped: `OST-setup-product` skill (2026-05-15), merged to `master`. Same day: `OST-init-workspace`.
+**In progress:** Nothing active. Last shipped: discovery-workspace rename + single-product mode + opportunity-selection rename (2026-05-15). Same day: `OST-setup-product` and `OST-init-workspace`.
 
-**Recent decisions (OST-setup-product build, 2026-05-15):**
+**Recent decisions (workspace rename / single-product mode, 2026-05-15):**
+- Renamed the top-level scaffold directory `workspace/` → `discovery/`. Reason: "workspace" was too generic; "discovery" tells you immediately what's in there. Touched the canonical knowledge anchor, 4 phase SKILL.md files with literal `workspace/` paths, and the init/setup-product skills. All 13 phase skills with `references/workspace-scope.md` symlinks pick up the rename automatically.
+- Renamed `portfolio/` → `opportunity-selection/` everywhere. Reason: "portfolio" is correct OST terminology but doesn't tell a teammate what lands in the folder. "Opportunity-selection" describes the work that happens there (validate + compare + select). Same touch points as the workspace rename.
+- Renamed the `--portfolio` flag to `--selection` to match the new folder name.
+- Added `--single-product` mode to `init_workspace.sh`. Drops the `<team>/<product>/` nesting and scaffolds directly under `discovery/`. Mutually exclusive with `--team`. Both layout modes use identical relative-path math for scope resolution, so the 13 phase skills work in either mode without changes.
+- Each round folder (`opportunity-selection/<date>/` or `opportunities/<opp>/<date>/`) now gets a `README.md` listing the canonical files that will land there and which OST-* skill produces each. Addresses the "I opened the dated folder and didn't know what was coming" gap.
+- Converted my new skills' `references/*.md` from copies to symlinks pointing at the canonical anchors, matching the pattern the 13 phase skills already use (commit `10d7579`). Single source of truth.
+
+**Earlier today: OST-setup-product (orchestrator) build, 2026-05-15:**
+
 - Sits above `OST-init-workspace` as the guided entrypoint. Wraps init's script and adds an interview that fills `product-outcome.md`, `experience-map.md`, and (optional) `chosen-opportunity.md`. Closes the "templates exist but no one fills them" gap — without this skill, the user has to infer where the files live and write them by hand.
 - Orchestrator-wraps-primitive pattern over linear-pipeline-with-pointer. Reason: the inference problem we were solving was "users don't read 'next steps' output and act on it." A printed pointer keeps the inference problem; wrapping removes it. Init is still independently invokable for advanced users; the NL trigger for "set up OST" routes to the orchestrator.
 - Interview is one-question-at-a-time, read-anchor-before-drafting, show-confirm-write. Three interviews in fixed order: product outcome → experience map → chosen opportunity. Each can be skipped/deferred.

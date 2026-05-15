@@ -15,7 +15,7 @@ The output is a **divergent candidate set**, not a recommendation. There is no c
 
 ## Steps
 
-1. **Resolve scope.** Follow the scope-resolution protocol in `references/workspace-scope.md`. The resolved scope is a discovery scope of the form `workspace/<team>/<product>/opportunities/<opp>/<YYYY-MM-DD>/`. Hard-exit if the resolved scope contains `/portfolio/` (this skill runs in phase B only).
+1. **Resolve scope.** Follow the scope-resolution protocol in `references/workspace-scope.md`. The resolved scope is a discovery scope of the form `discovery/<team>/<product>/opportunities/<opp>/<YYYY-MM-DD>/`. Hard-exit if the resolved scope contains `/opportunity-selection/` (this skill runs in phase B only).
 
 2. **Load context via parent walk-up.** Per `references/workspace-scope.md`:
    - `<scope>/../chosen-opportunity.md` — the ratified chosen opportunity
@@ -105,7 +105,7 @@ The hard-exit triggers:
 
 | Trigger | Looked for | Remedy |
 |---|---|---|
-| Chosen-opportunity file missing at `<scope>/../chosen-opportunity.md` | Trio's ratified chosen-opportunity file in the opportunity folder | Review the proposal in `<scope>/../../portfolio/<round>/chosen-opportunity-proposal.md`, ratify into `<scope>/../chosen-opportunity.md` per the format in `references/opportunity-selection.md` |
+| Chosen-opportunity file missing at `<scope>/../chosen-opportunity.md` | Trio's ratified chosen-opportunity file in the opportunity folder | Review the proposal in `<scope>/../../opportunity-selection/<round>/chosen-opportunity-proposal.md`, ratify into `<scope>/../chosen-opportunity.md` per the format in `references/opportunity-selection.md` |
 | Product outcome file missing at `<scope>/../../../_product-context/product-outcome.md` | Trio's product outcome file | Restore from git or re-author using the template structure |
 | chosen-opportunity.md missing `## Chosen opportunity` section with parseable id/quote/source line | The bold-id line `**<opp-id>** (Phase: <phase-id>) - "<quote>" - *<source>*` | Re-ratify using the format in `references/opportunity-selection.md` |
 | chosen-opp consistency check failed (composed JSON's `chosen_opportunity.*` does not match Step 6 parse) | Composed JSON `chosen_opportunity.{id, phase_id, quote, source}` equals the values from chosen-opportunity.md bold-id line | Re-run the skill; if persistent, the composition step is rewriting the id (inspect prompt for ambiguity around chosen-opp handling) |
@@ -181,7 +181,7 @@ Generation summary: 3 rounds × 3 roles × 2 ideas = 18 total. Roles: Product Ma
 
 - **Read interview transcripts.** Solutions are generative, not evidence-traced.
 - **Read the comparison matrix, validated table, clustered experience map, or extracted opportunities.** All chosen-opportunity context is in `<scope>/../chosen-opportunity.md`.
-- **Read the selector's proposal in `<scope>/../../portfolio/<round>/`.** The skill reads only the trio-ratified file at `<scope>/../chosen-opportunity.md`.
+- **Read the selector's proposal in `<scope>/../../opportunity-selection/<round>/`.** The skill reads only the trio-ratified file at `<scope>/../chosen-opportunity.md`.
 - **Modify upstream files.** `chosen-opportunity.md`, `product-outcome.md`, and the role anchors stay immutable.
 - **Cluster, score, rank, or select solutions.** Those are downstream (assist 7 clusterer, assist 8 top-3 selector).
 - **Generate assumptions, risk maps, or test cards.** Those are downstream (assists 9-12).

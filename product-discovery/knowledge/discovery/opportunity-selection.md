@@ -78,7 +78,7 @@ The ratified file mirrors the selector's proposal markdown structure, minus the 
 
 The trio's ratification action is concrete:
 
-1. Create a new opportunity folder at `workspace/<team>/<product>/opportunities/<opp-slug>/` (slug from the chosen opportunity's title per `knowledge/discovery/workspace-scope.md`) and copy `<scope>/chosen-opportunity-proposal.md` into it as `chosen-opportunity.md`.
+1. Create a new opportunity folder at `discovery/<team>/<product>/opportunities/<opp-slug>/` (slug from the chosen opportunity's title per `knowledge/discovery/workspace-scope.md`) and copy `<scope>/chosen-opportunity-proposal.md` into it as `chosen-opportunity.md`.
 2. Delete the `> **Trio HITL:** ...` blockquote.
 3. Delete the entire `## Alternatives considered` section and its bullet entries.
 4. Edit the chosen opportunity / rationale / score profile if overriding the selector's pick (otherwise leave as-is).
@@ -99,7 +99,7 @@ This is the contract that `OST-select-opportunity` produces. Downstream consumer
   "team": "string (carried from comparison matrix)",
   "title": "string (carried from comparison matrix)",
   "product_outcome": "string (carried from comparison matrix)",
-  "source_comparison_matrix": "string (filename of source comparison-matrix.json in the portfolio round folder)",
+  "source_comparison_matrix": "string (filename of source comparison-matrix.json in the opportunity-selection round folder)",
   "chosen_opportunity": {
     "id": "string (e.g., 'opp-5-1'; matches an id in the matrix's opportunities_compared[])",
     "phase_id": "string (carried from comparison matrix)",

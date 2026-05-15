@@ -15,7 +15,7 @@ The output is a **proposal** that assist 8 (top-3 selector) consumes. The trio r
 
 ## Steps
 
-1. **Resolve scope.** Follow `references/workspace-scope.md`. Discovery scope only; hard-exit if the resolved scope contains `/portfolio/`.
+1. **Resolve scope.** Follow `references/workspace-scope.md`. Discovery scope only; hard-exit if the resolved scope contains `/opportunity-selection/`.
 
 2. **Load context via parent walk-up:**
    - `<scope>/../chosen-opportunity.md`

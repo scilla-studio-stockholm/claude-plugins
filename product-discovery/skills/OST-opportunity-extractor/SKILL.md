@@ -21,7 +21,7 @@ If a transcript is long enough that you would be tempted to skim or sample, disp
 
 ## Steps
 
-1. **Resolve scope.** Follow `references/workspace-scope.md`. Portfolio scope only — the resolved path must contain `/portfolio/`. If no portfolio round exists for the target product yet, create a new round folder dated today: `workspace/<team>/<product>/portfolio/<YYYY-MM-DD>/`.
+1. **Resolve scope.** Follow `references/workspace-scope.md`. Opportunity-selection scope only — the resolved path must contain `/opportunity-selection/`. If no opportunity-selection round exists for the target product yet, create a new round folder dated today: `discovery/<team>/<product>/opportunity-selection/<YYYY-MM-DD>/`.
 
 2. **Load context via parent walk-up (optional):**
    - `<scope>/../../_product-context/product-outcome.md` (if it exists; the extractor can run without it)
@@ -77,7 +77,7 @@ If a transcript is long enough that you would be tempted to skim or sample, disp
    - Number of opportunity candidates extracted, by bucket, per file and total
    - Any transcripts where extraction yielded few candidates — flag for the trio
 
-12. **Save the result** as `<scope>/opportunities-extracted.md` with YAML frontmatter (title, date, team, purpose: "Extracted opportunity candidates from interview transcripts for this portfolio round", source_transcripts, based_on_outcome if known, tags).
+12. **Save the result** as `<scope>/opportunities-extracted.md` with YAML frontmatter (title, date, team, purpose: "Extracted opportunity candidates from interview transcripts for this opportunity-selection round", source_transcripts, based_on_outcome if known, tags).
 
 ## Output principles
 
