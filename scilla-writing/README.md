@@ -30,11 +30,11 @@ Activates when writing LinkedIn posts about product management insights.
 
 ## Installation
 
-Install via the `joni-local` marketplace:
+Install via the `scilla-studio` marketplace:
 
 ```
 /plugin marketplace add scilla-studio-stockholm/claude-plugins
-/plugin install scilla-writing@joni-local
+/plugin install scilla-writing@scilla-studio
 ```
 
 ## Usage

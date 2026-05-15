@@ -6,7 +6,7 @@ Scilla Studio Claude Code skills/plugins library. Four collections:
 - `prototype-kit/` — 4 prototype skills (add-component, add-prototype, design-system, setup-kit)
 - `product-discovery/` — 13 OST (Opportunity Solution Tree) skills for workshop-driven discovery
 
-Marketplace: `joni-local` (registered as `directory` source, `autoUpdate: true`). Plugin cache mirrors at `~/.claude/plugins/cache/joni-local/<plugin-name>/1.0.0/`. After changes, the cache auto-updates between sessions; force-sync within a session by copying `<plugin>/skills/<skill>/` into the cache path.
+Marketplace: `scilla-studio` (registered as `directory` source, `autoUpdate: true`). Plugin cache mirrors at `~/.claude/plugins/cache/scilla-studio/<plugin-name>/1.0.0/`. After changes, the cache auto-updates between sessions; force-sync within a session by copying `<plugin>/skills/<skill>/` into the cache path.
 
 ## Current State
 

@@ -1,9 +1,9 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "joni-local",
-  "description": "Joni's local plugins",
+  "name": "scilla-studio",
+  "description": "Scilla Studio Claude Code plugins",
   "owner": {
-    "name": "Joni Lindgren"
+    "name": "Scilla Studio"
   },
   "plugins": [
     {
