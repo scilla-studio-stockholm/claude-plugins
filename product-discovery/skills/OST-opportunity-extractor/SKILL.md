@@ -17,7 +17,7 @@ If a transcript is long enough that you would be tempted to skim or sample, disp
 
 ## Prerequisites
 
-- Transcripts must be cleaned with speaker labels. If they are not, recommend `joniskills:transcript-cleaner` first and exit.
+- Transcripts must be cleaned with speaker labels. If they are not, recommend `scilla-research:transcript-cleaner` first and exit.
 
 ## Steps
 

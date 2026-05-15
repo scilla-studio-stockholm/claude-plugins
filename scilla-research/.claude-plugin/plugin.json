@@ -1,0 +1,8 @@
+{
+  "name": "scilla-research",
+  "description": "PM and research toolkit: competitive teardown, customer feedback triage, JTBD interview planner, knowledge capture/finder, research documentation, transcript cleaner, cost review",
+  "version": "1.0.0",
+  "author": {
+    "name": "Scilla Studio"
+  }
+}

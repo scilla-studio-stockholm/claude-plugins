@@ -1,11 +1,12 @@
 # claude-plugins
 
-Personal Claude Code skills/plugins library. Three collections:
-- `joni-skills/` — 9 PM/research skills (competitive teardown, CSV summarizer, feedback triage, JTBD interview planner, knowledge capture/finder, research docs, transcript cleaner, **cost-review**)
-- `joni-writing/` — 2 writing skills (case study, LinkedIn post)
+Scilla Studio Claude Code skills/plugins library. Four collections:
+- `scilla-research/` — 9 PM/research skills (competitive teardown, CSV summarizer, feedback triage, JTBD interview planner, knowledge capture/finder, research docs, transcript cleaner, **cost-review**)
+- `scilla-writing/` — 2 writing skills (case study, LinkedIn post)
 - `prototype-kit/` — 4 prototype skills (add-component, add-prototype, design-system, setup-kit)
+- `product-discovery/` — 13 OST (Opportunity Solution Tree) skills for workshop-driven discovery
 
-Marketplace: `joni-local` (registered as `directory` source, `autoUpdate: true`). Plugin cache mirrors at `~/.claude/plugins/cache/joni-local/joniskills/1.0.0/`. After changes, the cache auto-updates between sessions; force-sync within a session by copying `joni-skills/skills/<skill>/` into the cache path.
+Marketplace: `joni-local` (registered as `directory` source, `autoUpdate: true`). Plugin cache mirrors at `~/.claude/plugins/cache/joni-local/<plugin-name>/1.0.0/`. After changes, the cache auto-updates between sessions; force-sync within a session by copying `<plugin>/skills/<skill>/` into the cache path.
 
 ## Current State
 
@@ -25,8 +26,8 @@ Marketplace: `joni-local` (registered as `directory` source, `autoUpdate: true`)
 - DESIGN.md `Open questions` is empty; can stay.
 
 **Gotchas:**
-- `joniskills` (plugin name in `plugin.json`) vs `joni-skills` (folder name). Both correct.
-- Plugin cache won't auto-refresh mid-session — copy `joni-skills/skills/<skill>/` into the cache manually if you want to test immediately after changes.
+- Plugin name in `plugin.json` matches folder name (e.g. `scilla-research` for both).
+- Plugin cache won't auto-refresh mid-session — copy `<plugin>/skills/<skill>/` into the cache manually if you want to test immediately after changes.
 - `cost-review --topic OST` on a large project reports ~$4.7K, not yesterday's $1.27K manual figure. Not a bug: substring filter is broader than a curated marker list. Document, don't fix.
 
 ## Session Startup

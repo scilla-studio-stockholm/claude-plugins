@@ -7,7 +7,7 @@ purpose: Mall och konventioner för CC-skills som implementerar workshop 3-assis
 
 # Skill template för Metria workshop 3-assister
 
-Mallen härledd från `OST-opportunity-extractor` som proof-of-concept (wrapper på `joniskills:knowledge-finder`). Använd den som mall för resterande tolv assister.
+Mallen härledd från `OST-opportunity-extractor` som proof-of-concept (wrapper på `scilla-research:knowledge-finder`). Använd den som mall för resterande tolv assister.
 
 ## Cross-cutting beslut som gäller alla skills
 
@@ -23,7 +23,7 @@ Mallen härledd från `OST-opportunity-extractor` som proof-of-concept (wrapper 
 
 **Knowledge-anchors:** Skills läser knowledge-filer från `knowledge/` vid körtid (runtime-access) snarare än som inbyggt i skill-prompten. Skills tillämpar den befintliga taxonomin snarare än att uppfinna egen. Knowledge/ ligger idag i klient-repots rot; principen är oberoende av framtida distribution (delat scilla-repo, plugin, eller global config).
 
-**Wrapper-mönster:** När en skill bygger på en annan skill (t.ex. `OST-opportunity-extractor` bygger på `joniskills:knowledge-finder`), dokumentera dependency tydligt under "Prerequisites" och exit om den saknas, snarare än att försöka degradera tyst.
+**Wrapper-mönster:** När en skill bygger på en annan skill (t.ex. `OST-opportunity-extractor` bygger på `scilla-research:knowledge-finder`), dokumentera dependency tydligt under "Prerequisites" och exit om den saknas, snarare än att försöka degradera tyst.
 
 ## SKILL.md-struktur
 
@@ -41,7 +41,7 @@ This skill is assist <N> in `skills-design/opportunity-solution-tree-agents.md`.
 
 ## Prerequisites (om några)
 
-- <Externa skills som krävs, t.ex. `joniskills:transcript-cleaner`>
+- <Externa skills som krävs, t.ex. `scilla-research:transcript-cleaner`>
 - <Filer eller artefakter som måste existera i förväg>
 
 ## Steps
@@ -92,7 +92,7 @@ This skill is assist <N> in `skills-design/opportunity-solution-tree-agents.md`.
 
 Per `opportunity-solution-tree-agents.md` är tretton assister speccade (steg 1, trios outcome-skrivande, är inte en AI-assist).
 
-- ✅ `OST-opportunity-extractor` (assist 3a-extractor) byggd som wrapper på joniskills:knowledge-finder
+- ✅ `OST-opportunity-extractor` (assist 3a-extractor) byggd som wrapper på scilla-research:knowledge-finder
 - ✅ `OST-validate-opportunities` (assist 3a-validator) byggd 2026-05-09: första generiska skill med engelsk body, flag-only-mönster (ingen rewrite-suggestion)
 - ✅ `OST-extract-experience-map` (assist 2) byggd 2026-05-09: första vision-baserade skill, paired JSON + markdown med deterministisk rendering, tiered strictness
 - ✅ `OST-cluster-opportunities` (assist 3b) byggd 2026-05-09: kombinerar tre inputs (experience-map JSON + validated table + extracted quotes) till v0.2 paired output med phase-clustering, parent-child inom fas (max 2 nivåer), och synthetic fas-0-unphased bucket. Bumpa schema till v0.2.

@@ -1,6 +1,6 @@
-# Joni's Writing Skills Plugin
+# Scilla Writing
 
-Personal writing styles for case studies and LinkedIn posts.
+Writing styles for product management content: case studies and LinkedIn posts.
 
 ## Skills Included
 
@@ -30,14 +30,11 @@ Activates when writing LinkedIn posts about product management insights.
 
 ## Installation
 
-Copy the plugin to your local plugins directory or reference it directly:
+Install via the `joni-local` marketplace:
 
-```bash
-# Option 1: Symlink to Claude's plugins directory (if supported)
-ln -s ~/claude-plugins/joni-writing ~/.claude/plugins/local/joni-writing
-
-# Option 2: Use as reference when needed
-# Just tell Claude to reference the skills in ~/claude-plugins/joni-writing/
+```
+/plugin marketplace add scilla-studio-stockholm/claude-plugins
+/plugin install scilla-writing@joni-local
 ```
 
 ## Usage
@@ -45,6 +42,6 @@ ln -s ~/claude-plugins/joni-writing ~/.claude/plugins/local/joni-writing
 The skills activate automatically when Claude detects relevant triggers in your requests. You can also explicitly reference them:
 
 ```
-"Write a case study for the Avanza project following my case-study skill"
-"Create a LinkedIn post about this insight using my linkedin-post skill"
+"Write a case study for the Avanza project using scilla-writing:case-study"
+"Create a LinkedIn post using scilla-writing:linkedin-post"
 ```
