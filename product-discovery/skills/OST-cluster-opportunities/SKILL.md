@@ -128,6 +128,24 @@ Paired JSON: `experience-map-clustered-<YYYY-MM-DD>.json`
 - Unphased: <N>
 - Verdicts: ✅ Approved <N>, 🔧 Needs tweak <N>, ⚠️ Solution in disguise <N>
 
+## Opportunity map
+
+```mermaid
+mindmap
+  root((<title>))
+    <phase 1 name>
+      ✅ opp-1-1 "<truncated quote>"
+        🔧 opp-1-2 "<truncated quote>"
+        ✅ opp-1-3 "<truncated quote>"
+      ⚠️ opp-1-4 "<truncated quote>"
+    <phase 2 name>
+      ✅ opp-2-1 "<truncated quote>"
+    fas-0-unphased
+      ⚠️ opp-0-1 "<truncated quote>"
+```
+
+(Phases that have at least one clustered opportunity appear as first-level branches in `order` order. Opportunities are leaves; children indented one level under their parent (parent_id). `fas-0-unphased` is a first-level branch only if it has opportunities. Phases with zero opportunities are omitted from the mindmap — the per-phase text section below still renders them.)
+
 ## Journey
 
 ### Phase 1: <name> (friction: <low|medium|high>)
@@ -176,6 +194,16 @@ from the extracted JSON)
 - Input file dates do not align: experience-map=2026-05-08, validated=2026-05-09, extracted=2026-05-09. Used latest of each.
 - Phase 5 step reference 'Credit Safe' resolved to step-5-2 (only step in phase that mentions Credit Safe).
 ```
+
+## Mindmap rendering rules
+
+- **Root label.** Use the experience map's `title` (the same value used in the H1). Wrap with `(())` for the circle shape.
+- **Phase labels.** Use `phases[].name` verbatim. No prefix number; the mindmap's vertical order reflects `order`.
+- **Opportunity labels.** `<verdict-emoji> <id> "<truncated quote>"` — emoji from the verdict (`approved`→✅, `needs_tweak`→🔧, `solution_in_disguise`→⚠️), then the opportunity `id`, then the quote truncated to ~50 characters with `…` appended if cut.
+- **Quote escaping.** Replace `"` inside the quote with `'` and collapse internal newlines/tabs to single spaces. Other characters (Swedish å/ä/ö, punctuation) pass through.
+- **Parent-child.** A child opportunity (one with `parent_id`) is indented one level under its parent. `fas-0-unphased` opportunities are flat (no parent-child inside it).
+- **Empty phases skipped.** A phase with zero clustered opportunities is omitted from the mindmap entirely. The per-phase Journey section below still renders it with the `_Inga opportunities klustrade till denna fas._` line.
+- **No mindmap when no opportunities.** If every phase is empty (including `fas-0-unphased`), omit the `## Opportunity map` section entirely.
 
 ## Output principles
 

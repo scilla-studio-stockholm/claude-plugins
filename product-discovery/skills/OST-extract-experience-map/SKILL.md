@@ -104,6 +104,41 @@ Paired JSON: `experience-map-extracted.json`
 
 ## Journey
 
+### Overview
+
+```mermaid
+flowchart LR
+  fas-1["1. &lt;phase name&gt;<br/>(&lt;friction&gt;)"]:::&lt;friction_class&gt; --> fas-2["2. &lt;phase name&gt;<br/>(&lt;friction&gt;)"]:::&lt;friction_class&gt;
+  classDef low fill:#d4edda,stroke:#155724
+  classDef medium fill:#fff3cd,stroke:#856404
+  classDef high fill:#f8d7da,stroke:#721c24
+```
+
+(One node per phase in `order` order, connected by `-->`. Class assigned per `friction_level`; phases missing friction get no class. If no phase has a friction value, omit the three `classDef` lines.)
+
+### Full graph
+
+```mermaid
+flowchart LR
+  subgraph fas-1 ["1. &lt;phase name&gt; (&lt;friction&gt;)"]
+    direction TB
+    step-1-1["&lt;description&gt;"] --> step-1-2["&lt;description&gt;"]
+  end
+  subgraph fas-2 ["2. &lt;phase name&gt; (&lt;friction&gt;)"]
+    direction TB
+    step-2-1["&lt;description&gt;"]
+  end
+  step-1-2 -->|"&lt;branch label&gt;"| step-2-1
+  fas-1 --> fas-2
+  classDef low fill:#d4edda,stroke:#155724
+  classDef medium fill:#fff3cd,stroke:#856404
+  classDef high fill:#f8d7da,stroke:#721c24
+  class fas-1 low
+  class fas-2 high
+```
+
+(Each phase is a `subgraph` containing its steps. Sequential steps inside a phase connect with `-->`. Decision branches use the labeled-edge syntax `step-X-Y -->|"label"| <leads_to>` and are written outside the subgraph blocks so they can cross phases. Phase-to-phase order arrows (`fas-1 --> fas-2`) sit at the same outer level. Friction class assigned per phase as in the Overview chart.)
+
 ### Phase 1: <name> (friction: <low|medium|high>)
 
 If the friction line shows `(friction: not recorded)`, the field was omitted from the JSON.
@@ -130,6 +165,15 @@ If the friction line shows `(friction: not recorded)`, the field was omitted fro
 - Phase 4 friction_level was ambiguous; field omitted from JSON [uncertain]
 - Phase 2 step 3 description was illegible; description field omitted from JSON [uncertain]
 ```
+
+## Mermaid rendering rules
+
+- **Node label escaping.** Replace `"` with `&quot;` and `\n` with `<br/>` inside node labels. Other special characters (Swedish å/ä/ö, parentheses) pass through unchanged.
+- **Step label source.** Use `steps[].description` verbatim. If the description was omitted (illegible), use the step id (`step-N-M`) as the label.
+- **Friction class names.** `low`, `medium`, `high` — match the schema values exactly. Omit `class` lines for phases with no friction.
+- **Branch edges.** Render only when `decision_branches[].leads_to` resolves to an existing step id in the JSON. Skip silently if it doesn't resolve. Do not invent edges from prose.
+- **Empty phases.** A phase with no steps still appears in both charts (the subgraph contains no nodes).
+- **No mermaid code block when phases is empty.** If `phases[]` is empty (shouldn't happen — it's a required field — but defensive), omit both chart blocks entirely.
 
 ## Output principles
 
