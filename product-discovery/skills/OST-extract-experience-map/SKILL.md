@@ -48,16 +48,16 @@ This skill is assist 2 in `skills-design/opportunity-solution-tree-agents.md`. T
    - `schema_version`: always `"0.1"`
    - IDs: `fas-N` for phases, `step-N-M` for steps
 
-5. **Apply tiered strictness.**
+8. **Apply tiered strictness.**
    - If a required field cannot be extracted with confidence: respond with the hard-exit message in the "Hard-exit format" section below and stop. Do not write any output files.
    - Exception for `product_outcome`: if it is missing from the screenshot but `<scope>/../../_product-context/product-outcome.md` exists, read the outcome from that file and add a Warning entry to the markdown output.
    - If an optional field is ambiguous: omit the key from the JSON and add an entry to the Warnings section.
 
-6. **Compose the JSON object** strictly against schema v0.1. For optional fields without an extractable value, omit the key entirely; never write `null`. Always omit `phases[].opportunities`.
+9. **Compose the JSON object** strictly against schema v0.1. For optional fields without an extractable value, omit the key entirely; never write `null`. Always omit `phases[].opportunities`.
 
-7. **Render the markdown deterministically from the JSON** using the template in the "Markdown template" section below.
+10. **Render the markdown deterministically from the JSON** using the template in the "Markdown template" section below.
 
-8. **Write paired output** to:
+11. **Write paired output** to:
    - `<scope>/experience-map-extracted.json`
    - `<scope>/experience-map-extracted.md`
 
@@ -84,7 +84,7 @@ The markdown output is rendered deterministically from the composed JSON using t
 ---
 title: Experience map - <title> (<team>)
 date: <YYYY-MM-DD>
-purpose: Extracted experience map for OST opportunity work, paired with experience-map-extracted-<YYYY-MM-DD>.json
+purpose: Extracted experience map for OST opportunity work, paired with experience-map-extracted.json
 
 ---
 
@@ -92,7 +92,7 @@ purpose: Extracted experience map for OST opportunity work, paired with experien
 
 Source screenshot: `<path>`
 Schema version: 0.1
-Paired JSON: `experience-map-extracted-<YYYY-MM-DD>.json`
+Paired JSON: `experience-map-extracted.json`
 
 ## Product outcome
 
