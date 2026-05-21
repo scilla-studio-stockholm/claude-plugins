@@ -1,7 +1,7 @@
 ---
 title: Assumption validation experiments
 date: 2026-05-12
-purpose: Reference for designing the cheapest viable validation experiment per riskiest assumption, based on David Bland's Test Card method and experiment catalog. Used by the OST-validation-experiment-designer assist in workshop 3 fas 5. Specifies the Test Card structure, common test types with effort/time/evidence ratings and the JSON output schema downstream consumers expect.
+purpose: Reference for designing the cheapest viable validation experiment per riskiest assumption, based on David Bland's Test Card method and experiment catalog. Used by the OST-validation-experiment-designer assist in phase 5. Specifies the Test Card structure, common test types with effort/time/evidence ratings and the JSON output schema downstream consumers expect.
 tags: [assumptions, validation, testing, experiments, bland, test-card]
 
 ---
@@ -166,7 +166,7 @@ The markdown is what the trion reads. The JSON is what downstream tooling consum
 
 ## v0.2 extensions (2026-05-12)
 
-The sections below extend v0.1 for the `OST-validation-experiment-designer` skill (workshop 3 assist 12, terminal assist in the critical path). The v0.1 Test Card structure, 12-test-type catalog, 5 selection principles, JSON schema v0.1, markdown rendering format, and application notes above are unchanged. v0.2 adds the runtime contract the skill reads at execution: a category-default test mapping, a success_criteria regex rule (numeric anchor required), full filtered identity-mapping over the upstream assist-11 output, the v0.2 JSON schema, and the renderer template with run-list HITL gate banner.
+The sections below extend v0.1 for the `OST-validation-experiment-designer` skill (assist 12, terminal assist in the critical path). The v0.1 Test Card structure, 12-test-type catalog, 5 selection principles, JSON schema v0.1, markdown rendering format, and application notes above are unchanged. v0.2 adds the runtime contract the skill reads at execution: a category-default test mapping, a success_criteria regex rule (numeric anchor required), full filtered identity-mapping over the upstream assist-11 output, the v0.2 JSON schema, and the renderer template with run-list HITL gate banner.
 
 ### Category-default test mapping (v0.2)
 
@@ -336,7 +336,7 @@ tags: [assumption-validation, ost, bland, test-card, schema-v0.2]
 
 # Validation experiments: <chosen_opportunity.id>
 
-> **Trio run-list handoff.** This is the terminal artifact for the workshop-3 critical path. Read the Test Cards; pick execution order based on resource availability, dependencies, and team capacity; run the cheapest viable test first per Bland's principle. The skill does NOT pick sequence. Capture results separately (a future Learning-Card skill is parked). If a recommended test does not fit your context, swap to one of the 2 alternatives.
+> **Trio run-list handoff.** This is the terminal artifact for the discovery critical path. Read the Test Cards; pick execution order based on resource availability, dependencies, and team capacity; run the cheapest viable test first per Bland's principle. The skill does NOT pick sequence. Capture results separately (a future Learning-Card skill is parked). If a recommended test does not fit your context, swap to one of the 2 alternatives.
 
 Source OST-riskiest-assumptions: `<source_riskiest_assumptions>`
 Source assumptions-categorized: `<source_assumptions_categorized>`
@@ -426,4 +426,4 @@ Rendering rules:
 | Version | Date | Change |
 |---|---|---|
 | v0.1 | 2026-05-06 | Initial Bland Test Card structure (4 fields), 12-test-type catalog with cost/time/evidence ratings, 5 selection principles, JSON schema v0.1 (`solutions[]` shape), markdown rendering format, application notes. |
-| v0.2 | 2026-05-12 | Extended for the OST-validation-experiment-designer skill (assist 12, terminal in workshop-3 critical path): filtered identity-mapping over upstream assist-11 output (every retained upstream field byte-identical + 2 new per-assumption fields), category-default test mapping with named-override rule (regex-checked rationale format), success_criteria regex rule (numeric anchor required), schema v0.2 (full carry-forward shape using `assumptions_per_solution[]` and `id` field names), renderer template with run-list HITL gate banner. |
+| v0.2 | 2026-05-12 | Extended for the OST-validation-experiment-designer skill (assist 12, terminal in the critical path): filtered identity-mapping over upstream assist-11 output (every retained upstream field byte-identical + 2 new per-assumption fields), category-default test mapping with named-override rule (regex-checked rationale format), success_criteria regex rule (numeric anchor required), schema v0.2 (full carry-forward shape using `assumptions_per_solution[]` and `id` field names), renderer template with run-list HITL gate banner. |

@@ -1,13 +1,13 @@
 ---
 title: "Opportunity Solution Tree Agents"
 date: 2026-05-06
-purpose: Designdokument för Opportunity Solution Tree Agents - de tretton AI-assister (skills med OST- prefix) som driver workshop 3-flödet, fördelat på fem faser - opportunity-val (steg 1-5), solution-brainstorm (steg 6-8), assumption identification (steg 9-10), assumption risk mapping (steg 11) och assumption validation experiments (steg 12). Per assist plus cross-cutting designfrågor och bygg-ordning. Inte en spec, ett underlag.
+purpose: Designdokument för Opportunity Solution Tree Agents - de tretton AI-assister (skills med OST- prefix) som driver discovery-flödet, fördelat på fem faser - opportunity-val (steg 1-5), solution-brainstorm (steg 6-8), assumption identification (steg 9-10), assumption risk mapping (steg 11) och assumption validation experiments (steg 12). Per assist plus cross-cutting designfrågor och bygg-ordning. Inte en spec, ett underlag.
 
 ---
 
 ## Namnkonvention
 
-Hela samlingen heter **Opportunity Solution Tree Agents** (OST Agents). Varje skill prefixas `OST-<verb-noun>` i `.claude/skills/`. Tidigare namn var "Workshop 3 AI-assister"; arkiverat 2026-05-13 till förmån för OST-namnet eftersom det är vad det faktiskt är - automatisering av Teresa Torres' Opportunity Solution Tree-process.
+Hela samlingen heter **Opportunity Solution Tree Agents** (OST Agents). Varje skill prefixas `OST-<verb-noun>` i `.claude/skills/`. OST-namnet beskriver vad samlingen faktiskt är - automatisering av Teresa Torres' Opportunity Solution Tree-process.
 
 ## Pipeline-översikt
 
@@ -81,7 +81,7 @@ flowchart TD
 
 ## Vad det här dokumentet är
 
-Det här är **inte** guiden för trio. Guiden är `plans/workshop-3-guide-trio-process.md`. Det är **inte** heller en spec på de skills och agenter vi ska bygga.
+Det här är **inte** guiden för trio och **inte** heller en spec på de skills och agenter vi ska bygga.
 
 Det är **designdokumentet för Opportunity Solution Tree Agents** där vi diskuterar:
 
@@ -124,9 +124,9 @@ Mappning mot assisterna i den här inputen:
 | 11 (Riskiest-assumptions agent)         | Outcomes-rubric kan koda binär scoring med konkret rationale per antagande.                                                                                                                                    |
 | 12 (Validation-experiment-designer)     | Outcomes-rubric kan koda cheapest-viable och falsifierbar success_criteria som kvalitetskrav.                                                                                                                  |
 
-Dreaming är out of scope för en enskild workshopkörning men relevant om assisterna körs över flera trios och kvartal: mönster som "trios glömmer ofta att markera evidensgap" kan surfaca över tid.
+Dreaming är out of scope för en enskild discovery-körning men relevant om assisterna körs över flera trios och kvartal: mönster som "trios glömmer ofta att markera evidensgap" kan surfaca över tid.
 
-**Beslut (2026-05-08): Claude Code valt.** Operatörsbasen är två scilla-personer (Joni, Linda) snarare än en hel organisation, och metodiken körs när som helst snarare än som workshop-tool. Managed Agents distributionsfördelar väger då inte upp den operativa overheaden (auth, frontend, access management). Iterationshastigheten väger också tungt eftersom prompts och datakontrakt kommer ändras löpande över nästa kvartal.
+**Beslut (2026-05-08): Claude Code valt.** Operatörsbasen är två scilla-personer (Joni, Linda) snarare än en hel organisation, och metodiken körs när som helst snarare än som ett tidsbundet event-verktyg. Managed Agents distributionsfördelar väger då inte upp den operativa overheaden (auth, frontend, access management). Iterationshastigheten väger också tungt eftersom prompts och datakontrakt kommer ändras löpande över nästa kvartal.
 
 Det vi avstår från är orchestration-primitiven inbyggt. Multi-agent för assist 6 och 9 kodas via Task-tool plus prompt-engineering, och outcomes-rubric för assist 8, 11 och 12 lever antingen i prompten eller som en separat granskning-skill snarare än som strukturell grader-passage. Mappningstabellen ovan behålls som referens om någon assist senare flyttas till Managed Agents.
 
@@ -410,7 +410,7 @@ Anchors: `../knowledge/discovery/product-outcomes-i-olika-skeden.md` och `../kno
 
 **Input:** Ett eller flera intervjutranskript (markerade talare).
 
-**Output:** Lista av kandidat-opportunities i workshop-2-citatformat. Inte godkända per default, kandidater för trio att granska.
+**Output:** Lista av kandidat-opportunities i citat-stickie-format. Inte godkända per default, kandidater för trio att granska.
 
 **Föreslagen typ:** Skill om transkripten är hanterbara i ett pass, agent om vi behöver iterera över många.
 
@@ -512,7 +512,7 @@ svar: opportunities kan hamna utanför en phase, behöver bara en tydlig klassif
 
 **Öppna designfrågor:**
 
-- Slutleveransens format till nästa workshop, fri text plus rationale eller strukturerad mall? (Öppen fråga från guiden, väntar på beslut.)
+- Slutleveransens format till nästa fas, fri text plus rationale eller strukturerad mall? (Öppen fråga från guiden, väntar på beslut.)
 - Hur uttalad ska assisten vara om sin egen osäkerhet? "Jag rekommenderar X givet vad jag ser, men ..." vs ren rekommendation?
 - Hur hanterar assisten oavgjort, två opportunities som ser likvärdiga ut?
 
@@ -526,7 +526,7 @@ svar: opportunities kan hamna utanför en phase, behöver bara en tydlig klassif
 
 Efter att trio har en vald opportunity tar AI över och producerar lösningskandidater. Trio kommer in vid slutet och approves top 3. Se HITL-mönstret per fas i cross-cutting-sektionen.
 
-Designfilosofin är inspirerad av workshop-loops som tvingar deltagare bortom de mest uppenbara idéerna. Round 1 fångar det intuitiva (vilket LLM:er, precis som människor, gravitar till). Round 2 och 3 förbjuder duplikat och kräver nya eller bygg-på-idéer. Tre omgångar ger tillräcklig divergens.
+Designfilosofin är inspirerad av ideation-loops som tvingar deltagare bortom de mest uppenbara idéerna. Round 1 fångar det intuitiva (vilket LLM:er, precis som människor, gravitar till). Round 2 och 3 förbjuder duplikat och kräver nya eller bygg-på-idéer. Tre omgångar ger tillräcklig divergens.
 
 ---
 
@@ -643,7 +643,7 @@ Designfilosofin är inspirerad av workshop-loops som tvingar deltagare bortom de
 
 Efter att top 3-lösningarna är valda i fas 2 ska antaganden som måste hålla för varje lösning surfacas. Trio kommer in i slutet och godkänner outputen. Se HITL-mönstret per fas i cross-cutting-sektionen, inklusive den olösta pedagogiska spänningen.
 
-**Designfilosofi:** Tre metoder, samma som workshopens analoga övning - storymap av lösningen, pre-mortem och outcome-impact-resonemang. Varje metod kör som en separat prompt-pass per lösning. Skälet är att varje metod attackerar en specifik LLM-svaghet:
+**Designfilosofi:** Tre metoder, samma som den analoga övningen - storymap av lösningen, pre-mortem och outcome-impact-resonemang. Varje metod kör som en separat prompt-pass per lösning. Skälet är att varje metod attackerar en specifik LLM-svaghet:
 
 - **Storymap** tvingar decomposition per användarsteg, hindrar generic high-level-antaganden
 - **Pre-mortem** flippar framen från "ska funka" till "har misslyckats", neutraliserar plausibility-bias
@@ -727,7 +727,7 @@ Tre oberoende frames ger bredare täckning än en. Rolldiversifiering (PM, UX, T
 
 Efter att antagandena är genererade och kategoriserade i fas 3 ska de mest riskfyllda identifieras. Trio kan inte testa alla. De ska testa de som är mest avgörande och har minst evidens, det Eric Ries kallade "leap of faith assumptions" och som David Bland operationaliserar i en 2x2-matris.
 
-**Designfilosofi:** Två binära frågor per antagande, samma som workshopens analoga övning. Binärt med flit. Graderad scoring inbjuder till falsk precision och kaninhål. JSON-output så downstream-konsumenter (assumption testing-fas, framtida risk-dashboards, trios review) får en strukturerad artefakt.
+**Designfilosofi:** Två binära frågor per antagande, samma som den analoga övningen. Binärt med flit. Graderad scoring inbjuder till falsk precision och kaninhål. JSON-output så downstream-konsumenter (assumption testing-fas, framtida risk-dashboards, trios review) får en strukturerad artefakt.
 
 ---
 
@@ -739,7 +739,7 @@ Efter att antagandena är genererade och kategoriserade i fas 3 ska de mest risk
 
 **Output:** JSON enligt schemat i `../knowledge/discovery/assumption-risk-mapping.md`. Per antagande: text, kategori, importance, evidence, is_riskiest, rationale.
 
-**Föreslagen typ:** Skill, single-pass scoring against låst 2x2-ramverk. Workshop-3-serien har konvergerat på skill-mönstret (även för multi-agent-orchestration som OST-generate-assumptions); en agent-paketering hade duplicerat operativ overhead utan att förbättra kapabilitet. Locked 2026-05-12.
+**Föreslagen typ:** Skill, single-pass scoring against låst 2x2-ramverk. Serien har konvergerat på skill-mönstret (även för multi-agent-orchestration som OST-generate-assumptions); en agent-paketering hade duplicerat operativ overhead utan att förbättra kapabilitet. Locked 2026-05-12.
 
 **Tools behövda:** Read, Write.
 
@@ -788,7 +788,7 @@ Efter att de mest riskfyllda antagandena är flaggade i fas 4 ska de valideras. 
 - **JSON** enligt schemat i `../knowledge/discovery/assumption-validation.md`. Per antagande: recommended_test (med Test Card-fälten) plus alternative_tests
 - **Markdown Test Cards** för trio att läsa, en per antagande. Båda härleds från samma underliggande extraktion
 
-**Föreslagen typ:** Skill, single-pass Test Card design against låst category-default mapping. Workshop-3-serien har konvergerat på skill-mönstret; terminal-assist (ingen downstream-skill) gör packaging-skillnaden mellan skill och agent ännu mindre meaningful här. Locked 2026-05-12.
+**Föreslagen typ:** Skill, single-pass Test Card design against låst category-default mapping. Serien har konvergerat på skill-mönstret; terminal-assist (ingen downstream-skill) gör packaging-skillnaden mellan skill och agent ännu mindre meaningful här. Locked 2026-05-12.
 
 **Tools behövda:** Read, Write.
 
@@ -811,7 +811,7 @@ Efter att de mest riskfyllda antagandena är flaggade i fas 4 ska de valideras. 
 - Customer-access flagging: ingen structured field; trio catcher access-needs vid HITL via test_type-inference.
 - Learning Card: deferred till v0.3 / framtida capture-skill. v1 stoppar vid "designed the test".
 
-Schema bumpat till v0.2 i `../knowledge/discovery/assumption-validation.md` (extension): filtered identity-mapping över upstream assist-11 output (is_riskiest=true only; varje retained upstream-fält byte-identical) plus 2 nya per-antagande-fält. Output paired JSON + markdown till `workspace/10-validation-experiments/`. Markdown öppnar med Trio run-list handoff banner (terminal-assist framing; ingen review-and-approve gate). Ingen `ratifications.md`-entry. Twelfth and final assist in workshop-3 critical path.
+Schema bumpat till v0.2 i `../knowledge/discovery/assumption-validation.md` (extension): filtered identity-mapping över upstream assist-11 output (is_riskiest=true only; varje retained upstream-fält byte-identical) plus 2 nya per-antagande-fält. Output paired JSON + markdown till `workspace/10-validation-experiments/`. Markdown öppnar med Trio run-list handoff banner (terminal-assist framing; ingen review-and-approve gate). Ingen `ratifications.md`-entry. Twelfth and final assist in the discovery critical path.
 
 **Prio:** Medium. Beroende av 13 (Riskiest-assumptions agent). Sista assisten i nuvarande scope.
 

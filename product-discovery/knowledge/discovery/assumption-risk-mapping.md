@@ -1,7 +1,7 @@
 ---
 title: Assumption risk mapping
 date: 2026-05-12
-purpose: Reference for the 2x2 method that identifies the riskiest assumptions per solution, based on David Bland's Assumptions Mapping. Used by the OST-riskiest-assumptions agent in workshop 3 fas 4. Specifies the two scoring questions, the quadrant interpretation and the JSON output schema downstream consumers expect.
+purpose: Reference for the 2x2 method that identifies the riskiest assumptions per solution, based on David Bland's Assumptions Mapping. Used by the OST-riskiest-assumptions agent in phase 4. Specifies the two scoring questions, the quadrant interpretation and the JSON output schema downstream consumers expect.
 tags: [assumptions, risk, validation, bland, leap-of-faith]
 
 ---
@@ -27,7 +27,7 @@ The output of this step feeds into assumption testing (designing experiments to 
 
 David J. Bland and Alexander Osterwalder, *Testing Business Ideas* (Wiley, 2019). The Assumptions Mapping technique sits in chapter 1 ("Design") of the book and builds on Eric Ries' *The Lean Startup* concept of "leap of faith assumptions".
 
-The version below is a simplified workshop variant. Bland's original uses slightly different axis labels but the core 2x2 logic is identical.
+The version below is a simplified variant. Bland's original uses slightly different axis labels but the core 2x2 logic is identical.
 
 ## The 2x2 framework
 
@@ -108,7 +108,7 @@ The OST-riskiest-assumptions agent outputs JSON in this structure. Downstream co
 
 ### Field notes
 
-- **`importance`** and **`evidence`** are binary, mirroring the workshop's two yes/no questions. No graded scale. The simplification is deliberate: graded scoring invites false precision and rabbit holes.
+- **`importance`** and **`evidence`** are binary, mirroring the two yes/no scoring questions. No graded scale. The simplification is deliberate: graded scoring invites false precision and rabbit holes.
 - **`is_riskiest`** is computed from importance and evidence. Including it as an explicit field makes downstream consumption simpler than re-deriving it.
 - **`rationale`** is a required one-line string. It exists so the trion can validate AI:s scoring at a glance and so future audits can see the reasoning. Brief, not a paragraph.
 - **`category`** is preserved from fas 3 categorization. It travels with the assumption through fas 4 because some downstream uses (e.g., risk dashboards split by category) need it.
@@ -118,7 +118,7 @@ The OST-riskiest-assumptions agent outputs JSON in this structure. Downstream co
 - **Riskiness is per solution, not global.** An assumption that is risky for solution A may not exist for solution B. The JSON groups assumptions under their solution.
 - **Not every solution will have the same number of riskiest assumptions.** Some may have several, others zero. Both are legitimate outputs.
 - **The agent does not propose tests.** That is the next step (assumption testing), out of scope here. Output stops at "this is risky and here is why".
-- **Workshop note preserved:** As trios train their ability to see assumptions and assess risk, the matrix becomes scaffolding rather than the goal. AI is a training aid, not a permanent crutch.
+- **Practice note:** As trios train their ability to see assumptions and assess risk, the matrix becomes scaffolding rather than the goal. AI is a training aid, not a permanent crutch.
 
 ## Open evolutions
 
@@ -127,7 +127,7 @@ The OST-riskiest-assumptions agent outputs JSON in this structure. Downstream co
 
 ## v0.2 extensions (2026-05-12)
 
-The sections below extend v0.1 for the `OST-riskiest-assumptions` skill (workshop 3 assist 11). The v0.1 framework, scoring questions, and application notes above are unchanged. v0.2 adds the runtime contract the skill reads at execution: a soft-evidence rule (replacing the strict empirical-only standard for the AI scoring pass; trios still override at HITL), a structured rationale format (regex-checked), full identity-mapping over the upstream assist-10 output (every upstream field byte-identical; 4 new per-assumption fields), the v0.2 JSON schema, and the renderer template with Trio HITL gate banner.
+The sections below extend v0.1 for the `OST-riskiest-assumptions` skill (assist 11). The v0.1 framework, scoring questions, and application notes above are unchanged. v0.2 adds the runtime contract the skill reads at execution: a soft-evidence rule (replacing the strict empirical-only standard for the AI scoring pass; trios still override at HITL), a structured rationale format (regex-checked), full identity-mapping over the upstream assist-10 output (every upstream field byte-identical; 4 new per-assumption fields), the v0.2 JSON schema, and the renderer template with Trio HITL gate banner.
 
 ### Soft-evidence rule (v0.2)
 
@@ -310,5 +310,5 @@ Rendering rules:
 
 | Version | Date | Change |
 |---|---|---|
-| v0.1 | 2026-05-06 | Initial 2x2 framework with binary axes (importance high/low, evidence strong/weak), two Swedish scoring questions, JSON schema v0.1 (`solutions[]` shape), workshop application notes. |
+| v0.1 | 2026-05-06 | Initial 2x2 framework with binary axes (importance high/low, evidence strong/weak), two Swedish scoring questions, JSON schema v0.1 (`solutions[]` shape), application notes. |
 | v0.2 | 2026-05-12 | Extended for the OST-riskiest-assumptions skill (assist 11): identity-mapping over upstream assist-10 output (every upstream field byte-identical + 4 new per-assumption fields), soft-evidence rule, structured rationale format (regex-checked), schema v0.2 (full carry-forward shape using `assumptions_per_solution[]` and `id` field names), renderer template with Trio HITL gate banner. |

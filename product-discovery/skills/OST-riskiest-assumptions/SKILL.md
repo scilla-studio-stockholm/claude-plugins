@@ -67,7 +67,7 @@ This skill IS the phase-3 trio HITL gate. The markdown output opens with a `Trio
 
    - **Role frame:** "You are scoring product-discovery assumptions on Bland's 2x2: importance (high/low) and evidence (strong/weak). Riskiest = high importance + weak evidence."
 
-   - **The two scoring questions** verbatim from `assumption-risk-mapping.md` v0.1 (Swedish-language original preserved for workshop fidelity):
+   - **The two scoring questions** verbatim from `assumption-risk-mapping.md` v0.1 (Swedish-language original preserved verbatim):
      - **Q1 (evidence):** *Har vi redan bevis för att det här antagandet är sant?* Yes → `strong`. No → `weak`.
      - **Q2 (importance):** *Om vi har fel i det här antagandet, skiter det sig då?* Yes → `high`. No → `low`.
 

@@ -1,7 +1,7 @@
 ---
 title: Assumption types for solution validation
 date: 2026-05-06
-purpose: Reference taxonomy for categorizing assumptions that must hold for a product solution to deliver its intended impact. Used by the assumption categorizer assist in workshop 3 fas 3, and as learning material for trios developing assumption-identification skill.
+purpose: Reference taxonomy for categorizing assumptions that must hold for a product solution to deliver its intended impact. Used by the assumption categorizer assist in phase 3, and as learning material for trios developing assumption-identification skill.
 tags: [assumptions, ost, validation, cagan, risk]
 
 ---
@@ -25,7 +25,7 @@ The taxonomy below is for the **decomposition step**. It does not say which assu
 
 ## The five categories
 
-The categories are anchored in Marty Cagan's "five product risks" from *Transformed* (see `knowledge/foundations/product-operating-model-marty-cagan.md`, principle 10), with terminology adjusted to match how Metria's trios discuss assumptions in workshops.
+The categories are anchored in Marty Cagan's "five product risks" from *Transformed* (see `knowledge/foundations/product-operating-model-marty-cagan.md`, principle 10), with terminology adjusted to match how product trios discuss assumptions in practice.
 
 ### 1. Desirability assumptions
 
@@ -33,7 +33,7 @@ The categories are anchored in Marty Cagan's "five product risks" from *Transfor
 
 **Surfacing question:** "Why would users care about this? What must be true for them to want it?"
 
-**Example assumptions (from workshop practice):**
+**Example assumptions (from discovery practice):**
 
 - Våra kunder och användare vill ha det här
 - Användare upplever värde när de använder det
@@ -101,10 +101,10 @@ The categories are anchored in Marty Cagan's "five product risks" from *Transfor
 ## Application notes
 
 - **One assumption can touch multiple categories.** When that happens, place it in the category that best describes the risk if the assumption fails. If a feasibility-flavored assumption would actually sink the business case if false, file it under viability.
-- **The categories are scaffolding, not the goal.** The goal is to see assumptions clearly enough to decide which to test. Trios learn to surface assumptions without leaning on the categories over time. Per the workshop note: "Ju mer tränade ni blir i att se egna antaganden desto mindre kommer ni behöva luta er mot strukturerade metoder."
+- **The categories are scaffolding, not the goal.** The goal is to see assumptions clearly enough to decide which to test. Trios learn to surface assumptions without leaning on the categories over time. As a guiding principle: "Ju mer tränade ni blir i att se egna antaganden desto mindre kommer ni behöva luta er mot strukturerade metoder."
 - **The categorization is per solution.** Assumptions for solution A are kept separate from assumptions for solution B even if they look similar. Two solutions can have superficially similar assumptions that fail differently.
 
 ## Open evolutions
 
 - The "other" category is a known weak point. If the same kind of assumption keeps landing there (e.g. regulatory or compliance-flavored), promote it to its own category in v0.2.
-- Workshop practice may produce category-specific surfacing methods beyond the three current methods (storymap, pre-mortem, outcome-impact). When that happens, link them per category.
+- Discovery practice may produce category-specific surfacing methods beyond the three current methods (storymap, pre-mortem, outcome-impact). When that happens, link them per category.

@@ -5,7 +5,7 @@ description: For product trios and researchers, when designing validation experi
 
 # OST-validation-experiment-designer
 
-You help a product trio design validation experiments for the riskiest assumptions surfaced by `OST-riskiest-assumptions` (assist 11), using David Bland's Test Card method and the cheapest-viable principle. This skill is assist 12 in `skills-design/opportunity-solution-tree-agents.md` and the only assist in phase 5 (assumption validation experiments). It is the terminal assist in the workshop-3 critical path.
+You help a product trio design validation experiments for the riskiest assumptions surfaced by `OST-riskiest-assumptions` (assist 11), using David Bland's Test Card method and the cheapest-viable principle. This skill is assist 12 in `skills-design/opportunity-solution-tree-agents.md` and the only assist in phase 5 (assumption validation experiments). It is the terminal assist in the discovery critical path.
 
 The skill is a filtered identity map over upstream assumptions plus 2 new per-assumption fields (`recommended_test`, `alternative_tests`). Filter: `is_riskiest=true` only. Non-riskiest assumptions are dropped. Every upstream field for retained assumptions carries through byte-identical.
 
@@ -177,7 +177,7 @@ This skill is terminal. There is no downstream skill. The markdown output opens 
 
     # Validation experiments: <chosen_opportunity.id>
 
-    > **Trio run-list handoff.** This is the terminal artifact for the workshop-3 critical path. Read the Test Cards; pick execution order based on resource availability, dependencies, and team capacity; run the cheapest viable test first per Bland's principle. The skill does NOT pick sequence. Capture results separately (a future Learning-Card skill is parked). If a recommended test does not fit your context, swap to one of the 2 alternatives.
+    > **Trio run-list handoff.** This is the terminal artifact for the discovery critical path. Read the Test Cards; pick execution order based on resource availability, dependencies, and team capacity; run the cheapest viable test first per Bland's principle. The skill does NOT pick sequence. Capture results separately (a future Learning-Card skill is parked). If a recommended test does not fit your context, swap to one of the 2 alternatives.
 
     Source chosen opportunity: `<scope>/../chosen-opportunity.md`
     Source product outcome: `<scope>/../../../_product-context/product-outcome.md`
@@ -266,7 +266,7 @@ This skill is terminal. There is no downstream skill. The markdown output opens 
 
 ## Output principles
 
-- The output is the terminal artifact for the workshop-3 critical path. Markdown opens with a run-list handoff banner; the trio reads, picks execution order, runs the cheapest viable first.
+- The output is the terminal artifact for the discovery critical path. Markdown opens with a run-list handoff banner; the trio reads, picks execution order, runs the cheapest viable first.
 - Filtered identity-mapping is the load-bearing invariant. Every retained upstream field byte-identical; only 2 new fields added per assumption. Non-riskiest dropped.
 - Apply category-default first, override only when assumption text justifies. Name the override in rationale.
 - `success_criteria` is falsifiable: at least one digit required. Vague thresholds rejected.

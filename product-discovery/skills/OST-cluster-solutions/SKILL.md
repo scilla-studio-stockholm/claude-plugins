@@ -243,7 +243,7 @@ Members (<N>):
 - **Read interview transcripts.** Candidates come from the brainstormer.
 - **Read the experience map, validated opportunities table, opportunity-comparison matrix, or chosen-opportunity selector output.** Everything the clusterer needs is in `<scope>/solution-candidates.json`, `<scope>/../chosen-opportunity.md`, and `<scope>/../../../_product-context/product-outcome.md`.
 - **Use a `Cites:` line or per-member trace-back invariant.** Members are carried verbatim; no trace-back needed beyond `id` matching.
-- **Apply effort or feasibility weighing.** Torres principle is in effect through the whole workshop-3 pipeline; no exceptions here.
+- **Apply effort or feasibility weighing.** Torres principle is in effect through the whole discovery pipeline; no exceptions here.
 - **Parse `build_on` references from description prose.** Deferred to v0.2 if assist 8 reports needing it.
 - **Generate a `cluster_axis_summary` field.** Deferred to v0.2.
 - **Flag low-fit members.** Deferred to v0.2.

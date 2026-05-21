@@ -2,13 +2,13 @@
 title: "OST-select-top-three-solutions: design spec (v2)"
 date: 2026-05-11
 purpose: Locked v2 design for assist 8 in opportunity-solution-tree-agents.md - takes the v0.1 solution-candidates JSON from OST-brainstorm-solutions (assist 6) plus the trio's chosen-opportunity and product-outcome context, runs a single-pass LLM call to pick 3 specific member solutions ranked by outcome-impact probability, each with a 2-3 sentence outcome-mapping rationale. Schema v0.2 in ../knowledge/discovery/top-three-selection.md replaces v0.1 (cluster-input + discriminator picks). OST-cluster-solutions stays built but is removed from the required pipeline. Input to the implementation plan.
-tags: [skill-design, workshop-3, ost, top-three-selection, schema-v0.2]
+tags: [skill-design, ost, top-three-selection, schema-v0.2]
 
 ---
 
 # OST-select-top-three-solutions: design spec (v2)
 
-This is the locked v2 design for **assist 8** in `opportunity-solution-tree-agents.md`. It supersedes the v0.1 design (committed at `36a2826`, implemented in commits `9693096..2553a1e` on 2026-05-11). Smoke-test of v0.1 surfaced an architectural mismatch with the workshop process — the picker output clusters rather than specific solutions, conflated "explore in parallel" with mechanism diversification, and pre-empted assist 9's assumption-reasoning. The v2 redesign drops the clusterer from the required pipeline and simplifies the picker to "top 3 by outcome-impact probability, each a specific solution".
+This is the locked v2 design for **assist 8** in `opportunity-solution-tree-agents.md`. It supersedes the v0.1 design (committed at `36a2826`, implemented in commits `9693096..2553a1e` on 2026-05-11). Smoke-test of v0.1 surfaced an architectural mismatch with the discovery process — the picker output clusters rather than specific solutions, conflated "explore in parallel" with mechanism diversification, and pre-empted assist 9's assumption-reasoning. The v2 redesign drops the clusterer from the required pipeline and simplifies the picker to "top 3 by outcome-impact probability, each a specific solution".
 
 ## What the skill does (v2)
 
@@ -22,7 +22,7 @@ The skill produces a **proposal**, not a decision-of-record. The trio reviews th
 
 The v0.1 implementation was built and smoke-tested. The smoke-test output revealed three architectural problems:
 
-1. **Cluster-bias in picker behavior.** The v0.1 discriminator-variant schema let the picker choose cluster-picks or member-picks per pick. In practice the picker chose 3-of-3 cluster-picks because cluster-level rationale is easier to argue than per-member differentiation. The "flexibility" of the discriminator hid a strong default that didn't match the trio's mental model. Specific solutions are what the trio expects to carry forward; clusters are workshop-scaffolding for human cognition.
+1. **Cluster-bias in picker behavior.** The v0.1 discriminator-variant schema let the picker choose cluster-picks or member-picks per pick. In practice the picker chose 3-of-3 cluster-picks because cluster-level rationale is easier to argue than per-member differentiation. The "flexibility" of the discriminator hid a strong default that didn't match the trio's mental model. Specific solutions are what the trio expects to carry forward; clusters are scaffolding for human cognition.
 2. **"Explore in parallel" ≠ mechanism diversification.** v0.1 imported a soft diversification heuristic (via the cluster-context rationale ingredient) on the theory that Torres' "choose three to explore in parallel" implied mechanism diversity. Torres' principle is actually about comparative-learning speed (running 3 simultaneously beats running 1 → evaluate → run next), not about hedging across mechanisms. Three picks that all bet on flavors of one mechanism is a legitimate trio choice. The picker shouldn't enforce diversification.
 3. **Premature assumption-reasoning.** v0.1's rationale-ingredient "customer-evidence anchor" plus the diversification heuristic together pushed the picker into reasoning about which assumptions the picks share. That's assist 9's job. The picker's job is "if this works, would it move the outcome?" — not "what makes this risky?".
 
@@ -42,7 +42,7 @@ The v2 brainstorm resolved four open questions on top of the v0.1 corrections.
 | Assumptions | No `key_assumptions[]` field, assist 9 owns | **No `key_assumptions[]` field** (unchanged). v2 reinforces: rationale prose does NOT mention assumptions or risks. Assist 9 owns that domain. |
 | Hedging tone | Confident on clean wins, transparent on close calls | **Same** (unchanged). Rationale prose may name a near-miss inline if the #3 vs #4 distinction is genuinely close; otherwise stays confident. |
 | Input source | Cluster-map from OST-cluster-solutions | **Direct from OST-brainstorm-solutions output.** The 18 specific solutions, no intermediate clustering. |
-| OST-cluster-solutions in pipeline | Required upstream (assist 7) | **Off-pipeline.** Skill stays built and available; trios may invoke it for their own clustered review of the brainstorm. Not a required input to assist 8. Bygg-status pipeline shrinks from 13 to 12 required assists for the workshop-3 critical path. |
+| OST-cluster-solutions in pipeline | Required upstream (assist 7) | **Off-pipeline.** Skill stays built and available; trios may invoke it for their own clustered review of the brainstorm. Not a required input to assist 8. Bygg-status pipeline shrinks from 13 to 12 required assists for the discovery critical path. |
 | Schema version | v0.1 in `top-three-selection.md` | **v0.2** in `top-three-selection.md`. v0.1 stays as Evolution entry. |
 | Trio ratification | Ratification-flag pattern via `workspace/context/ratifications.md` | **Same** (unchanged). v0.1 introduced this pattern; v2 keeps it. |
 | Cross-check chosen-opp id | Source-JSON vs context-md bold-id | **Same** (unchanged). Brainstormer output carries `chosen_opportunity.id`; cross-check against context bold-id row, hard-exit on mismatch. |
@@ -368,7 +368,7 @@ These go to `TODO.md` rather than blocking v2.
 9. **`workspace/context/ratifications.md` documentation.** Inherited from v0.1. Document the file convention and one-line format in the workspace README.
 10. **Assist 9 reads from `ratifications.md` contract.** Inherited from v0.1. Assist 9's design will specify the line format it parses and behavior on multiple ratification entries.
 
-## What this skill establishes for the workshop-3 series (v2)
+## What this skill establishes for the discovery series (v2)
 
 - **Direct-input precedent.** v0.2 is the first picker-style skill in the series that reads brainstormer output directly without an intermediate clustering pass. The pattern transfers to any future skill that ranks a flat set of candidates.
 - **Schema-version evolution within an anchor.** First instance of an anchor (top-three-selection.md) bumping from v0.1 to v0.2 with the Evolution section carrying the change rationale. Establishes the precedent for in-place schema bumps when the design shifts.

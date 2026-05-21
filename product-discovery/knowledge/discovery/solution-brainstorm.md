@@ -20,7 +20,7 @@ The brainstormer does not curate, rank, or pre-cluster the 18 candidates. The tr
 
 ## The three-round structure
 
-Workshop-loops literature shows that the most obvious ideas come first. Round 1 captures these. Rounds 2 and 3 force divergence past the obvious by making each sub-agent see the prior pool with a "no paraphrases" rule.
+Iterative-brainstorm research shows that the most obvious ideas come first. Round 1 captures these. Rounds 2 and 3 force divergence past the obvious by making each sub-agent see the prior pool with a "no paraphrases" rule.
 
 - **Round 1:** Each sub-agent sees the chosen opportunity, the outcome, and its own role anchor. It produces 2 ideas from its frame. Three sub-agents in parallel: 6 ideas.
 - **Round 2:** Each sub-agent sees the 6 round-1 ideas as a "do not duplicate" pool, plus the same context as round 1. It produces 2 more ideas. 6 more ideas.

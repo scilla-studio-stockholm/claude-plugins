@@ -2,13 +2,13 @@
 title: "OST-brainstorm-solutions: design spec"
 date: 2026-05-10
 purpose: Locked design for assist 6 in opportunity-solution-tree-agents.md - takes the trio-ratified chosen-opportunity from workspace/context/chosen-opportunity.md and the product outcome, spawns three role sub-agents (PM, UX, Tech Lead) in parallel per round across three rounds via the Agent tool with a prompt-only "new or build-on, no paraphrases" anti-duplication rule, and produces 18 paired JSON + markdown solution candidates conforming to a new schema v0.1 in ../knowledge/discovery/solution-brainstorm.md. Input to the implementation plan.
-tags: [skill-design, workshop-3, ost, solution-brainstorm, schema-v0.1, agent-orchestration]
+tags: [skill-design, ost, solution-brainstorm, schema-v0.1, agent-orchestration]
 
 ---
 
 # OST-brainstorm-solutions: design spec
 
-This is the locked design for **assist 6** in `opportunity-solution-tree-agents.md`. It is the seventh skill built in the workshop 3 series, after `OST-opportunity-extractor`, `OST-validate-opportunities`, `OST-extract-experience-map`, `OST-cluster-opportunities`, `OST-compare-opportunities`, and `OST-select-opportunity`. The implementation plan derives from this document.
+This is the locked design for **assist 6** in `opportunity-solution-tree-agents.md`. It is the seventh skill built, after `OST-opportunity-extractor`, `OST-validate-opportunities`, `OST-extract-experience-map`, `OST-cluster-opportunities`, `OST-compare-opportunities`, and `OST-select-opportunity`. The implementation plan derives from this document.
 
 This is the first assist in **phase 2 (solution space)**. All prior assists were phase 1 (opportunity space). The HITL pattern shifts here: phase 1 was trio-driven discovery with AI summarization; phase 2 starts with AI-driven generation, and the trio comes in at the end of the phase (assist 8) to approve top 3. There is no in-skill HITL banner in this skill's output; the trio's gate is downstream.
 
@@ -102,7 +102,7 @@ This anchor carries the same role for the brainstormer that `opportunity-compari
 Sections in the anchor:
 
 1. **What the brainstormer does** - short framework prose tying it to Torres CDH ch 8 ("Generate solutions"). Notes that the brainstormer consumes a ratified chosen opportunity and produces a divergent candidate set; clustering and selection are downstream.
-2. **The three-round structure** - why three rounds: round 1 catches the intuitive, rounds 2 and 3 force divergence past the obvious. From workshop-loops literature.
+2. **The three-round structure** - why three rounds: round 1 catches the intuitive, rounds 2 and 3 force divergence past the obvious. From ideation-loop literature.
 3. **Role diversification** - why PM, UX, Tech Lead specifically. Each role's lens biases what surface area they explore. Three roles is the trio's structural diversity; using them as generation anchors maps the diversity into the candidate set.
 4. **The anti-duplication rule** - prompt-only, "new or build-on, no paraphrases", build-on entries cite the prior idea by title in their description. assist 7 (clusterer) is the dedup layer.
 5. **Definition of "solution"** - "A solution is anything a product trio could ship or change that plausibly moves the product outcome on the chosen opportunity. This includes user-facing features, process redesigns, policy changes, integration changes, automation, internal tooling, removed steps, or org-level changes." Each role steers framing; no role is restricted to a single surface.

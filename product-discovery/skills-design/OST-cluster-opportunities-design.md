@@ -2,13 +2,13 @@
 title: "OST-cluster-opportunities: design spec"
 date: 2026-05-09
 purpose: Locked design for assist 3b in opportunity-solution-tree-agents.md - takes validated opportunities and an experience-map JSON and produces an enriched experience-map JSON (schema v0.2) where each opportunity is tagged with phase_id (and optionally step_id), parent-child grouped within phase, with a separate fas-0-unphased bucket. Input to the implementation plan.
-tags: [skill-design, workshop-3, ost, opportunity-clustering, schema-v0.2]
+tags: [skill-design, ost, opportunity-clustering, schema-v0.2]
 
 ---
 
 # OST-cluster-opportunities: design spec
 
-This is the locked design for **assist 3b** in `opportunity-solution-tree-agents.md`. It is the fourth skill built in the workshop 3 series, after `OST-opportunity-extractor`, `OST-validate-opportunities`, and `OST-extract-experience-map`. The implementation plan derives from this document.
+This is the locked design for **assist 3b** in `opportunity-solution-tree-agents.md`. It is the fourth skill built, after `OST-opportunity-extractor`, `OST-validate-opportunities`, and `OST-extract-experience-map`. The implementation plan derives from this document.
 
 ## What the skill does
 

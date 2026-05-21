@@ -93,7 +93,7 @@ Start with a "crummy first draft" after 3–4 interviews. Evolve continuously ra
 | Premature effort assessment | Kills creative opportunities before they're explored |
 | Treating the tree as static | It should evolve with every batch of interviews |
 
-## Workshop exercise: OST Mapping
+## OST Mapping exercise
 
 **Duration**: 60–90 minutes | **Group size**: 4–12 | **Materials**: Whiteboard/Miro/FigJam
 

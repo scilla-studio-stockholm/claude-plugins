@@ -20,7 +20,7 @@ Output is a paired JSON + markdown rendering with one deduped assumption list pe
 
 ## The three methods
 
-The three methods are drawn from the workshop wall in `plans/Session 3_ Opportunities, Solutions & Assumptions - Identifiera antaganden 60 min.jpg`. Each method surfaces assumptions through a different lens; together they triangulate the assumption space for one solution.
+The three methods are drawn from `plans/Session 3_ Opportunities, Solutions & Assumptions - Identifiera antaganden 60 min.jpg`. Each method surfaces assumptions through a different lens; together they triangulate the assumption space for one solution.
 
 ### Storymap method
 

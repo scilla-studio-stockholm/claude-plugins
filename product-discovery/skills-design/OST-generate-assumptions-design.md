@@ -2,13 +2,13 @@
 title: "OST-generate-assumptions: design spec"
 date: 2026-05-11
 purpose: Locked design for assist 9 in opportunity-solution-tree-agents.md - takes the trio-ratified top-three-solutions v0.2 JSON (located via the ratification-flag pattern in workspace/context/ratifications.md), the chosen-opportunity, the product outcome, and the extracted experience map; spawns 9 method-pass sub-agents (3 methods x 3 solutions) in parallel via the Agent tool, then runs 3 per-solution LLM dedup-passes that merge similar assumptions across methods with source-method attribution preserved as an array; produces paired JSON + markdown per a new schema v0.1 in ../knowledge/discovery/assumption-generation.md. Input to the implementation plan.
-tags: [skill-design, workshop-3, ost, assumption-generation, schema-v0.1, agent-orchestration]
+tags: [skill-design, ost, assumption-generation, schema-v0.1, agent-orchestration]
 
 ---
 
 # OST-generate-assumptions: design spec
 
-This is the locked design for **assist 9** in `opportunity-solution-tree-agents.md`. It is the ninth skill built in the workshop 3 series and the first assist in **phase 3 (assumption testing)**. All prior assists were phase 1 (opportunity space) or phase 2 (solution space). The HITL pattern shifts again here: phase 3 assists generate intermediate artifacts in sequence (generate -> categorize -> riskiest-map), and the trio's gate is at the end of the phase (assist 11), not inside this skill. The implementation plan derives from this document.
+This is the locked design for **assist 9** in `opportunity-solution-tree-agents.md`. It is the ninth skill built and the first assist in **phase 3 (assumption testing)**. All prior assists were phase 1 (opportunity space) or phase 2 (solution space). The HITL pattern shifts again here: phase 3 assists generate intermediate artifacts in sequence (generate -> categorize -> riskiest-map), and the trio's gate is at the end of the phase (assist 11), not inside this skill. The implementation plan derives from this document.
 
 ## What the skill does
 
@@ -28,9 +28,9 @@ The brainstorm narrowed the six open questions in `opportunity-solution-tree-age
 | Method orchestration | **Parallel, blind to each other.** Spawn 9 sub-agents (storymap x 3, pre-mortem x 3, outcome-impact x 3) simultaneously in one Agent tool-use block. Each sub-agent sees only its assigned solution + chosen opp + product outcome + its method's framing. Storymap sub-agents additionally receive the extracted experience map. Maximum diversification. |
 | Count per method-pass | **Fixed 6 assumptions per sub-agent.** 6 x 3 methods x 3 solutions = 54 raw. After per-solution dedup approximately 10-14 per solution = approximately 30-42 deduped. Locked at v1; configurable counts are a v0.2 follow-up. |
 | Cross-method dedup | **Per-solution LLM dedup-pass with `source_methods` array.** After the 9 sub-agent calls, three dedup-passes (one per solution) merge similar assumptions across the 3 methods. Each surviving entry carries a `source_methods` array of length 1-3 with values from `{storymap, pre-mortem, outcome-impact}`. Array length is the triangulation signal: a 3-source entry was surfaced by all three methods independently. |
-| Cross-solution dedup | **None.** Each solution gets its own independent deduped list. No `shared_with` marking. Per-solution structure mirrors the workshop wall and matches the downstream categorizer contract. Cross-solution patterns are a future concern, not this skill's job. |
+| Cross-solution dedup | **None.** Each solution gets its own independent deduped list. No `shared_with` marking. Per-solution structure mirrors the discovery board and matches the downstream categorizer contract. Cross-solution patterns are a future concern, not this skill's job. |
 | Source-method attribution | **Visible in JSON as `source_methods` array; rendered in markdown as inline tag.** Not a hidden internal field. Preserves traceability and surfaces triangulation strength. |
-| Experience map for storymap | **Yes, passed to storymap sub-agents only.** Provides anchoring context for inferring the future user-flow the solution implies. Prompt instructs sub-agent that the map is today's flow and to reason about the future. Hard-exit if missing (the workshop-3 pipeline assumes it exists from assist 3). |
+| Experience map for storymap | **Yes, passed to storymap sub-agents only.** Provides anchoring context for inferring the future user-flow the solution implies. Prompt instructs sub-agent that the map is today's flow and to reason about the future. Hard-exit if missing (the discovery pipeline assumes it exists from assist 3). |
 | Input source for top-3 | **Ratification-flag pattern.** Read `workspace/context/ratifications.md`, find the latest entry whose artifact filename matches `top-three-solutions-*.json`, read that JSON from `workspace/6-top-three/`. Hard-exit if no matching ratification entry. Pattern defined in `../knowledge/discovery/top-three-selection.md` (v2 introduced; this skill is the first consumer). |
 | HITL flavor | **No in-skill HITL banner.** Trio gate for phase 3 is downstream at assist 11 (OST-riskiest-assumptions output). Matches the OST-brainstorm-solutions precedent (trio gate downstream at top-3 selector). |
 | Output location | `workspace/7-assumptions/`. Stage-numbered convention continuing `1-opportunity-val/`, `2-opportunity-compare/`, `3-opportunity-select/`, `4-solution-brainstorm/`, `5-solution-cluster/`, `6-top-three/`. |
@@ -93,7 +93,7 @@ This anchor carries the same role for the generator that `solution-brainstorm.md
 
 **Sections in the anchor:**
 
-1. **What the generator does** - short framework prose tying it to Torres CDH ch 8 ("Decompose into assumptions") and the workshop screenshot. Notes that the generator consumes a trio-ratified top-3 and produces a per-solution deduped assumption list with method attribution; categorization and risk-mapping are downstream.
+1. **What the generator does** - short framework prose tying it to Torres CDH ch 8 ("Decompose into assumptions") and the source screenshot. Notes that the generator consumes a trio-ratified top-3 and produces a per-solution deduped assumption list with method attribution; categorization and risk-mapping are downstream.
 2. **The three methods.**
    - **Storymap method:** infer the user-flow for the solution (user types -> steps); for each step, surface what must be true for that step to work. Today's experience map is anchoring context; the sub-agent reasons about the future flow the solution implies.
    - **Pre-mortem method:** imagine 6 months out, the solution failed. Walk the failure modes; for each mode, name the underlying assumption that turned out false.
@@ -203,7 +203,7 @@ The skill follows the same numbered-step pattern as `OST-brainstorm-solutions` a
 6. **Spawn 9 sub-agents in parallel.** The orchestrator issues a single Agent tool-use block containing 9 invocations (storymap x 3 solutions, pre-mortem x 3 solutions, outcome-impact x 3 solutions), each with `subagent_type: general-purpose`. Each sub-agent prompt is constructed from:
 
    - **Common context** (all 9): chosen opportunity (id, phase, quote, source), product outcome (verbatim), the one specific solution this sub-agent is reasoning about (id, title, description, generating_role, round_number, rationale from the upstream picks entry).
-   - **Method-specific framing** (varies per method): 1-2 paragraphs from `assumption-generation.md` describing how that method surfaces assumptions, drawn from the workshop screenshot wall.
+   - **Method-specific framing** (varies per method): 1-2 paragraphs from `assumption-generation.md` describing how that method surfaces assumptions, drawn from the source screenshot.
    - **Storymap sub-agents only:** additionally receive the `experience-map-extracted-*.json` content with explicit prompt instruction: "This is today's user journey. The solution may propose a new flow. Use this as anchoring but reason about the future flow the solution implies."
    - **Definition of "assumption"** (verbatim from `assumption-generation.md`).
    - **Per-method task:** "Produce exactly 6 assumptions for this solution using the <method-name> method. Each assumption is 1-2 sentences max. Return a JSON array of 6 objects with shape `{text: string}`. No other fields."
@@ -470,19 +470,19 @@ These gaps in test coverage are accepted for v1; they go on the open-follow-ups 
 These are added to `TODO.md` rather than blocking v1.
 
 1. **Configurable count per method-pass.** v1 locks 6. If trios consistently want different sizing (4 to reduce noise, 8 to widen the net), surface via config.
-2. **Configurable method set.** v1 fixes storymap / pre-mortem / outcome-impact. Future workshops may add methods (e.g., "5 whys", "competitor-flow walkthrough"). Make extensible.
+2. **Configurable method set.** v1 fixes storymap / pre-mortem / outcome-impact. Future iterations may add methods (e.g., "5 whys", "competitor-flow walkthrough"). Make extensible.
 3. **Configurable solution count.** v1 fixes 3 (mirrors upstream selector). If the selector becomes configurable in v0.3 (its own open follow-up), this skill should match.
 4. **Cross-solution `shared_with` marking.** Deliberately deferred. Re-open if trios report that shared bets across solutions are valuable to surface here rather than in risk-mapping.
 5. **Per-team experience-map source override.** v1 reads the latest extracted by date. If a trio runs multiple extractions and wants a specific version, surface via config.
 6. **Dedup-pass quality bar.** If smoke-test trios report that dedup over-merges (collapses distinct assumptions) or under-merges (preserves obvious dups), tune the prompt or add a count-distribution sanity check.
 7. **Effort-vocabulary blocklist post-pass.** Eyeball-only at smoke test. Carried as a candidate from `OST-select-top-three-solutions`' open follow-ups.
 8. **Category-vocabulary blocklist post-pass.** Same shape. If sub-agents start writing "this is a feasibility assumption" instead of stating the assumption, that creeps into assist 10's territory.
-9. **Method-grouped rendering option.** v1 renders flat with method tags. If trios prefer separate sections per method (closer to the workshop wall layout), surface as a flavor.
+9. **Method-grouped rendering option.** v1 renders flat with method tags. If trios prefer separate sections per method (closer to the discovery board layout), surface as a flavor.
 10. **Optional `category` pre-tag from sub-agents.** v1 keeps categorization in assist 10. If pipeline timing suggests pre-tagging here is cheaper, evaluate the coupling cost.
 11. **Schema evolution beyond v0.1.** Procedure same as `solution-brainstorm`: add an Evolution entry to `assumption-generation.md` and bump `schema_version` in the skill prompt.
 12. **Storymap experience-map over-anchoring.** v1 passes the experience map with a "future flow, not today" instruction. If smoke test shows sub-agents drifting back to today's flow, tighten the prompt or drop the input entirely.
 
-## What this skill establishes for the workshop-3 series
+## What this skill establishes for the discovery series
 
 - **Multi-method sub-agent orchestration precedent.** First skill in the series that spawns sub-agents grouped by method x target rather than role-only. Pattern transfers to any future skill that triangulates a single artifact through multiple lenses.
 - **Per-solution LLM dedup-pass precedent.** First skill that runs an LLM dedup-pass as a structural orchestration step (not just prompt-only anti-dup). Pattern transfers to any future skill where multiple blind passes produce overlapping output.

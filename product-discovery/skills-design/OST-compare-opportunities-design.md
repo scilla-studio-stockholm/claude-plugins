@@ -2,13 +2,13 @@
 title: "OST-compare-opportunities: design spec"
 date: 2026-05-09
 purpose: Locked design for assist 4 in opportunity-solution-tree-agents.md - takes the clustered v0.2 experience-map JSON from OST-cluster-opportunities (assist 3b) and the trio's product outcome, filters to approved opportunities, and produces a paired JSON + markdown comparison matrix (5 Torres criteria × N approved opportunities) plus an evidence-gap list. Input to the implementation plan.
-tags: [skill-design, workshop-3, ost, opportunity-comparison, schema-v0.1]
+tags: [skill-design, ost, opportunity-comparison, schema-v0.1]
 
 ---
 
 # OST-compare-opportunities: design spec
 
-This is the locked design for **assist 4** in `opportunity-solution-tree-agents.md`. It is the fifth skill built in the workshop 3 series, after `OST-opportunity-extractor`, `OST-validate-opportunities`, `OST-extract-experience-map`, and `OST-cluster-opportunities`. The implementation plan derives from this document.
+This is the locked design for **assist 4** in `opportunity-solution-tree-agents.md`. It is the fifth skill built, after `OST-opportunity-extractor`, `OST-validate-opportunities`, `OST-extract-experience-map`, and `OST-cluster-opportunities`. The implementation plan derives from this document.
 
 ## What the skill does
 

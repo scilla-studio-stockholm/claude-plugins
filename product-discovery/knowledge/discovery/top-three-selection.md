@@ -18,7 +18,7 @@ The selector reads the v0.1 solution-candidates JSON from `OST-brainstorm-soluti
 
 Output is a proposal that assist 9 consumes after trio ratification. The trio reviews the markdown, edits if needed, then writes a one-line ratification entry into `<scope>/../ratifications.md`. The selector itself does not write to the opportunity-folder root.
 
-The selector does NOT consume OST-cluster-solutions output. `OST-cluster-solutions` is a separate optional skill the trio may invoke for their own clustered review of the brainstorm; it is off the workshop-3 critical path as of v0.2.
+The selector does NOT consume OST-cluster-solutions output. `OST-cluster-solutions` is a separate optional skill the trio may invoke for their own clustered review of the brainstorm; it is off the critical path as of v0.2.
 
 ## The four v2 locked decisions
 
@@ -155,4 +155,4 @@ v0.2 changes:
 - `pick_count` and `notes` fields removed (redundant with always-3 invariant).
 - `OST-cluster-solutions` removed from required pipeline; stays available as standalone skill.
 
-Pipeline shrinks from 13 to 12 required workshop-3 assists.
+Pipeline shrinks from 13 to 12 required assists.

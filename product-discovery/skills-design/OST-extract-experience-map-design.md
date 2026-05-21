@@ -7,7 +7,7 @@ purpose: Locked design for assist 2 in opportunity-solution-tree-agents.md - rea
 
 # OST-extract-experience-map: design spec
 
-This is the locked design for **assist 2** in `opportunity-solution-tree-agents.md`. It is the third skill built in the workshop 3 series (after `OST-opportunity-extractor` and `OST-validate-opportunities`) and the first that uses vision. The implementation plan derives from this document.
+This is the locked design for **assist 2** in `opportunity-solution-tree-agents.md`. It is the third skill built (after `OST-opportunity-extractor` and `OST-validate-opportunities`) and the first that uses vision. The implementation plan derives from this document.
 
 ## What the skill does
 
@@ -200,7 +200,7 @@ These are added to the existing cleanup TODO list rather than blocking v1.
 
 1. **Skill-template body-language line.** `skills-design/skill-template.md` still says "Svenska i body och output". After this skill ships, update the template to reflect the English convention now confirmed across `OST-validate-opportunities` and `OST-extract-experience-map`. Already on the cleanup list.
 2. **`OST-validate-opportunities` output frontmatter.** Add YAML frontmatter to its output template, matching the format used here, so generated `.md` files comply with the Metria global frontmatter rule.
-3. **`workshop-3-guide-trio-process.md` design-time names.** Already on the cleanup list for "Format-validator" → `OST-validate-opportunities`. The same guide refers to assist 2 by a design-time name; rename to `OST-extract-experience-map` in the same sweep.
+3. **Trio process guide design-time names.** Already on the cleanup list for "Format-validator" → `OST-validate-opportunities`. The same guide refers to assist 2 by a design-time name; rename to `OST-extract-experience-map` in the same sweep.
 4. **Schema evolution to v0.2.** Bumps when (a) a trio creates a map whose structure does not fit (friction at step level, journey-level start/end states) or (b) a downstream skill requests new fields. Procedure: add an "Evolution" entry to `experience-mapping.md` and bump `schema_version` in skill prompts. Not triggered yet.
 5. **Miro MCP path.** Revisit if re-running the skill on the same map becomes painful enough that operators want a refresh-from-board command. Trigger is operator pain, not theoretical completeness.
 6. **Multi-screenshot or very large maps.** Current design assumes one screenshot fits the whole map at readable quality. If trios produce maps too large for a single screenshot, add a stitch feature.

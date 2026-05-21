@@ -2,13 +2,13 @@
 title: "OST-select-opportunity: design spec"
 date: 2026-05-10
 purpose: Locked design for assist 5 in opportunity-solution-tree-agents.md - takes the v0.1 comparison-matrix JSON from OST-compare-opportunities (assist 4) and the trio's product outcome, applies a locked three-step decision rule (outcome-alignment filter, strongest-aggregate-profile rank, fewer-evidence-gaps tiebreak), and produces a paired JSON + markdown chosen-opportunity proposal with rationale, every other approved opportunity as an alternative-considered, and an AI-judged subset of evidence gaps to carry into phase 2. Input to the implementation plan.
-tags: [skill-design, workshop-3, ost, opportunity-selection, schema-v0.1]
+tags: [skill-design, ost, opportunity-selection, schema-v0.1]
 
 ---
 
 # OST-select-opportunity: design spec
 
-This is the locked design for **assist 5** in `opportunity-solution-tree-agents.md`. It is the sixth skill built in the workshop 3 series, after `OST-opportunity-extractor`, `OST-validate-opportunities`, `OST-extract-experience-map`, `OST-cluster-opportunities`, and `OST-compare-opportunities`. The implementation plan derives from this document.
+This is the locked design for **assist 5** in `opportunity-solution-tree-agents.md`. It is the sixth skill built, after `OST-opportunity-extractor`, `OST-validate-opportunities`, `OST-extract-experience-map`, `OST-cluster-opportunities`, and `OST-compare-opportunities`. The implementation plan derives from this document.
 
 ## What the skill does
 

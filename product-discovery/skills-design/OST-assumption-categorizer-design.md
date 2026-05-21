@@ -2,13 +2,13 @@
 title: "OST-assumption-categorizer: design spec"
 date: 2026-05-12
 purpose: Locked design for assist 10 in opportunity-solution-tree-agents.md - takes the deduped per-solution assumption list from OST-generate-assumptions (assist 9), runs a single classification LLM pass against the 5-category Cagan taxonomy in ../knowledge/discovery/assumption-types.md, and writes paired JSON + markdown with each assumption tagged with exactly one category. Identity-mapping over upstream assumptions (no reorder, no add, no drop, no re-wording). Input to assist 11 (OST-riskiest-assumptions). Input to the implementation plan.
-tags: [skill-design, workshop-3, ost, assumption-categorization, schema-v0.1]
+tags: [skill-design, ost, assumption-categorization, schema-v0.1]
 
 ---
 
 # OST-assumption-categorizer: design spec
 
-This is the locked design for **assist 10** in `opportunity-solution-tree-agents.md`. It is the tenth skill built in the workshop 3 series and the second assist in **phase 3 (assumption testing)**. Upstream is assist 9 (`OST-generate-assumptions`), which produces the deduped per-solution assumption lists with source-method attribution. Downstream is assist 11 (`OST-riskiest-assumptions`), where the phase-3 trio gate sits. There is no ratification step between assists 9 and 10. The implementation plan derives from this document.
+This is the locked design for **assist 10** in `opportunity-solution-tree-agents.md`. It is the tenth skill built and the second assist in **phase 3 (assumption testing)**. Upstream is assist 9 (`OST-generate-assumptions`), which produces the deduped per-solution assumption lists with source-method attribution. Downstream is assist 11 (`OST-riskiest-assumptions`), where the phase-3 trio gate sits. There is no ratification step between assists 9 and 10. The implementation plan derives from this document.
 
 ## What the skill does
 
@@ -431,11 +431,11 @@ These are added to `TODO.md` rather than blocking v1.
 5. **Configurable category enum.** v1 locks Cagan-five. If a trio wants to use a different taxonomy (e.g., Test Card-derived risk categories from Bland), surface via config.
 6. **Explicit-filename input mode.** v1 reads latest `assumptions-*.json` by date. If a trio wants to re-categorize an older version, add an optional filename parameter.
 7. **Schema evolution beyond v0.1.** Procedure same as `solution-brainstorm` and `assumption-generation`: add an Evolution entry to `assumption-categorization.md` and bump `schema_version` in the skill prompt.
-8. **Category-grouped rendering option.** The rejected "categories-as-containers" shape (per-category headers within each solution) could be surfaced as a flavor flag if trios prefer that layout for workshop walls.
+8. **Category-grouped rendering option.** The rejected "categories-as-containers" shape (per-category headers within each solution) could be surfaced as a flavor flag if trios prefer that layout for discovery boards.
 9. **Effort-vocabulary blocklist post-pass.** Carried from upstream skills' open follow-ups. Eyeball-only at smoke test.
 10. **Risk-vocabulary blocklist post-pass.** If sub-agents start writing "this is a high-risk assumption" or "this is the riskiest one" in the input text and that creeps in through the carry-forward (it shouldn't, the text field is byte-identical), surface as a v0.2 check.
 
-## What this skill establishes for the workshop-3 series
+## What this skill establishes for the discovery series
 
 - **Identity-mapping precedent.** First skill in the series that strictly preserves every upstream field byte-identical and adds exactly one new field per item. Pattern transfers to any future skill that enriches an existing artifact without restructuring it.
 - **Single-pass classification against a locked taxonomy.** First post-brainstorm skill that uses a single LLM pass with no sub-agents and no dedup. Pattern transfers to any future "apply a taxonomy" skill where diversification doesn't help.

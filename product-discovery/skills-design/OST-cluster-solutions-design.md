@@ -2,13 +2,13 @@
 title: "OST-cluster-solutions: design spec"
 date: 2026-05-11
 purpose: Locked design for assist 7 in opportunity-solution-tree-agents.md - takes the 18 paired JSON+markdown solution candidates from OST-brainstorm-solutions (assist 6) plus chosen-opportunity and product-outcome context, runs a single-pass LLM clustering call to group candidates into 3-5 thematic clusters with full member embed and LLM-generated title + summary per cluster, and produces a paired JSON + markdown clustered solution map conforming to a new schema v0.1 in ../knowledge/discovery/solution-cluster.md. Input to the implementation plan.
-tags: [skill-design, workshop-3, ost, solution-clustering, schema-v0.1]
+tags: [skill-design, ost, solution-clustering, schema-v0.1]
 
 ---
 
 # OST-cluster-solutions: design spec
 
-This is the locked design for **assist 7** in `opportunity-solution-tree-agents.md`. It is the seventh skill built in the workshop 3 series, after `OST-opportunity-extractor`, `OST-validate-opportunities`, `OST-extract-experience-map`, `OST-cluster-opportunities`, `OST-compare-opportunities`, `OST-select-opportunity`, and `OST-brainstorm-solutions`. The implementation plan derives from this document.
+This is the locked design for **assist 7** in `opportunity-solution-tree-agents.md`. It is the seventh skill built, after `OST-opportunity-extractor`, `OST-validate-opportunities`, `OST-extract-experience-map`, `OST-cluster-opportunities`, `OST-compare-opportunities`, `OST-select-opportunity`, and `OST-brainstorm-solutions`. The implementation plan derives from this document.
 
 ## What the skill does
 
@@ -32,7 +32,7 @@ The brainstorm resolved four open questions from `opportunity-solution-tree-agen
 | Clustering axis | **Free-form by theme.** Prompt says "group by theme/similarity"; LLM picks dimensions that the material carries (mechanism, target user, system surface, intervention type, etc.). No fixed primary axis. |
 | Cluster ordering | **By member count descending; tiebreak first-appearing member id.** Signals which themes dominated the brainstorm. Cluster ids `c1, c2, ...` assigned post-sort. |
 | Member ordering within cluster | **Lead-idea first, then round ascending, then role (PM, UX, TL).** Soft convention in the prompt; not a hard invariant. |
-| HITL flow | **AI-driven HITL** per the steg 6-8 pattern in the workshop-3 cross-cutting decisions. Trio reviews at the top-3 stage (assist 8), not at this intermediate clusterer stage. |
+| HITL flow | **AI-driven HITL** per the steg 6-8 pattern in the cross-cutting decisions. Trio reviews at the top-3 stage (assist 8), not at this intermediate clusterer stage. |
 | Schema location | **New knowledge anchor `../knowledge/discovery/solution-cluster.md` v0.1.** Per the cross-cutting datakontrakt; mirrors `opportunity-comparison.md`, `opportunity-selection.md`, `solution-brainstorm.md`. |
 | Body language | **English.** Matches `OST-validate-opportunities`, `OST-extract-experience-map`, `OST-cluster-opportunities`, `OST-compare-opportunities`, `OST-select-opportunity`, `OST-brainstorm-solutions`. |
 | Output location | `workspace/5-solution-cluster/` (created lazily if absent). Stage-numbered convention continuing `1-opportunity-val/`, `2-opportunity-compare/`, `3-opportunity-select/`, `4-solution-brainstorm/`. The workspace-folder-convention follow-up TODO opened by `OST-compare-opportunities` / `OST-select-opportunity` / `OST-brainstorm-solutions` was closed 2026-05-11. |
@@ -287,7 +287,7 @@ The skill explicitly does NOT:
 7. **Cluster rationale field.** A short *why* per cluster (why these members go together, beyond the `summary`). Likely subsumed by assist 8's downstream rationale.
 8. **Negative-test fixtures.** Tracked in `TODO.md` (shared with OST-brainstorm-solutions). Construct fixtures for: missing source file, schema mismatch, ≠ 18 candidates, missing context file, chosen-opp id mismatch, malformed LLM output, invariant violation.
 
-## What this skill establishes for the workshop-3 series
+## What this skill establishes for the discovery series
 
 - **Discovered-cluster precedent.** Where `OST-cluster-opportunities` clusters against a known taxonomy (experience-map phases), `OST-cluster-solutions` discovers clusters from data. The single-member-cluster rule and the cluster-ordering-by-member-count rule are the first locked conventions for the discovered-cluster pattern. If future assists need similar pattern (e.g., clustering assumptions across solutions), this design is the reference.
 - **Chosen-opp cross-check.** First skill to enforce a hard-exit cross-check between a JSON id and a markdown bold-id row. Pattern transfers to any skill that consumes a context file alongside a downstream-derived JSON.

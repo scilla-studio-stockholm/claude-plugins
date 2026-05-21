@@ -15,7 +15,7 @@ This is a first version (v0.1) reference for experience mapping as it is practic
 It serves two readers:
 
 - **Trios** who need to understand what an experience map should contain and why
-- **AI assists** in `plans/workshop-3-guide-trio-process.md` that consume the map as JSON
+- **AI assists** that consume the map as JSON
 
 ## Where it sits in the OST flow
 

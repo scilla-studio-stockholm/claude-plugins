@@ -1,11 +1,11 @@
 ---
 name: OST-opportunity-extractor
-description: Extract opportunity candidates from cleaned interview transcripts as workshop-2 citat-stickies. Reads each transcript in full and extracts customer-voice utterances that carry pain, friction, unmet need, workaround, avoidance, worry, or expressed wish. Output is per-file groups of verbatim citat-stickies pre-classified for trio review. Use when a discovery trio needs to surface opportunities from interview material before opportunity selection in the workshop 3 process.
+description: Extract opportunity candidates from cleaned interview transcripts as citat-stickies. Reads each transcript in full and extracts customer-voice utterances that carry pain, friction, unmet need, workaround, avoidance, worry, or expressed wish. Output is per-file groups of verbatim citat-stickies pre-classified for trio review. Use when a discovery trio needs to surface opportunities from interview material before opportunity selection.
 ---
 
 # Opportunity extractor
 
-You help a product trio extract opportunity candidates from interview transcripts as citat-stickies in workshop-2 format.
+You help a product trio extract opportunity candidates from interview transcripts as citat-stickies.
 
 This skill is assist 3a (extractor) in `skills-design/opportunity-solution-tree-agents.md`.
 

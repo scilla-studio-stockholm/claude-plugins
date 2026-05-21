@@ -1,14 +1,14 @@
 ---
 title: "OST-validation-experiment-designer: design spec"
 date: 2026-05-12
-purpose: Locked design for assist 12 in opportunity-solution-tree-agents.md - takes the scored per-solution assumption list from OST-riskiest-assumptions (assist 11), filters to is_riskiest=true, runs a single cross-solution LLM pass that designs a Bland Test Card per riskiest assumption using a hybrid category-default + named-override selection rule, and writes paired JSON + markdown with one Test Card per riskiest assumption plus 2 alternative tests. success_criteria regex-anchored to require numeric thresholds; identity-mapping over surviving (riskiest) upstream assumptions. Terminal assist in the workshop-3 critical path; markdown carries a run-list handoff banner. Input to the implementation plan.
-tags: [skill-design, workshop-3, ost, OST-validation-experiment-designer, bland, test-card, schema-v0.2]
+purpose: Locked design for assist 12 in opportunity-solution-tree-agents.md - takes the scored per-solution assumption list from OST-riskiest-assumptions (assist 11), filters to is_riskiest=true, runs a single cross-solution LLM pass that designs a Bland Test Card per riskiest assumption using a hybrid category-default + named-override selection rule, and writes paired JSON + markdown with one Test Card per riskiest assumption plus 2 alternative tests. success_criteria regex-anchored to require numeric thresholds; identity-mapping over surviving (riskiest) upstream assumptions. Terminal assist in the discovery critical path; markdown carries a run-list handoff banner. Input to the implementation plan.
+tags: [skill-design, ost, OST-validation-experiment-designer, bland, test-card, schema-v0.2]
 
 ---
 
 # OST-validation-experiment-designer: design spec
 
-This is the locked design for **assist 12** in `opportunity-solution-tree-agents.md`. It is the twelfth and final skill in the workshop 3 critical path, and the only assist in **phase 5 (assumption validation experiments)**. Upstream is assist 11 (`OST-riskiest-assumptions`), which produces the scored per-solution assumption lists with the `is_riskiest` flag plus the full carry-forward chain. Downstream is the trio (and a hypothetical future Learning-Card capture skill, out of scope). This skill is terminal: it produces a run-list of Bland Test Cards that the trio reads, picks execution order, and runs. The markdown HITL banner is framed as a run-list handoff, not a review-and-approve gate. The implementation plan derives from this document.
+This is the locked design for **assist 12** in `opportunity-solution-tree-agents.md`. It is the twelfth and final skill in the discovery critical path, and the only assist in **phase 5 (assumption validation experiments)**. Upstream is assist 11 (`OST-riskiest-assumptions`), which produces the scored per-solution assumption lists with the `is_riskiest` flag plus the full carry-forward chain. Downstream is the trio (and a hypothetical future Learning-Card capture skill, out of scope). This skill is terminal: it produces a run-list of Bland Test Cards that the trio reads, picks execution order, and runs. The markdown HITL banner is framed as a run-list handoff, not a review-and-approve gate. The implementation plan derives from this document.
 
 ## What the skill does
 
@@ -335,7 +335,7 @@ tags: [assumption-validation, ost, bland, test-card, schema-v0.2]
 
 # Validation experiments: <chosen_opportunity.id>
 
-> **Trio run-list handoff.** This is the terminal artifact for the workshop-3 critical path. Read the Test Cards; pick execution order based on resource availability, dependencies, and team capacity; run the cheapest viable test first per Bland's principle. The skill does NOT pick sequence. Capture results separately (a future Learning-Card skill is parked). If a recommended test does not fit your context, swap to one of the 2 alternatives.
+> **Trio run-list handoff.** This is the terminal artifact for the discovery critical path. Read the Test Cards; pick execution order based on resource availability, dependencies, and team capacity; run the cheapest viable test first per Bland's principle. The skill does NOT pick sequence. Capture results separately (a future Learning-Card skill is parked). If a recommended test does not fit your context, swap to one of the 2 alternatives.
 
 Source OST-riskiest-assumptions: `<source_riskiest_assumptions>`
 Source assumptions-categorized: `<source_assumptions_categorized>`
@@ -422,7 +422,7 @@ Total riskiest: <N>. Total Test Cards: <N>.
 As part of building this skill:
 
 - **Bump `../knowledge/discovery/assumption-validation.md` to v0.2.** Append 5 new sections (category-default mapping, success_criteria regex rule, carry-forward + filter + identity-mapping invariants, schema v0.2, renderer template). Append Evolution row dated 2026-05-12 ("Extended for OST-validation-experiment-designer skill: filtered identity-mapping over upstream assist-11 output, category-default + named-override selection rule, regex-anchored success_criteria, schema v0.2 with full carry-forward + 2 new per-assumption fields, renderer template with run-list HITL banner."). Update frontmatter date to 2026-05-12. v0.1 content stays intact.
-- **Update `skills-design/skill-template.md` Bygg-status** — mark `OST-validation-experiment-designer` as built. Update the tail count from `en` to `0` or remove the "Övriga … återstår" line entirely (workshop-3 critical path complete). Final task in the implementation plan.
+- **Update `skills-design/skill-template.md` Bygg-status** — mark `OST-validation-experiment-designer` as built. Update the tail count from `en` to `0` or remove the "Övriga … återstår" line entirely (discovery critical path complete). Final task in the implementation plan.
 - **Update `skills-design/opportunity-solution-tree-agents.md`** — replace section 12's six open design questions with a reference to the locked design at `skills-design/OST-validation-experiment-designer-design.md`. Update "Föreslagen typ" from "Agent" to "Skill (single-pass Test Card design against locked category-default mapping)" to match the actual decision.
 
 What is NOT updated:
@@ -585,11 +585,11 @@ These are added to `TODO.md` rather than blocking v1.
 9. **Cheapest-viable distribution sanity check.** Soft-warn if all retained Test Cards default to the same test type (signals miscalibration or unusual domain). v1 is eyeball-only.
 10. **Schema evolution beyond v0.2.** Procedure same as upstream skills: add Evolution entry and bump `schema_version`.
 
-## What this skill establishes for the workshop-3 series
+## What this skill establishes for the discovery series
 
 - **Filtered identity-mapping precedent.** First skill that filters upstream input (`is_riskiest=true` only) while preserving byte-identical carry-forward for the surviving subset. Pattern transfers to any future skill that consumes a flagged subset (e.g., "design tests only for the top-priority opportunities").
 - **Terminal-assist HITL framing.** First skill with a run-list handoff banner instead of a review-and-approve gate. Pattern transfers to any future skill that produces a final deliverable for the trio rather than feeding a downstream skill.
 - **Regex-anchored content rule.** First skill that enforces a content-level regex (numeric anchor in `success_criteria`) beyond simple format checks. Pattern transfers to any future skill where a free-form field has substantive correctness constraints.
 - **Category-default with named-override rule.** First skill that uses a mechanical default + LLM-override pattern with a regex-checked rationale format documenting the override. Pattern transfers to any future skill that picks from a catalog with a category-grounded baseline.
 - **Multi-anchor v0.1 → v0.2 extension.** Second skill (after assist 11) to bump an existing v0.1 anchor to v0.2 rather than create a new anchor. Pattern is now established as the default for re-using existing schema artifacts.
-- **Workshop-3 critical path completion.** Twelfth and final assist. After this build, the workshop-3 series shrinks to 0 remaining critical-path assists; future work moves to scilla-broader productization, per-team smoke tests against live trios, and post-test capture (Learning Card etc.).
+- **Discovery critical path completion.** Twelfth and final assist. After this build, the series shrinks to 0 remaining critical-path assists; future work moves to scilla-broader productization, per-team smoke tests against live trios, and post-test capture (Learning Card etc.).

@@ -2,13 +2,13 @@
 title: "OST-riskiest-assumptions: design spec"
 date: 2026-05-12
 purpose: Locked design for assist 11 in opportunity-solution-tree-agents.md - takes the categorized per-solution assumption list from OST-assumption-categorizer (assist 10), runs a single cross-solution LLM pass that scores each assumption on Bland's 2x2 (importance: high/low; evidence: strong/weak), computes is_riskiest deterministically as (importance=high AND evidence=weak), and writes paired JSON + markdown with the riskiest flagged inline and per-solution. Identity-mapping over upstream assist-10 output (no reorder, no add, no drop, no re-wording). This skill is the phase-3 trio HITL gate; markdown carries a review-and-approve banner. Input to assist 12 (OST-validation-experiment-designer) via latest-by-date. Input to the implementation plan.
-tags: [skill-design, workshop-3, ost, OST-riskiest-assumptions, bland, schema-v0.2]
+tags: [skill-design, ost, OST-riskiest-assumptions, bland, schema-v0.2]
 
 ---
 
 # OST-riskiest-assumptions: design spec
 
-This is the locked design for **assist 11** in `opportunity-solution-tree-agents.md`. It is the eleventh skill built in the workshop 3 series and the only assist in **phase 4 (assumption risk mapping)**. Upstream is assist 10 (`OST-assumption-categorizer`), which produces the categorized per-solution assumption lists with full carry-forward chain. Downstream is assist 12 (`OST-validation-experiment-designer`), which reads the riskiest-flagged assumptions and designs Test Cards. This skill is the phase-3 trio HITL gate: the trio reads and approves (or edits the JSON before approving) the importance/evidence scoring here, then assist 12 picks the latest version by date. The implementation plan derives from this document.
+This is the locked design for **assist 11** in `opportunity-solution-tree-agents.md`. It is the eleventh skill built and the only assist in **phase 4 (assumption risk mapping)**. Upstream is assist 10 (`OST-assumption-categorizer`), which produces the categorized per-solution assumption lists with full carry-forward chain. Downstream is assist 12 (`OST-validation-experiment-designer`), which reads the riskiest-flagged assumptions and designs Test Cards. This skill is the phase-3 trio HITL gate: the trio reads and approves (or edits the JSON before approving) the importance/evidence scoring here, then assist 12 picks the latest version by date. The implementation plan derives from this document.
 
 ## What the skill does
 
@@ -26,7 +26,7 @@ The four open questions in `opportunity-solution-tree-agents.md` section 11 are 
 
 | Question | Decision |
 |---|---|
-| Skill vs agent | **Single-pass skill, no sub-agents.** Single SKILL.md prompt at `.claude/skills/OST-riskiest-assumptions/SKILL.md`. Body instructs Claude to run one LLM scoring pass over the full flat list. Mirrors the precedent set by `OST-assumption-categorizer` (v1). The brainstorm-input doc listed "agent" as the suggested type for cleaner packaging; in practice the workshop-3 series has converged on skills, and a 2x2 scoring against a locked framework is a bounded transformation. |
+| Skill vs agent | **Single-pass skill, no sub-agents.** Single SKILL.md prompt at `.claude/skills/OST-riskiest-assumptions/SKILL.md`. Body instructs Claude to run one LLM scoring pass over the full flat list. Mirrors the precedent set by `OST-assumption-categorizer` (v1). The brainstorm-input doc listed "agent" as the suggested type for cleaner packaging; in practice the series has converged on skills, and a 2x2 scoring against a locked framework is a bounded transformation. |
 | Schema relationship to existing anchor | **Bump existing `assumption-risk-mapping.md` to v0.2.** The v0.1 schema in the anchor (written 2026-05-06) predates the identity-mapping pattern established by assist 10. v0.2 extends it: full carry-forward of every upstream field byte-identical PLUS four new per-assumption fields. Uses assist-10's field names (`assumptions_per_solution`, `id`) rather than v0.1's (`solutions`, `assumption_id`) for consistency through the chain. The existing v0.1 content stays in the anchor as historical reference; new sections are appended; Evolution entry added. |
 | Evidence rule (strict vs soft) | **Soft.** LLM may reason about plausibility, including domain norms, industry conventions, and general engineering practice. Mark `strong` if the assumption seems well-grounded; `weak` if genuinely speculative. Wider net of `strong` calls than strict; trio overrides at review by editing the JSON. Trade-off: lower auditability than strict, but more useful default for trios who do not want to research every assumption to mark it `strong`. |
 | Rationale format | **Single sentence, importance-then-evidence, structurally parseable.** Format: `Importance=<level> (<reason>); evidence=<level> (<reason>).` Regex-checked at validation. Each rationale covers both axes in one sentence; the structure makes downstream parsing trivial and gives trio a fixed scan pattern at review. |
@@ -41,7 +41,7 @@ The four open questions in `opportunity-solution-tree-agents.md` section 11 are 
 | Output filename | `OST-riskiest-assumptions-<YYYY-MM-DD>.{json,md}` per cross-cutting datakontrakt. |
 | Output format | Paired JSON + markdown (cross-cutting decision applies; the v0.1 anchor only specified JSON, but the brainstorm-input cross-cutting locked-decision now adds markdown for trio readability). |
 | Slug name | `OST-riskiest-assumptions`. Verb-less noun; matches the existing `assumption-risk-mapping.md` anchor's framing; consistent with the `OST-assumption-categorizer` precedent (also verb-less). |
-| Body language | English, matching all skill-body precedent. Inputs (the Swedish scoring questions from the anchor) and output prose (Swedish assumption text and rationale) may be Swedish; the skill body and the new anchor sections are English. The two scoring questions are quoted verbatim in Swedish in the prompt to preserve the workshop wall's exact wording. |
+| Body language | English, matching all skill-body precedent. Inputs (the Swedish scoring questions from the anchor) and output prose (Swedish assumption text and rationale) may be Swedish; the skill body and the new anchor sections are English. The two scoring questions are quoted verbatim in Swedish in the prompt to preserve the source's exact wording. |
 | Tools | `Read`. No sub-agents, no Write tool needed beyond the orchestrator's normal output-file writes. |
 
 ## Skill identity
@@ -200,7 +200,7 @@ The skill follows the same numbered-step pattern as `OST-assumption-categorizer`
 6. **Run one LLM scoring pass.** Issue a single LLM call. The prompt contains, in order:
 
    - **Role frame:** "You are scoring product-discovery assumptions on Bland's 2x2: importance (high/low) and evidence (strong/weak). Riskiest = high importance + weak evidence."
-   - **The two scoring questions** verbatim from `assumption-risk-mapping.md` v0.1 (Swedish-language original preserved for workshop fidelity):
+   - **The two scoring questions** verbatim from `assumption-risk-mapping.md` v0.1 (Swedish-language original preserved verbatim):
      - Q1 (evidence): *Har vi redan bevis för att det här antagandet är sant?* Yes → `strong`. No → `weak`.
      - Q2 (importance): *Om vi har fel i det här antagandet, skiter det sig då?* Yes → `high`. No → `low`.
    - **The soft-evidence rule** verbatim from v0.2 (NEW):
@@ -492,7 +492,7 @@ These are added to `TODO.md` rather than blocking v1.
 9. **Explicit-filename input mode.** v1 reads latest `assumptions-categorized-*.json` by date. Add an optional filename parameter for re-scoring older versions.
 10. **Trio-edit re-render mode.** v1 generates markdown once at skill run; trio edits to JSON are not reflected in markdown. Parked feature: a separate "re-render markdown from current JSON" mode.
 
-## What this skill establishes for the workshop-3 series
+## What this skill establishes for the discovery series
 
 - **Schema-extension precedent.** First skill that BUMPS an existing knowledge anchor (v0.1 → v0.2) rather than creating a new one. Pattern transfers to any future skill that extends an existing structured artifact rather than introducing a new artifact type.
 - **Identity-mapping with multi-field add.** Builds on assist 10's precedent (identity-map + 1 new field) by demonstrating that the pattern scales to 4 new fields cleanly. Future skills can add larger field sets without breaking the carry-forward chain.
