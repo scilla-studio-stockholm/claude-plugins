@@ -1,11 +1,11 @@
 ---
 name: OST-compare-opportunities
-description: For product trios and researchers, when comparing approved opportunities against a product outcome and Torres criteria, output a paired JSON + markdown rendering with a qualitative comparison matrix (criteria × opportunities) plus an evidence-gap list of unknown cells.
+description: For product trios and researchers, when comparing approved opportunities against a product outcome and Torres criteria, output paired JSON + markdown + HTML. JSON and markdown carry the full 5×N matrix; HTML renders the same data as journey-grouped opportunity cards with expandable rationales and filter chips, scannable at 96 opportunities.
 ---
 
 # Compare opportunities
 
-You help a product trio compare approved opportunities against their product outcome and Torres prioritization criteria, producing paired JSON (per the opportunity-comparison schema v0.1) plus a markdown rendering. The output is a 5×N matrix (5 Torres-derived criteria × N approved opportunities) with qualitative scores and grounded rationales, plus an evidence-gap list derived from cells that scored `unknown`.
+You help a product trio compare approved opportunities against their product outcome and Torres prioritization criteria, producing paired JSON (per the opportunity-comparison schema v0.1) plus a markdown rendering and a self-contained HTML rendering. The data shape is a 5×N matrix (5 Torres-derived criteria × N approved opportunities) with qualitative scores and grounded rationales, plus an evidence-gap list derived from cells that scored `unknown`. The JSON and markdown render this as a literal matrix table; the HTML renders the same data as a journey-grouped card view (phases as swim-lane columns) optimized for skimming at 96+ opportunities.
 
 This skill is assist 4 in `skills-design/opportunity-solution-tree-agents.md`. The full design lives in `skills-design/OST-compare-opportunities-design.md`.
 
@@ -581,7 +581,9 @@ The HTML output is rendered deterministically from the same composed JSON as the
 - **Matrix row order** matches `criteria[]` order in the JSON: outcome-alignment, customer-importance, market-size, strategic-fit, competitive-landscape.
 - **No silent degradation.** Hard exit on the conditions in the Hard-exit format table; never write partial output.
 - **No JSON self-validation pass.** Trust the prompt; downstream skills surface any malformed JSON.
-- **Upstream files are immutable.** Never modify `<scope>/experience-map-clustered.json` or `<scope>/../../_product-context/product-outcome.md`. The skill only writes `<scope>/comparison-matrix.json` and `<scope>/comparison-matrix.md`.
+- **Upstream files are immutable.** Never modify `<scope>/experience-map-clustered.json` or `<scope>/../../_product-context/product-outcome.md`. The skill only writes `<scope>/comparison-matrix.json`, `<scope>/comparison-matrix.md`, and `<scope>/comparison-matrix.html`.
+- **Three artifacts, one render.** `.json`, `.md`, and `.html` are written from the same composed JSON in a single pass. They carry identical data; the markdown and HTML are different views of the JSON. Never write one without the other two, and never re-render one in isolation.
+- **HTML is self-contained.** Inline `<style>` and inline `<script>` only. No external CSS, no remote fonts, no external scripts. JS is limited to ~50 LOC of filter logic. See HTML rendering rules in the "HTML template" section above.
 - **Single pass.** No retries, no iteration over the inputs.
 
 ## What this skill does NOT do
@@ -599,9 +601,9 @@ The HTML output is rendered deterministically from the same composed JSON as the
 - **Compare `needs_tweak` or `solution_in_disguise` opportunities.** Filtered out at step 4 with a visible note.
 - **Score cells with confidence values outside the 5-value vocabulary.** No "high-medium" or numeric scores.
 - **Use emoji or numeric encoding for scores.** Words only.
-- **Iterate, retry, or run multiple passes.** One pass over the inputs, one pair of output files.
+- **Iterate, retry, or run multiple passes.** One pass over the inputs, one set of three output files.
 - **Run a JSON self-validation pass after composition.**
-- **Write to Miro or any external surface.** JSON + markdown only.
+- **Write to Miro or any external surface.** JSON + markdown + HTML only, all local files under `<scope>/`.
 - **Audit the cluster JSON for invariant violations** beyond what's needed to filter. The comparator only filters by verdict and reads quote/source/phase fields.
 - **Ask the trio for clustering choices interactively.** If a cell is genuinely uncertain, score `unknown` and add a gap entry; don't ask.
 - **Mark accepted gaps in the product outcome's "Known limitations" section as problems.** Those gaps are trio-accepted.
