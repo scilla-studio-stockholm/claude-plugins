@@ -42,6 +42,7 @@ The comparator filters by verdict before scoring: only `verdict == "approved"` o
 6. **Parse, filter, and partition.**
    - Parse the clustered JSON. Index `phases[]` by `id`. Walk `phases[].opportunities[]`.
    - Parse the product outcome from `<scope>/../../_product-context/product-outcome.md`. Extract the outcome formulation under the `## Outcome` heading. Carry the team name from `## Team`.
+   - **Snapshot `journey_phases[]`** from the clustered JSON: one entry per `phases[]` element in upstream array order, carrying `{ id, name }` verbatim. Include every phase, even those with zero approved opportunities (zero-opp phases still render as empty swim-lane columns in the HTML).
    - Partition opportunities by verdict:
      - `verdict == "approved"` → `opportunities_compared[]`. Carry verbatim: `id`, `phase_id`, `quote`, `source`.
      - `verdict ∈ {"needs_tweak", "solution_in_disguise"}` → `opportunities_excluded[]`. Carry `id`, `phase_id`, `verdict`, plus a one-line `reason`.
@@ -74,15 +75,36 @@ The comparator filters by verdict before scoring: only `verdict == "approved"` o
 
    `n/a` cells do not appear here. Empty array if no `unknown` cells.
 
-10. **Compose the v0.1 JSON.** All fields per the schema in `references/opportunity-comparison.md`. Per the missing-optional convention, omit any optional key whose value isn't set; never write `null`. `opportunities_excluded[]` and `evidence_gaps[]` are written as empty arrays when applicable, never as `null` and never omitted.
+10. **Generate AI summary titles** for opportunities in `opportunities_compared[]`. For each opportunity without an existing non-empty `summary_title`, generate a short descriptive noun phrase (3-6 words) that names the underlying pain or friction. Style: in the source language of the underlying `quote` (Swedish if the quote is Swedish, English if English, etc.).
 
-11. **Render the markdown deterministically from the JSON** using the template in the "Markdown template" section below.
+    Examples:
+    - quote: "Användare förstår inte hur de ska beställa och måste mejla support..." → summary_title: `Otydlig beställningsprocess`
+    - quote: "Mejlkonversation om beställningen drar ut på tiden..." → summary_title: `Mejlkonversation drar ut på tiden`
+    - quote: "Customers can't tell whether their order shipped..." → summary_title: `Unclear shipping status`
 
-12. **Write paired output** to:
+    Cache rule: if the input `<scope>/comparison-matrix.json` already exists and contains `summary_title` values for any opportunities, carry those titles through unchanged. Generate titles only for opportunities missing the field. This makes re-renders cheap and stable.
+
+    Compute `score_counts` per opportunity in `opportunities_compared[]` as `{ strong, medium, weak, unknown, na }` (integer counts of cells with each score across the five criteria, for that opportunity's column).
+
+    If you cannot produce a valid `summary_title` for any opportunity (LLM returns empty, refuses, or produces something outside the 3-6 word noun-phrase style), hard exit with the opp-id named.
+
+11. **Compose the v0.1 JSON.** All fields per the schema in `references/opportunity-comparison.md`, plus three additive fields at v0.1 (schema version stays `"0.1"`):
+    - `journey_phases[]` at top level (from step 6).
+    - `summary_title` on each `opportunities_compared[]` entry (from step 10).
+    - `score_counts` on each `opportunities_compared[]` entry (from step 10).
+
+    Per the missing-optional convention, omit any optional key whose value isn't set; never write `null`. `opportunities_excluded[]` and `evidence_gaps[]` are written as empty arrays when applicable, never as `null` and never omitted. `journey_phases[]` is always non-empty (at least one phase exists in any valid clustered JSON).
+
+12. **Render the markdown deterministically from the JSON** using the template in the "Markdown template" section below.
+
+13. **Render the HTML deterministically from the same JSON** using the template in the "HTML template" section below. The HTML carries the same data as the markdown (same outcome, same opportunities, same scores, same rationales, same gaps, same notes, same excluded list) but presents them as a journey-grouped, scannable view: phases as horizontal swim-lane columns, opportunities as cards within each column (sorted by `score_counts.strong` desc then `score_counts.weak` asc), with rationales collocated inside expandable `<details>`. The HTML carries the matrix's data, not the matrix's tabular form. Single self-contained file with inline `<style>` and inline `<script>`; no external CSS, no remote dependencies. Filter chips above the swim-lanes toggle visibility of cards based on score-count thresholds.
+
+14. **Write paired output** to:
     - `<scope>/comparison-matrix.json`
     - `<scope>/comparison-matrix.md`
+    - `<scope>/comparison-matrix.html`
 
-    Upstream `experience-map-clustered.json` and `product-outcome.md` are not modified. Create `<scope>/` if it doesn't exist.
+    All three artifacts are written from the same composed JSON in a single pass. Upstream `experience-map-clustered.json` and `product-outcome.md` are not modified. Create `<scope>/` if it doesn't exist.
 
 ## Hard-exit format
 
@@ -95,7 +117,7 @@ ERROR: <one-line failure>
 - Remedy: <concrete next step the operator should take>
 ```
 
-The seven hard-exit triggers:
+The eight hard-exit triggers:
 
 | Trigger | Looked for | Remedy |
 |---|---|---|
@@ -106,6 +128,7 @@ The seven hard-exit triggers:
 | Zero approved opportunities after verdict filtering | At least one opportunity with `verdict == "approved"` | Re-run `OST-validate-opportunities` and review verdicts; the comparator cannot compare an empty set |
 | Product outcome file has no extractable `## Outcome` section | A heading `## Outcome` followed by the outcome formulation | Re-author `<scope>/../../_product-context/product-outcome.md` using the template structure |
 | One or more clustered opportunities missing the `verdict` field | `verdict` set on every opportunity in the clustered JSON | Re-run `OST-cluster-opportunities`; do not hand-edit the clustered JSON |
+| AI title generation failed for one or more opportunities | A 3-6 word noun-phrase `summary_title` for every approved opportunity | Re-run the skill; if it recurs, hand-edit the missing `summary_title` values into `<scope>/comparison-matrix.json` and re-run (cached titles are reused) |
 
 ## Markdown template
 
