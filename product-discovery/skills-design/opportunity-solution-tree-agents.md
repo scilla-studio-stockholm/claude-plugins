@@ -1,9 +1,12 @@
 ---
 title: "Opportunity Solution Tree Agents"
 date: 2026-05-06
-purpose: Designdokument för Opportunity Solution Tree Agents - de tretton AI-assister (skills med OST- prefix) som driver discovery-flödet, fördelat på fem faser - opportunity-val (steg 1-5), solution-brainstorm (steg 6-8), assumption identification (steg 9-10), assumption risk mapping (steg 11) och assumption validation experiments (steg 12). Per assist plus cross-cutting designfrågor och bygg-ordning. Inte en spec, ett underlag.
+last_refreshed: 2026-05-22
+purpose: Designdokument för Opportunity Solution Tree Agents - de tretton phase-assister (skills med OST- prefix) som driver discovery-flödet, fördelat på fem faser - opportunity-val (steg 1-5), solution-brainstorm (steg 6-8), assumption identification (steg 9-10), assumption risk mapping (steg 11) och assumption validation experiments (steg 12). Plus två scaffolding-skills (`OST-init-workspace`, `OST-setup-product`) som bootstrappar discovery-mappen. Per assist plus cross-cutting designfrågor och bygg-ordning. Inte en spec, ett underlag.
 
 ---
+
+> **Status 2026-05-22:** Alla 13 phase-assister plus 2 scaffolding-skills har skeppats. Per-skill `skills-design/OST-*-design.md` är kanoniska för per-assist-detaljer. Det här dokumentet behålls för cross-cutting-rationalen (Managed Agents-beslutet, HITL-mönster per fas, datakontrakt-resonemanget, pedagogisk spänning kring antaganden) som inte är fångad någon annanstans. Paths och numreringen är uppdaterade mot dagens `discovery/`-layout (se `knowledge/discovery/workspace-scope.md` för kanonisk spec).
 
 ## Namnkonvention
 
@@ -13,10 +16,14 @@ Hela samlingen heter **Opportunity Solution Tree Agents** (OST Agents). Varje sk
 
 ```mermaid
 flowchart TD
-    PO["📄 product-outcome.md<br/>(trio writes)"]:::trio
+    SETUP["🔧 OST-setup-product<br/>(wraps init-workspace +<br/>guided context interview)"]:::setup
+    PO["📄 _product-context/product-outcome.md<br/>(trio writes, via setup-product)"]:::trio
     EM["🖼️ experience map<br/>(screenshot / Miro)"]:::trio
     TR["📜 interview transcripts"]:::trio
-    CO["📄 chosen-opportunity.md<br/>(trio ratifies)"]:::trio
+    CO["📄 opportunities/&lt;opp&gt;/chosen-opportunity.md<br/>(trio ratifies)"]:::trio
+
+    SETUP --> PO
+    SETUP --> EM
 
     subgraph P1["Phase 1 - Opportunity selection (steps 2-5)"]
         A1["OST-opportunity-extractor"]:::skill
@@ -77,7 +84,10 @@ flowchart TD
     classDef trio fill:#fef3c7,stroke:#92400e,color:#111
     classDef skill fill:#dbeafe,stroke:#1e40af,color:#111
     classDef offpipe fill:#f3f4f6,stroke:#6b7280,color:#555,stroke-dasharray: 5 5
+    classDef setup fill:#dcfce7,stroke:#166534,color:#111
 ```
+
+Scaffolding (inte ritade som phase): `OST-init-workspace` (low-level mappskapande) och `OST-setup-product` (orchestrator som wrappar init + guidar trio genom att fylla `product-outcome.md`, `experience-map.md`, ev. `chosen-opportunity.md`). Setup-product är det vanligast invokerade entry-pointet för en ny produkt.
 
 ## Vad det här dokumentet är
 
@@ -132,13 +142,7 @@ Det vi avstår från är orchestration-primitiven inbyggt. Multi-agent för assi
 
 ### Var bor assisterna i repot?
 
-Öppen fråga. Möjliga konventioner:
-
-- `.claude/skills/` för CC-skills (om det är konventionen i den setup trio får)
-- `.claude/agents/` eller motsvarande för agenter
-- Knowledge-anchors fortsätter ligga i `knowledge/` och refereras från skill-prompten
-
-Detta behöver låsas innan vi börjar bygga.
+Beslut låst 2026-05-15: skills bor i plugin-paketet `product-discovery/skills/OST-*/SKILL.md` i marketplace-repot `scilla-studio/claude-plugins`. Teammates installerar via `/plugin install product-discovery@scilla-studio`. Knowledge-anchors ligger i `product-discovery/knowledge/discovery/*.md` och refereras från SKILL-prompts via `references/`-symlinks per skill. Inga separata agenter — multi-agent-orchestration (assist 6 och 9) körs via Task-tool internt i en skill.
 
 ### Datakontrakt
 
@@ -158,31 +162,32 @@ Avvikelse från tidigare spec: assist 11 hade specats med JSON enbart; lägger t
 
 **Filnamnskonvention**
 
-`workspace/<fas>/<artifact-typ>-<YYYY-MM-DD>.<ext>` där `<ext>` är `.json` eller `.md`. Paired output skriver båda filerna med samma rotnamn. Re-runs samma dag skriver över befintlig fil; commit:a först om tidigare version ska bevaras.
+Beslut omsett 2026-05-15. Round-folder-dating ersätter filnamns-dating: en round-mapp namnges `<YYYY-MM-DD>/` och filerna inuti har inte datum i namnet. Re-run samma dag skriver över befintliga filer i round-mappen; commit:a först om tidigare version ska bevaras. Re-run en ny dag → ny round-mapp under samma opportunity (eller selection-spår).
 
-Artifact-typ är kebab-case och börjar med substantiv (`opportunities-extracted` snarare än `extract-opportunities`). Specifika namn låses per assist.
+Artifact-typ är kebab-case och börjar med substantiv (`opportunities-extracted` snarare än `extract-opportunities`). Kanonisk filnamns-tabell per steg ligger i `knowledge/discovery/workspace-scope.md`.
 
 **Mapp-struktur**
 
+Kanonisk spec: `knowledge/discovery/workspace-scope.md`. Sammanfattning av single-product mode (multi-product mode lägger `<team>/<product>/`-nivå ovanför):
+
 ```text
-workspace/
-├── context/                  # Trio-skrivna inputs (read-only för skills)
-├── 1-opportunity-val/        # Assist 1-3: extract-opportunities, OST-extract-experience-map, OST-validate-opportunities
-├── 2-opportunity-compare/    # Assist 4: OST-compare-opportunities
-├── 3-opportunity-select/     # Assist 5: OST-select-opportunity
-├── 4-solution-brainstorm/    # Assist 6: OST-brainstorm-solutions
-└── 5-solution-cluster/       # Assist 7: OST-cluster-solutions (nästa att bygga)
+discovery/
+├── .current-scope                         # one-line: relative path to active round
+├── _product-context/                      # product-outcome.md, experience-map.{md,json}
+├── opportunity-selection/<YYYY-MM-DD>/    # phase A round: extract → validate → cluster → compare → select
+└── opportunities/<opp-slug>/              # ratified opportunity
+    ├── chosen-opportunity.md              # persistent context
+    ├── ratifications.md                   # optional trio log
+    └── <YYYY-MM-DD>/                      # phase B round: brainstorm → top-3 → assumptions → riskiest → experiments
 ```
 
-Konventionen är **en mapp per AI-assist**, numrerad i invocation-ordning. Undantag: `1-opportunity-val/` klumpar assist 1-3 (extract + experience-map + validate) historiskt - kvarstår tills någon har anledning att splitta. Folder-namn matchar skill-namn (utan verb-prefix där det blir naturligt).
+Konventionen är **två spår av dated round-mappar** snarare än per-assist-mappar: phase A (`opportunity-selection/<date>/`) klumpar alla phase-1-assister inuti en round, och phase B (`opportunities/<opp>/<date>/`) klumpar phase 2-5. Skillet är att en round är "ett pass genom flera assister mot samma opportunity och datum", inte "en mapp per skill". Dependency-impact är synlig via filnamnen i round-mappen, inte via folder-prefix.
 
-Mappstrukturen för assist 8-12 låses när respektive assist designas, inte i förväg - speculativa folder-namn för obyggda assister leder till samma drift som detta TODO försökte stänga.
+Skifte från tidigare numrerade folders (`workspace/1-opportunity-val/` osv): den ursprungliga "en mapp per AI-assist"-konventionen skalade dåligt när Workshop-3-numreringen torkade in. Round-folder-modellen gör det också enkelt för en trio att hålla parallella opportunities åtskilda, vilket numrerade folder-prefix inte kunde.
 
-Phased subdirs för att (a) hålla flat workspace navigerbart med tolv assister gånger paired output gånger flera körningar, (b) göra dependency-impact synligt vid re-runs, (c) ge stabila paths som skills kan referera till utan att veta varifrån de blir invokerade.
+`_product-context/` rymmer trio-skrivna inputs gemensamma för alla opportunities under produkten (product outcome, experience map). Per-opportunity-kontext (`chosen-opportunity.md`) ligger på opportunity-folder-roten. Inputs som transkript och experience map-skärmdumpar bor i sina egna hem och refereras in vid behov.
 
-`context/` rymmer trio-skrivna inputs. Inputs som transkript och experience map-skärmdumpar lever i sina existerande hem (`teams/<team>/`, `docs/`) och passas in som parametrar till assister utan att kopieras till workspace/.
-
-Per-klient-isolering kommer för fritt eftersom workspace/ ligger i klient-repo:t. Inga client-name-prefix behövs i filnamn.
+Per-klient-isolering kommer för fritt eftersom `discovery/` ligger i klient-repo:t. Inga client-name-prefix behövs i filnamn.
 
 **Schema-hantering**
 
@@ -192,7 +197,7 @@ Versionering: semver-lite. `v0.1 → v0.2` för bakåtkompatibla tillägg, `v1.0
 
 Validering: assister producerar JSON enligt schemat i sin knowledge anchor; downstream-assister antar att schemat håller. Vid malformed input exit:ar skill med tydligt felmeddelande snarare än degraderar tyst.
 
-Schemas saknas idag för assist 3b, 4, 5, 6, 7, 8, 9 och 10. Skapas per assist när vi designar respektive assist, för att undvika spekulativa schemas som visar sig fel när assisten faktiskt byggs.
+Status 2026-05-22: Alla schemas finns nu i `knowledge/discovery/` (`opportunity-citation-format.md`, `opportunity-comparison.md`, `opportunity-selection.md`, `experience-mapping.md`, `solution-brainstorm.md`, `solution-cluster.md`, `top-three-selection.md`, `assumption-generation.md`, `assumption-categorization.md`, `assumption-risk-mapping.md`, `assumption-validation.md`).
 
 **Knowledge-folder-distribution**
 
@@ -219,7 +224,7 @@ Notera: ursprungliga formuleringen nämnde "trio" som invocation-aktör. Operat�
 
 Det är två olika human-in-the-loop-mönster i den här processen:
 
-- **Steg 1:** Trio-only. Trio skriver sitt product outcome i `workspace/context/product-outcome.md` med eventuella kända begränsningar. Ingen AI-assist.
+- **Steg 1:** Trio-only. Trio skriver sitt product outcome i `_product-context/product-outcome.md` med eventuella kända begränsningar. Ingen AI-assist.
 - **Steg 2-5 (välja opportunity):** Parallell HITL. AI och trio gör samma jobb. Trio jämför AI:ns output mot sin egen vid en explicit jämförelsepunkt per steg.
 - **Steg 6-8 (solution brainstorm):** AI-driven HITL. AI producerar lösningskandidater, klustrar dem och väljer top 3. Trio kommer in vid slutet och approves de tre utvalda. Det är inte en parallell process där människan brainstormar samtidigt.
 - **Steg 9-10 (assumption identification):** AI-driven HITL, samma princip som fas 2. AI genererar antaganden per lösning via tre metoder och kategoriserar dem. Trio läser och godkänner.
@@ -233,7 +238,7 @@ Det betyder att assister i steg 6-12 designas för att producera trovärdig outp
 ## Beroendegraf
 
 ```text
-    (workspace/context/product-outcome.md, skrivet av trio)
+    (_product-context/product-outcome.md, skrivet av trio)
               │
               ├─────────────────────┐
               │                     │
@@ -305,25 +310,28 @@ Det betyder att assister i steg 6-12 designas för att producera trovärdig outp
         (JSON + markdown Test Cards: rekommenderad test per riskfyllt antagande)
 ```
 
-## Föreslagen bygg-ordning
+## Bygg-ordning (historisk, alla shipped 2026-05-22)
 
-Sortering efter beroenden och förväntad svårighetsgrad. Steg 1 (trio skriver outcome i `workspace/context/product-outcome.md`) är inte en AI-assist och ingår inte i listan.
+Ursprunglig sortering efter beroenden och förväntad svårighetsgrad. Steg 1 (trio skriver outcome) är inte en AI-assist och ingår inte i listan. Alla phase-assister nedan har skeppats; ordningsanteckningen bevaras för posteritet.
 
-1. **Format-validator** - oberoende, hjälper trio städa befintliga artefakter
-2. **Opportunity-extractor** - oberoende, men kräver att transkriptkonventionen är låst
-3. **Experience map importer** - gatekeeper för downstream, tekniskt mer komplex (vision eller MCP)
-4. **Opportunity-clusterer** - kräver att format-validator/extractor och experience-map-importer finns
-5. **Comparator + evidensgap** - kräver klustrad fil + outcome
-6. **Opportunity-väljare** - terminal i fas 1, enklast logik men kräver matrisen från comparator
-7. **Synthetic trio solution brainstormer** - startar fas 2, tekniskt mest komplex (multi-agent orchestration, anti-duplication mellan rundor)
-8. **Solution clusterer** - beroende av brainstormer
-9. **Top-3 solution selector** - terminal i fas 2
-10. **Assumption generator** - startar fas 3, multi-method orchestration per lösning
-11. **Assumption categorizer** - terminal i fas 3
-12. **Riskiest-assumptions agent** - fas 4, binär scoring med rationale
-13. **Validation-experiment-designer agent** - fas 5, Test Card-generering med cheapest-viable-heuristic
+1. **Format-validator** (`OST-validate-opportunities`) - oberoende, hjälper trio städa befintliga artefakter
+2. **Opportunity-extractor** (`OST-opportunity-extractor`) - oberoende, men kräver att transkriptkonventionen är låst
+3. **Experience map importer** (`OST-extract-experience-map`) - gatekeeper för downstream, tekniskt mer komplex (vision)
+4. **Opportunity-clusterer** (`OST-cluster-opportunities`) - kräver att format-validator/extractor och experience-map-importer finns
+5. **Comparator + evidensgap** (`OST-compare-opportunities`) - kräver klustrad fil + outcome
+6. **Opportunity-väljare** (`OST-select-opportunity`) - terminal i fas 1, enklast logik men kräver matrisen från comparator
+7. **Synthetic trio solution brainstormer** (`OST-brainstorm-solutions`) - startar fas 2, tekniskt mest komplex (multi-agent orchestration, anti-duplication mellan rundor)
+8. **Solution clusterer** (`OST-cluster-solutions`) - beroende av brainstormer; off-pipeline sedan top-3-redesign 2026-05-11
+9. **Top-3 solution selector** (`OST-select-top-three-solutions`) - terminal i fas 2
+10. **Assumption generator** (`OST-generate-assumptions`) - startar fas 3, multi-method orchestration per lösning
+11. **Assumption categorizer** (`OST-assumption-categorizer`) - terminal i fas 3
+12. **Riskiest-assumptions agent** (`OST-riskiest-assumptions`) - fas 4, binär scoring med rationale
+13. **Validation-experiment-designer agent** (`OST-validation-experiment-designer`) - fas 5, Test Card-generering med cheapest-viable-heuristic
 
-End-to-end-tråd kan testas tidigt med syntetisk data om vi bygger comparator + väljare mot mock-input innan opportunity-utvinningen är klar. Senare faser kan på samma sätt testas mot mock-input för respektive uppströms artefakt innan tidigare faser är kompletta.
+**Scaffolding (byggdes sist, 2026-05-15)** efter att phase-assisterna visade sig anta en mappstruktur som inte fanns out-of-the-box:
+
+- `OST-init-workspace` - low-level scaffold-skapande av `discovery/`-hierarkin
+- `OST-setup-product` - orchestrator som wrappar init plus guidar trio genom `product-outcome.md`, `experience-map.md` och `chosen-opportunity.md`. Vanligaste entrypointet för ny produkt.
 
 ---
 
@@ -331,7 +339,7 @@ End-to-end-tråd kan testas tidigt med syntetisk data om vi bygger comparator + 
 
 ### Steg 1: Trio skriver outcome (ingen AI-assist)
 
-Trio skriver sitt product outcome i `workspace/context/product-outcome.md` med eventuella kända begränsningar (saknad baseline, osatt tidsram osv). Trio accepterar att outcomet kan ha luckor om de är medvetna och dokumenterade. Outcomet är input till downstream-skills, inte output från en AI-assist.
+Trio skriver sitt product outcome i `_product-context/product-outcome.md` med eventuella kända begränsningar (saknad baseline, osatt tidsram osv). Trio accepterar att outcomet kan ha luckor om de är medvetna och dokumenterade. Outcomet är input till downstream-skills, inte output från en AI-assist.
 
 Anchors: `../knowledge/discovery/product-outcomes-i-olika-skeden.md` och `../knowledge/discovery/product-outcomes-vs-business-outcomes.md` finns för trio att konsultera vid skrivning, men det är trios ansvar, inte en AI-uppgift.
 
@@ -394,7 +402,7 @@ Anchors: `../knowledge/discovery/product-outcomes-i-olika-skeden.md` och `../kno
 **Öppna designfrågor (låsta 2026-05-09):**
 
 - Format för input. Plain markdown, JSON, en specifik fil-konvention?  
-  svar: Plain markdown enligt `../knowledge/discovery/opportunity-citation-format.md`. En fil per körning. Default-filsökväg `workspace/1-opportunity-val/opportunities-extracted-<date>.md`; operatören kan ange annan.
+  svar: Plain markdown enligt `../knowledge/discovery/opportunity-citation-format.md`. En fil per körning. Default-filsökväg `<scope>/opportunities-extracted.md` (där `<scope>` typiskt är `discovery/opportunity-selection/<YYYY-MM-DD>/`); operatören kan ange annan.
 - Ska assisten kunna föreslå konkreta omformuleringar, eller bara flagga?  
   svar: Bara flagga. Trios egen formulering är canonical text. Lärupplevelsen är starkare när trio själv hittar formuleringen utifrån motiveringen.
 
@@ -406,13 +414,15 @@ Anchors: `../knowledge/discovery/product-outcomes-i-olika-skeden.md` och `../kno
 
 ### 3a (parallell). Opportunity-extractor
 
-**Jobb (en mening):** Läs intervjutranskript och extrahera kandidat-opportunities i citat-stickie-format.
+> **Status 2026-05-22:** Skeppat som `OST-opportunity-extractor`. Per-skill design och senare iterationer lever i `skills/OST-opportunity-extractor/SKILL.md`.
+
+**Jobb (en mening):** Läs intervjutranskript och extrahera kandidat-opportunities i citat-stickie-format, pre-klassificerade för trio-review.
 
 **Input:** Ett eller flera intervjutranskript (markerade talare).
 
-**Output:** Lista av kandidat-opportunities i citat-stickie-format. Inte godkända per default, kandidater för trio att granska.
+**Output:** Per-fil-grupper av verbatim citat-stickies pre-klassificerade för trio review.
 
-**Föreslagen typ:** Skill om transkripten är hanterbara i ett pass, agent om vi behöver iterera över många.
+**Föreslagen typ:** Skill. Single-pass över transkript per körning.
 
 **Tools behövda:** Read.
 
@@ -421,12 +431,6 @@ Anchors: `../knowledge/discovery/product-outcomes-i-olika-skeden.md` och `../kno
 **Nedströms-konsumenter:** Format-validator (3a) eller direkt trio.
 
 **Knowledge-anchors:** `../knowledge/discovery/opportunity-citation-format.md`.
-
-**Öppna designfrågor:**
-
-- Hur skiljer assisten signal (riktig opportunity) från brus (artigt prat, sidospår)?
-- Hur många kandidater per transkript, och vill vi ha ett tak?
-- Ska den länka tillbaka till exakt tidsstämpel om transkriptet har det?
 
 **Prio:** Medium. Behövs när opportunities saknas eller är tunna, kan annars hoppa över.
 
@@ -476,7 +480,7 @@ svar: opportunities kan hamna utanför en phase, behöver bara en tydlig klassif
 
 **Tools behövda:** Read.
 
-**Uppströms-beroenden:** Steg 3b (Opportunity-clusterer), `workspace/context/product-outcome.md`.
+**Uppströms-beroenden:** Steg 3b (Opportunity-clusterer), `_product-context/product-outcome.md`.
 
 **Nedströms-konsumenter:** Steg 5.
 
@@ -504,7 +508,7 @@ svar: opportunities kan hamna utanför en phase, behöver bara en tydlig klassif
 
 **Tools behövda:** Read.
 
-**Uppströms-beroenden:** Steg 4 (Comparator), `workspace/context/product-outcome.md`.
+**Uppströms-beroenden:** Steg 4 (Comparator), `_product-context/product-outcome.md`.
 
 **Nedströms-konsumenter:** Trio själv. Output är slutartefakten.
 
@@ -546,7 +550,7 @@ Designfilosofin är inspirerad av ideation-loops som tvingar deltagare bortom de
 
 **Tools behövda:** Read (för rollbeskrivningar och input), Agent (för sub-agent-spawning om det är så vi orkestrerar).
 
-**Uppströms-beroenden:** Steg 5 (Opportunity-väljare), `workspace/context/product-outcome.md`.
+**Uppströms-beroenden:** Steg 5 (Opportunity-väljare), `_product-context/product-outcome.md`.
 
 **Nedströms-konsumenter:** Steg 7 (Solution clusterer).
 
@@ -577,7 +581,7 @@ Designfilosofin är inspirerad av ideation-loops som tvingar deltagare bortom de
 
 **Jobb (en mening):** Gruppera de 18 lösningskandidaterna efter likhet och tema så att duplikat försvinner och unika idéer framträder.
 
-**Input:** 18 lösningar från assist 8.
+**Input:** 18 lösningar från assist 6.
 
 **Output:** Klustrad lösningskarta. Varje kluster har titel, kort summa, och listar de individuella lösningarna inom det.
 
@@ -598,7 +602,7 @@ Designfilosofin är inspirerad av ideation-loops som tvingar deltagare bortom de
 - Hanteras bygg-på-relationer mellan idéer? Om en round 2-lösning byggde på en round 1-lösning, syns den relationen i kartan?
 - Vad gör clusterern med en outlier-lösning som inte passar i något kluster? Egen bucket eller tvinga in i närmaste?
 
-**Prio:** Medium. Beroende av 8.
+**Prio:** Medium. Beroende av 6 (brainstormer).
 
 ---
 
@@ -611,8 +615,8 @@ Designfilosofin är inspirerad av ideation-loops som tvingar deltagare bortom de
 **Input:**
 
 - Solution-candidates JSON (från steg 6, OST-brainstorm-solutions) - de 18 specifika lösningarna
-- `workspace/context/chosen-opportunity.md` (trio-ratificerad)
-- `workspace/context/product-outcome.md`
+- `opportunities/<opp>/chosen-opportunity.md` (trio-ratificerad)
+- `_product-context/product-outcome.md`
 
 **Output:** Top 3 specifika lösningar (inga clusters, ingen discriminator). Per lösning: id, title, generating_role, round_number, description (verbatim från source), plus 2-3 meningar outcome-mapping rationale. Ingen alternatives-sektion (trio läser brainstormer-markdown om de vill överrida). Schema v0.2 i `../knowledge/discovery/top-three-selection.md`.
 
@@ -620,9 +624,9 @@ Designfilosofin är inspirerad av ideation-loops som tvingar deltagare bortom de
 
 **Tools behövda:** Read.
 
-**Uppströms-beroenden:** Steg 6 (OST-brainstorm-solutions), `workspace/context/chosen-opportunity.md`, `workspace/context/product-outcome.md`. **Inte** steg 7 (clusterer) - v2 hoppar över clustering-steget.
+**Uppströms-beroenden:** Steg 6 (OST-brainstorm-solutions), `opportunities/<opp>/chosen-opportunity.md`, `_product-context/product-outcome.md`. **Inte** steg 7 (clusterer) - v2 hoppar över clustering-steget.
 
-**Nedströms-konsumenter:** Trio (granskar, ratificerar via `workspace/context/ratifications.md`), steg 9 (Assumption generator) som läser ratifications.md för att hitta godkänd version.
+**Nedströms-konsumenter:** Trio (granskar, ratificerar via `opportunities/<opp>/ratifications.md`), steg 9 (Assumption generator) som läser ratifications.md för att hitta godkänd version.
 
 **Knowledge-anchors:** `../knowledge/discovery/top-three-selection.md` (schema v0.2, fyra v2 låsta beslut), `../knowledge/discovery/solution-brainstorm.md` (source schema), `../knowledge/discovery/opportunity-solution-tree-teresa-torres.md` (Torres-principer).
 
@@ -659,9 +663,9 @@ Tre oberoende frames ger bredare täckning än en. Rolldiversifiering (PM, UX, T
 
 **Input:**
 
-- Top 3 lösningar plus rationale (från assist 10)
+- Top 3 lösningar plus rationale (från assist 8)
 - Product outcome (från assist 1)
-- Vald opportunity plus rationale (från assist 7)
+- Vald opportunity plus rationale (från assist 5)
 
 **Output:** Per lösning, en deduperad lista antaganden, varje med attribution till källmetod (för spårbarhet).
 
@@ -669,7 +673,7 @@ Tre oberoende frames ger bredare täckning än en. Rolldiversifiering (PM, UX, T
 
 **Tools behövda:** Read.
 
-**Uppströms-beroenden:** Steg 8 (Top-3 selector), `workspace/context/product-outcome.md`, steg 5 (Opportunity-väljare).
+**Uppströms-beroenden:** Steg 8 (Top-3 selector), `_product-context/product-outcome.md`, steg 5 (Opportunity-väljare).
 
 **Nedströms-konsumenter:** Steg 10 (Assumption categorizer).
 
@@ -706,7 +710,7 @@ Tre oberoende frames ger bredare täckning än en. Rolldiversifiering (PM, UX, T
 
 **Uppströms-beroenden:** Steg 9 (Assumption generator).
 
-**Nedströms-konsumenter:** Steg 11 (Riskiest-assumptions agent) som läser kategoriserade antaganden från `workspace/8-assumptions-categorized/`.
+**Nedströms-konsumenter:** Steg 11 (Riskiest-assumptions agent) som läser kategoriserade antaganden från `<scope>/assumptions-categorized.{md,json}` i samma discovery-round (`opportunities/<opp>/<YYYY-MM-DD>/`).
 
 **Knowledge-anchors:** `../knowledge/discovery/assumption-types.md` (taxonomin med definitioner och exempel), `../knowledge/foundations/product-operating-model-marty-cagan.md` (Cagan five product risks som ankrar taxonomin).
 
@@ -717,7 +721,7 @@ Tre oberoende frames ger bredare täckning än en. Rolldiversifiering (PM, UX, T
 - Output-format: flat per-antagande-rader med `[category]`-tagg efter `[methods]`-taggen. Inga per-kategori-rubriker; row-order bevarar upstream-ordning (identity-mapping).
 - Intra-kategori-ordning: ingen; identity-mapping över upstream `assumptions[]` är invariant. Re-sortering är v0.2-followup (#8 "Category-grouped rendering option").
 
-**Prio:** Hög. Beroende av 11. Sista i fas 3.
+**Prio:** Hög. Beroende av 9 (generator). Sista i fas 3.
 
 ---
 
@@ -735,7 +739,7 @@ Efter att antagandena är genererade och kategoriserade i fas 3 ska de mest risk
 
 **Jobb (en mening):** För varje antagande per lösning, klassificera på två binära axlar (importance, evidence) och flagga det som mest riskfyllt om det är högt på importance och svagt på evidence.
 
-**Input:** Kategoriserade antaganden per lösning (från assist 12), product outcome (från assist 1), top 3-lösningar med rationale (från assist 10).
+**Input:** Kategoriserade antaganden per lösning (från assist 10), product outcome (från assist 1), top 3-lösningar med rationale (från assist 8).
 
 **Output:** JSON enligt schemat i `../knowledge/discovery/assumption-risk-mapping.md`. Per antagande: text, kategori, importance, evidence, is_riskiest, rationale.
 
@@ -743,7 +747,7 @@ Efter att antagandena är genererade och kategoriserade i fas 3 ska de mest risk
 
 **Tools behövda:** Read, Write.
 
-**Uppströms-beroenden:** Steg 10 (Assumption categorizer), `workspace/context/product-outcome.md` (för product outcome som referens i importance-bedömning), steg 8 (Top-3 selector, för lösningskontext).
+**Uppströms-beroenden:** Steg 10 (Assumption categorizer), `_product-context/product-outcome.md` (för product outcome som referens i importance-bedömning), steg 8 (Top-3 selector, för lösningskontext).
 
 **Nedströms-konsumenter:** Trio (för läsning och godkännande), framtida assumption testing-fas (utanför nuvarande scope).
 
@@ -761,9 +765,9 @@ Efter att antagandena är genererade och kategoriserade i fas 3 ska de mest risk
 - Not_sure-fallback: ingen. Binary axes only, no graded scale (carried from v0.1 anchor).
 - Pass-struktur: single cross-solution pass (matches assist-10 precedent). LLM returnerar `{id, importance, evidence, rationale}`; skill beräknar `is_riskiest = (importance=high AND evidence=weak)` deterministically.
 
-Schema bumpat till v0.2 i `../knowledge/discovery/assumption-risk-mapping.md` (extension, inte replacement): full identity-mapping över upstream assist-10 output (varje upstream-fält byte-identical) plus 4 nya per-antagande-fält. Output paired JSON + markdown till `workspace/9-riskiest-assumptions/`. Markdown öppnar med Trio HITL gate banner (per-solution `Riskiest:` summary-rad + inline `[RISKIEST]`-tagg). Ingen `ratifications.md`-entry; assist 12 läser latest-by-date.
+Schema bumpat till v0.2 i `../knowledge/discovery/assumption-risk-mapping.md` (extension, inte replacement): full identity-mapping över upstream assist-10 output (varje upstream-fält byte-identical) plus 4 nya per-antagande-fält. Output paired JSON + markdown till `<scope>/riskiest-assumptions.{md,json}` i samma discovery-round. Markdown öppnar med Trio HITL gate banner (per-solution `Riskiest:` summary-rad + inline `[RISKIEST]`-tagg). Ingen `ratifications.md`-entry; assist 12 läser samma round-scope.
 
-**Prio:** Medium. Beroende av 12 (categorizer). Tekniskt enklare än fas 3-genereraren men producerar den artefakt som assumption testing kommer hänga på, så kvalitet är viktig.
+**Prio:** Medium. Beroende av 10 (categorizer). Tekniskt enklare än fas 3-genereraren men producerar den artefakt som assumption testing kommer hänga på, så kvalitet är viktig.
 
 ---
 
@@ -781,7 +785,7 @@ Efter att de mest riskfyllda antagandena är flaggade i fas 4 ska de valideras. 
 
 **Jobb (en mening):** För varje antagande som är flaggat som riskfyllt i fas 4, designa en Test Card enligt Blands struktur (hypothesis, test, metric, success criteria) plus 1-2 alternativa tester, och optimera för cheapest viable.
 
-**Input:** JSON från assist 13 (OST-riskiest-assumptions agent), filtrerad till antaganden där `is_riskiest: true`. Plus product outcome (från 1) och vald opportunity (från 7) som kontext.
+**Input:** JSON från assist 11 (OST-riskiest-assumptions agent), filtrerad till antaganden där `is_riskiest: true`. Plus product outcome (från 1) och vald opportunity (från 5) som kontext.
 
 **Output:**
 
@@ -792,7 +796,7 @@ Efter att de mest riskfyllda antagandena är flaggade i fas 4 ska de valideras. 
 
 **Tools behövda:** Read, Write.
 
-**Uppströms-beroenden:** Steg 11 (Riskiest-assumptions agent), `workspace/context/product-outcome.md`, steg 5 (Opportunity-väljare).
+**Uppströms-beroenden:** Steg 11 (Riskiest-assumptions agent), `_product-context/product-outcome.md`, steg 5 (Opportunity-väljare).
 
 **Nedströms-konsumenter:** Trio (för läsning, godkännande, körning), framtida experiment-tracking-system (utanför nuvarande scope).
 
@@ -811,17 +815,17 @@ Efter att de mest riskfyllda antagandena är flaggade i fas 4 ska de valideras. 
 - Customer-access flagging: ingen structured field; trio catcher access-needs vid HITL via test_type-inference.
 - Learning Card: deferred till v0.3 / framtida capture-skill. v1 stoppar vid "designed the test".
 
-Schema bumpat till v0.2 i `../knowledge/discovery/assumption-validation.md` (extension): filtered identity-mapping över upstream assist-11 output (is_riskiest=true only; varje retained upstream-fält byte-identical) plus 2 nya per-antagande-fält. Output paired JSON + markdown till `workspace/10-validation-experiments/`. Markdown öppnar med Trio run-list handoff banner (terminal-assist framing; ingen review-and-approve gate). Ingen `ratifications.md`-entry. Twelfth and final assist in the discovery critical path.
+Schema bumpat till v0.2 i `../knowledge/discovery/assumption-validation.md` (extension): filtered identity-mapping över upstream assist-11 output (is_riskiest=true only; varje retained upstream-fält byte-identical) plus 2 nya per-antagande-fält. Output paired JSON + markdown till `<scope>/validation-experiments.{md,json}` i samma discovery-round. Markdown öppnar med Trio run-list handoff banner (terminal-assist framing; ingen review-and-approve gate). Ingen `ratifications.md`-entry. Twelfth and final assist in the discovery critical path.
 
-**Prio:** Medium. Beroende av 13 (Riskiest-assumptions agent). Sista assisten i nuvarande scope.
+**Prio:** Medium. Beroende av 11 (Riskiest-assumptions agent). Sista assisten i nuvarande scope.
 
 ---
 
-## Brainstormpassets förslagna agenda
+## Brainstormpassets förslagna agenda (historisk)
 
-När vi sätter oss i brainstormpasset, en möjlig disposition:
+Inputen till brainstorm-passen som körde 2026-05-06 till 2026-05-12. Disposition som följdes:
 
-1. Lås cross-cutting-frågorna först (skill kontra agent-mappning, var assister bor, datakontrakt, invocation-yta)
-2. Gå assist för assist, ta de öppna designfrågorna och låt dem styra prompt-strategi och tool-val
-3. Bestäm bygg-ordning slutgiltigt och skriv en första skill eller agent som proof-of-concept
+1. Cross-cutting först (skill-vs-agent, var assister bor, datakontrakt, invocation-yta) — låst 2026-05-08 till 2026-05-15
+2. Per-assist designfrågor — låst i respektive `skills-design/OST-*-design.md`
+3. Bygg-ordning — alla 13 phase-assister plus 2 scaffolding-skills shippad 2026-05-22
 
