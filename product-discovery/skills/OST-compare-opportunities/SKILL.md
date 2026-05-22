@@ -282,17 +282,18 @@ The HTML output is rendered deterministically from the same composed JSON as the
   details.opp-card[open] { background: var(--surface); border-color: var(--ink-soft); }
   details.opp-card.filtered-out { display: none; }
   details.opp-card > summary { cursor: pointer; list-style: none; outline: none; }
+  details.opp-card > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
   details.opp-card > summary::-webkit-details-marker { display: none; }
   details.opp-card > summary::after { content: "▾"; float: right; color: var(--ink-soft); font-size: .85rem; transition: transform .15s; }
   details.opp-card[open] > summary::after { transform: rotate(180deg); }
-  .card-title { font-weight: 600; font-size: .92rem; margin: 0 1.5rem .15rem 0; line-height: 1.35; }
+  .card-title { display: block; font-weight: 600; font-size: .92rem; margin: 0 1.5rem .15rem 0; line-height: 1.35; }
   .card-step { float: right; font-size: .72rem; color: var(--ink-soft); font-family: ui-monospace, "SF Mono", Menlo, monospace; margin-left: .25rem; text-decoration: none; }
   .card-step:hover { text-decoration: underline; }
-  .card-standouts { font-size: .8rem; margin: .15rem 0 .1rem; line-height: 1.5; }
+  .card-standouts { display: block; font-size: .8rem; margin: .15rem 0 .1rem; line-height: 1.5; }
   .card-standouts .label { color: var(--ink-soft); display: inline-block; min-width: 3.6em; }
   .card-standouts.strong .label { color: var(--strong-ink); font-weight: 600; }
   .card-standouts.weak .label { color: var(--weak-ink); font-weight: 600; }
-  .card-no-standouts { font-size: .8rem; color: var(--ink-soft); font-style: italic; margin: .15rem 0; }
+  .card-no-standouts { display: block; font-size: .8rem; color: var(--ink-soft); font-style: italic; margin: .15rem 0; }
 
   /* Card expansion content */
   .card-detail { margin-top: .55rem; padding-top: .5rem; border-top: 1px dashed var(--rule); }
@@ -330,7 +331,7 @@ The HTML output is rendered deterministically from the same composed JSON as the
     section { page-break-inside: avoid; }
     a { color: inherit; text-decoration: none; }
     details.opp-card, details.opp-card[open] { background: white; border-color: var(--rule); }
-    details:not([open]) > *:not(summary) { display: revert; }
+    details > *:not(summary) { display: block; }
     details > summary::after { display: none; }
     .swim-col-head { position: static; }
     .swim-grid { grid-template-columns: repeat(var(--col-count), minmax(0, 1fr)); }
@@ -397,13 +398,13 @@ The HTML output is rendered deterministically from the same composed JSON as the
                data-strong-count="<n>" data-weak-count="<n>" data-unknown-count="<n>">
         <summary>
           <a class="card-step" href="#step-<step_id>">step-X-Y</a>
-          <p class="card-title"><summary_title></p>
+          <span class="card-title"><summary_title></span>
           <!-- If score_counts.strong >= 1, render the strong row; otherwise omit it: -->
-          <p class="card-standouts strong"><span class="label">strong:</span> outcome alignment, customer importance</p>
+          <span class="card-standouts strong"><span class="label">strong:</span> outcome alignment, customer importance</span>
           <!-- If score_counts.weak >= 1, render the weak row; otherwise omit it: -->
-          <p class="card-standouts weak"><span class="label">weak:</span> strategic fit</p>
+          <span class="card-standouts weak"><span class="label">weak:</span> strategic fit</span>
           <!-- If both score_counts.strong == 0 AND score_counts.weak == 0, render this instead: -->
-          <!-- <p class="card-no-standouts">No standout scores.</p> -->
+          <!-- <span class="card-no-standouts">No standout scores.</span> -->
         </summary>
         <div class="card-detail">
           <blockquote>"<full quote>"</blockquote>
