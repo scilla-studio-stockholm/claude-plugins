@@ -378,7 +378,8 @@ The HTML output is rendered deterministically from the same composed JSON as the
   <div class="swim-grid" style="--col-count: <col-count>;">
     <!--
       Render one <div class="swim-col"> per entry in journey_phases[], in array order,
-      with data-phase-index="<0-based index>". Then, if at least one opportunity has
+      with data-phase-index="<0-based index mod 5>" (the tint cycles past 5 phases).
+      Then, if at least one opportunity has
       no phase set (unphased bucket), render a final <div class="swim-col"
       data-phase-index="unphased"> at the end. <col-count> is the total column count
       (length of journey_phases + 1 if unphased column is rendered, else just length).
