@@ -528,6 +528,44 @@ The HTML output is rendered deterministically from the same composed JSON as the
 </html>
 ```
 
+### HTML rendering rules
+
+- **Single self-contained file.** Inline `<style>` and inline `<script>` only. No external CSS, no remote fonts, no external scripts. The trio can open the file from any path, email it, or open it offline.
+- **JavaScript scope.** ~50 LOC of vanilla JS in one inline `<script>` at the end of `<body>`. Drives only filter-chip toggling and (optionally) opening a `<details>` if the URL fragment is `#opp-X-Y`. No event handlers on cards; native `<details>` toggle is used for expand/collapse. No framework, no fetch, no async, no global state beyond the IIFE.
+- **No emoji.** Score values are conveyed by background color, text color, and (for `n/a`) a dashed border. Matches the markdown's "words only" rule.
+- **Anchor IDs are deterministic.**
+  - Opportunity cards: `id="opp-X-Y"` on the `<details>` element (matches the `opp-id`). URL fragments like `#opp-4-1` open the card expanded.
+  - Phase columns: `id="phase-<phase_id>"` (matches the upstream phase id). Unphased column: `id="phase-unphased"`.
+  - Step index entries: `id="step-<step_id>"` (matches the upstream step id). Card step labels link via `<a href="#step-X-Y">`.
+- **Color classes match the score vocabulary exactly.** `strong` / `medium` / `weak` / `unknown` / `na`. `n/a` uses class `na` (dot is invalid in a class name).
+- **Phase color accents.** Each swim-lane column gets a subtle left-border tint, rotated through five warm-neutral CSS variables (`--phase-tint-1` through `--phase-tint-5`) keyed off the phase's 0-based index. The unphased column uses `--ink-soft` with a dashed left border to distinguish it from regular phases. Phase tints are deliberately distinct from score colors to avoid semantic confusion.
+- **Swim-lane column rendering rules.**
+  - One column per entry in `journey_phases[]`, in array order, including zero-opp phases. Set `data-phase-index="<0-based index mod 5>"` so the tint cycles correctly past five phases.
+  - One trailing column with `data-phase-index="unphased"` renders only when ≥1 opportunity has no `phase` set.
+  - Each column header carries the phase name and opportunity count. Headers are `position: sticky; top: <filter-bar-height>` so they stay visible during vertical scroll.
+  - Columns with zero opportunities render `<div class="swim-col-empty">No opportunities in this phase.</div>` in place of any cards (and never render the `<div class="swim-col-nomatch">` placeholder).
+  - Columns with opportunities always render the `<div class="swim-col-nomatch">` placeholder at the bottom (hidden via CSS unless all cards in the column are filtered out).
+  - Column width: `minmax(220px, 1fr)`. The swim-grid uses `min-width: max-content` so on narrow viewports the grid overflows horizontally with scroll instead of collapsing columns.
+- **Card rendering rules.**
+  - Cards within a column are sorted by `score_counts.strong` descending, then `score_counts.weak` ascending, then upstream `opportunities_compared[]` array index. Deterministic and stable.
+  - The card title (`<p class="card-title">`) renders the AI-generated `summary_title` from the JSON.
+  - The collapsed card shows standout chips only: a `card-standouts strong` row listing the criterion display names of cells scoring `strong` (only if at least one such cell exists), and a `card-standouts weak` row listing the criterion display names of cells scoring `weak` (only if at least one such cell exists). Criterion names appear in their full English display form (e.g., "outcome alignment", "customer importance"), comma-joined in `criteria[]` order.
+  - If neither bucket has entries, the card shows `<p class="card-no-standouts">No standout scores.</p>` in their place.
+  - The expanded card (`.card-detail` block, revealed when the `<details>` is opened) renders the full quote, source citation, and one `.rationale-row` per criterion in `criteria[]` order. Unknown and n/a rows omit the `.cites` paragraph entirely, matching the markdown rule.
+  - The step label (`<a class="card-step" href="#step-X-Y">`) appears floated to the right of the title and links into the `<details id="steps">` index at the bottom of the page.
+  - `data-strong-count`, `data-weak-count`, and `data-unknown-count` attributes on each `<details class="opp-card">` mirror the JSON's `score_counts` and drive the filter logic.
+- **Filter chip semantics.**
+  - `strong-heavy`: hides cards where `score_counts.strong < 3`.
+  - `has-weak`: hides cards where `score_counts.weak < 1`.
+  - `has-unknown`: hides cards where `score_counts.unknown < 1`.
+  - Active chips AND-combine. The Reset button clears all active chips.
+  - The counter (`<span class="counter">`) updates to `N of M shown` based on visible cards.
+  - When a column has cards but the active filter hides them all, the column shows `No matching opportunities.` in place of the cards (via the `.is-empty-filter` class toggled by the script).
+- **Section omission matches the markdown.** `#excluded`, `#gaps`, `#notes` are omitted entirely (the whole `<section>` element) when their underlying list is empty.
+- **Print stylesheet** hides the filter bar, forces all `<details>` content to be visible (`details:not([open]) > *:not(summary) { display: revert; }`), drops sticky positioning, and removes the chevron marker. The trio gets a complete printable record showing every card fully expanded.
+- **Language attribute.** Set `<html lang>` to match the source language detected in the clustered JSON's `quote` text and `phases[].name` (`sv` for Swedish, `en` for English, etc.). Criterion display names stay in English regardless, matching the markdown's rule.
+- **Step index (`#steps`).** Renders one `<li id="step-<step_id>">` per distinct `(phase_id, step_id, step_name)` tuple referenced by at least one card. Order: upstream phases[].steps[] traversal order. Wrapped in a `<details>` collapsed by default so it doesn't push the journey content down on first view.
+
 ## Output principles
 
 - **Score values use full words** in both the matrix table and the rationales: `strong` / `medium` / `weak` / `unknown` / `n/a`. No emoji.
