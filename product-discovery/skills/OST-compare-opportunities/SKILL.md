@@ -210,6 +210,323 @@ Cells where evidence was thin and an honest score wasn't defensible. Each gap na
 - **Competitive landscape** scored `n/a` for all opportunities, suggesting it isn't load-bearing for this trio's context. The trio may consider dropping this criterion in HITL.
 ```
 
+## HTML template
+
+The HTML output is rendered deterministically from the same composed JSON as the markdown, using this template. Single self-contained file with inline `<style>` and inline `<script>`; no external CSS, no remote fonts, no external scripts. The HTML carries the matrix data as a journey-grouped scannable view (cards in phase columns), not as a tabular matrix.
+
+```html
+<!DOCTYPE html>
+<html lang="<lang>">
+<head>
+<meta charset="utf-8">
+<title>Comparison matrix: <title> (<team>)</title>
+<style>
+  :root {
+    --bg: #faf8f5;
+    --surface: #ffffff;
+    --ink: #1a1815;
+    --ink-soft: #5a564f;
+    --rule: #e8e4dc;
+    --strong-bg: #d4ead5; --strong-ink: #1f5e2a;
+    --medium-bg: #fbe7b8; --medium-ink: #6b4a05;
+    --weak-bg:   #f4cfc6; --weak-ink:   #7a2418;
+    --unknown-bg:#ecebe7; --unknown-ink:#5a564f;
+    --na-bg:    transparent; --na-ink:  #98948c;
+    --accent: #6b3fa0;
+    --phase-tint-1: #f3ede0;
+    --phase-tint-2: #ebe5d6;
+    --phase-tint-3: #e3ddce;
+    --phase-tint-4: #ddd5c5;
+    --phase-tint-5: #d5ccbb;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: var(--ink); background: var(--bg);
+    max-width: 1600px; margin: 0 auto; padding: 1.5rem 1rem 6rem;
+  }
+  header { border-bottom: 1px solid var(--rule); padding-bottom: 1.25rem; margin-bottom: 1.25rem; }
+  h1 { font-size: 1.75rem; margin: 0 0 .4rem; letter-spacing: -.01em; }
+  h2 { font-size: 1.15rem; margin: 2rem 0 .8rem; letter-spacing: -.005em; }
+  .meta { color: var(--ink-soft); font-size: .85rem; margin: 0; }
+  .meta code { font-size: .8rem; background: var(--surface); padding: 1px 5px; border-radius: 3px; border: 1px solid var(--rule); }
+  blockquote { margin: 0; padding: .9rem 1.1rem; border-left: 3px solid var(--accent); background: var(--surface); border-radius: 0 4px 4px 0; }
+  section { scroll-margin-top: 1rem; }
+
+  /* Filter bar */
+  nav.filters { position: sticky; top: 0; z-index: 3; background: var(--bg); padding: .65rem 0; margin: 0 0 .25rem; display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; border-bottom: 1px solid var(--rule); }
+  nav.filters .chip { font-size: .85rem; padding: .3rem .75rem; border-radius: 999px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); cursor: pointer; user-select: none; }
+  nav.filters .chip.active { background: var(--accent); color: white; border-color: var(--accent); }
+  nav.filters .reset { font-size: .8rem; padding: .3rem .65rem; border-radius: 4px; border: 1px solid var(--rule); background: transparent; color: var(--ink-soft); cursor: pointer; }
+  nav.filters .counter { margin-left: auto; font-size: .85rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+
+  /* Swim-lane grid */
+  section.journey { overflow-x: auto; }
+  .swim-grid { display: grid; grid-template-columns: repeat(var(--col-count), minmax(220px, 1fr)); gap: .6rem; min-width: max-content; }
+  .swim-col { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: .55rem; border-left: 3px solid var(--phase-tint-1); }
+  .swim-col[data-phase-index="0"] { border-left-color: var(--phase-tint-1); }
+  .swim-col[data-phase-index="1"] { border-left-color: var(--phase-tint-2); }
+  .swim-col[data-phase-index="2"] { border-left-color: var(--phase-tint-3); }
+  .swim-col[data-phase-index="3"] { border-left-color: var(--phase-tint-4); }
+  .swim-col[data-phase-index="4"] { border-left-color: var(--phase-tint-5); }
+  .swim-col[data-phase-index="unphased"] { border-left-color: var(--ink-soft); border-left-style: dashed; }
+  .swim-col-head { position: sticky; top: 3rem; background: var(--surface); padding: .35rem .25rem .5rem; margin-bottom: .35rem; z-index: 2; border-bottom: 1px solid var(--rule); }
+  .swim-col-head .phase-name { font-weight: 600; font-size: .95rem; }
+  .swim-col-head .phase-count { color: var(--ink-soft); font-size: .8rem; margin-left: .3rem; font-variant-numeric: tabular-nums; }
+  .swim-col-empty { font-size: .85rem; color: var(--ink-soft); font-style: italic; padding: .5rem .25rem; }
+  .swim-col-nomatch { font-size: .85rem; color: var(--ink-soft); font-style: italic; padding: .5rem .25rem; display: none; }
+  .swim-col.is-empty-filter .swim-col-nomatch { display: block; }
+
+  /* Opportunity cards */
+  details.opp-card { background: #fefdfb; border: 1px solid var(--rule); border-radius: 4px; padding: .55rem .65rem; margin-bottom: .4rem; scroll-margin-top: 4rem; }
+  details.opp-card[open] { background: var(--surface); border-color: var(--ink-soft); }
+  details.opp-card.filtered-out { display: none; }
+  details.opp-card > summary { cursor: pointer; list-style: none; outline: none; }
+  details.opp-card > summary::-webkit-details-marker { display: none; }
+  details.opp-card > summary::after { content: "▾"; float: right; color: var(--ink-soft); font-size: .85rem; transition: transform .15s; }
+  details.opp-card[open] > summary::after { transform: rotate(180deg); }
+  .card-title { font-weight: 600; font-size: .92rem; margin: 0 1.5rem .15rem 0; line-height: 1.35; }
+  .card-step { float: right; font-size: .72rem; color: var(--ink-soft); font-family: ui-monospace, "SF Mono", Menlo, monospace; margin-left: .25rem; text-decoration: none; }
+  .card-step:hover { text-decoration: underline; }
+  .card-standouts { font-size: .8rem; margin: .15rem 0 .1rem; line-height: 1.5; }
+  .card-standouts .label { color: var(--ink-soft); display: inline-block; min-width: 3.6em; }
+  .card-standouts.strong .label { color: var(--strong-ink); font-weight: 600; }
+  .card-standouts.weak .label { color: var(--weak-ink); font-weight: 600; }
+  .card-no-standouts { font-size: .8rem; color: var(--ink-soft); font-style: italic; margin: .15rem 0; }
+
+  /* Card expansion content */
+  .card-detail { margin-top: .55rem; padding-top: .5rem; border-top: 1px dashed var(--rule); }
+  .card-detail blockquote { font-size: .85rem; margin: 0 0 .35rem; padding: .5rem .65rem; border-left: 2px solid var(--accent); }
+  .card-detail cite { display: block; font-style: normal; font-size: .75rem; color: var(--ink-soft); margin-bottom: .55rem; }
+  .card-detail .rationale-row { font-size: .8rem; margin-bottom: .5rem; padding: .35rem .5rem; background: #faf8f3; border-radius: 3px; border-left: 2px solid var(--rule); }
+  .card-detail .rationale-row.strong  { border-left-color: var(--strong-ink); }
+  .card-detail .rationale-row.medium  { border-left-color: var(--medium-ink); }
+  .card-detail .rationale-row.weak    { border-left-color: var(--weak-ink); }
+  .card-detail .rationale-row.unknown { border-left-color: var(--unknown-ink); }
+  .card-detail .rationale-row.na      { border-left-color: var(--na-ink); border-left-style: dashed; }
+  .card-detail .rationale-head { display: flex; gap: .4rem; align-items: baseline; margin-bottom: .15rem; }
+  .card-detail .crit-name { font-weight: 600; }
+  .card-detail .score-pill { font-size: .7rem; padding: 1px 6px; border-radius: 999px; font-weight: 600; }
+  .card-detail .score-pill.strong  { background: var(--strong-bg);  color: var(--strong-ink); }
+  .card-detail .score-pill.medium  { background: var(--medium-bg);  color: var(--medium-ink); }
+  .card-detail .score-pill.weak    { background: var(--weak-bg);    color: var(--weak-ink); }
+  .card-detail .score-pill.unknown { background: var(--unknown-bg); color: var(--unknown-ink); }
+  .card-detail .score-pill.na      { background: var(--na-bg);      color: var(--na-ink); border: 1px dashed var(--rule); }
+  .card-detail .cites { font-size: .72rem; color: var(--ink-soft); margin-top: .15rem; }
+
+  /* Gaps / excluded / notes / step index */
+  .gap-list, .excluded-list, .notes-list { list-style: none; padding: 0; }
+  .gap-list li, .excluded-list li, .notes-list li { background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: .55rem .85rem; margin-bottom: .45rem; }
+  .gap-list strong { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-weight: 600; color: var(--accent); }
+  details#steps summary { cursor: pointer; padding: .4rem 0; font-weight: 600; color: var(--ink-soft); text-transform: uppercase; font-size: .8rem; letter-spacing: .04em; }
+  details#steps ul { list-style: none; padding: 0; columns: 3; column-gap: 1.5rem; }
+  details#steps li { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: .8rem; padding: .15rem 0; }
+  details#steps li code { color: var(--accent); }
+
+  /* Print */
+  @media print {
+    body { max-width: none; padding: 1cm; background: white; }
+    nav.filters { display: none; }
+    section { page-break-inside: avoid; }
+    a { color: inherit; text-decoration: none; }
+    details.opp-card, details.opp-card[open] { background: white; border-color: var(--rule); }
+    details:not([open]) > *:not(summary) { display: revert; }
+    details > summary::after { display: none; }
+    .swim-col-head { position: static; }
+    .swim-grid { grid-template-columns: repeat(var(--col-count), minmax(0, 1fr)); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Comparison matrix: <title> (<team>)</h1>
+  <p class="meta">
+    <YYYY-MM-DD> · Schema v0.1 · Paired with
+    <code><scope>/comparison-matrix.json</code> and
+    <code><scope>/comparison-matrix.md</code>
+    <br>Source clustered map: <code><scope>/experience-map-clustered.json</code>
+    <br>Source product outcome: <code><scope>/../../_product-context/product-outcome.md</code>
+  </p>
+</header>
+
+<section id="outcome">
+  <h2>Product outcome</h2>
+  <blockquote><full outcome formulation></blockquote>
+</section>
+
+<!-- Omit entirely if opportunities_excluded[] is empty -->
+<section id="excluded">
+  <h2>Excluded from comparison (<N>)</h2>
+  <ul class="excluded-list">
+    <li><strong>opp-X-Y</strong> (Phase: <phase name>; verdict: needs_tweak) - <reason></li>
+    <li><strong>opp-A-B</strong> (Phase: <phase name>; verdict: solution_in_disguise) - <reason></li>
+  </ul>
+</section>
+
+<nav class="filters" id="filters">
+  <button class="chip" data-filter="strong-heavy" type="button">strong-heavy (≥3 strongs)</button>
+  <button class="chip" data-filter="has-weak" type="button">has weak</button>
+  <button class="chip" data-filter="has-unknown" type="button">has unknown</button>
+  <button class="reset" type="button">Reset</button>
+  <span class="counter"><span id="counter-shown"><N></span> of <span id="counter-total"><N></span> shown</span>
+</nav>
+
+<section id="journey" class="journey">
+  <h2>Opportunities by journey phase (<N>)</h2>
+  <div class="swim-grid" style="--col-count: <col-count>;">
+    <!--
+      Render one <div class="swim-col"> per entry in journey_phases[], in array order,
+      with data-phase-index="<0-based index>". Then, if at least one opportunity has
+      no phase set (unphased bucket), render a final <div class="swim-col"
+      data-phase-index="unphased"> at the end. <col-count> is the total column count
+      (length of journey_phases + 1 if unphased column is rendered, else just length).
+    -->
+    <div class="swim-col" data-phase-index="0" id="phase-<phase_id>">
+      <div class="swim-col-head">
+        <span class="phase-name"><phase name></span>
+        <span class="phase-count">(<N>)</span>
+      </div>
+
+      <!-- If this column has zero opportunities, render the empty placeholder instead of any cards: -->
+      <!-- <div class="swim-col-empty">No opportunities in this phase.</div> -->
+
+      <!-- Otherwise, render cards sorted by score_counts.strong DESC,
+           then score_counts.weak ASC, then upstream opportunities_compared[] order: -->
+      <details class="opp-card" id="opp-X-Y"
+               data-strong-count="<n>" data-weak-count="<n>" data-unknown-count="<n>">
+        <summary>
+          <a class="card-step" href="#step-<step_id>">step-X-Y</a>
+          <p class="card-title"><summary_title></p>
+          <!-- If score_counts.strong >= 1, render the strong row; otherwise omit it: -->
+          <p class="card-standouts strong"><span class="label">strong:</span> outcome alignment, customer importance</p>
+          <!-- If score_counts.weak >= 1, render the weak row; otherwise omit it: -->
+          <p class="card-standouts weak"><span class="label">weak:</span> strategic fit</p>
+          <!-- If both score_counts.strong == 0 AND score_counts.weak == 0, render this instead: -->
+          <!-- <p class="card-no-standouts">No standout scores.</p> -->
+        </summary>
+        <div class="card-detail">
+          <blockquote>"<full quote>"</blockquote>
+          <cite><source></cite>
+          <!-- One rationale-row per criterion, in criteria[] order:
+               outcome-alignment, customer-importance, market-size, strategic-fit,
+               competitive-landscape. unknown and n/a rows omit the .cites line. -->
+          <div class="rationale-row strong">
+            <div class="rationale-head"><span class="crit-name">Outcome alignment</span><span class="score-pill strong">strong</span></div>
+            <p><rationale prose></p>
+            <p class="cites">Cites: opp-X-Y.</p>
+          </div>
+          <div class="rationale-row na">
+            <div class="rationale-head"><span class="crit-name">Competitive landscape</span><span class="score-pill na">n/a</span></div>
+            <p><rationale prose></p>
+            <!-- no .cites for unknown / n/a -->
+          </div>
+        </div>
+      </details>
+      <!-- ...more cards in this column... -->
+
+      <div class="swim-col-nomatch">No matching opportunities.</div>
+    </div>
+    <!-- ...more phase columns... -->
+
+    <!-- Optional final unphased column. Render only if at least one opportunity has no phase set: -->
+    <div class="swim-col" data-phase-index="unphased" id="phase-unphased">
+      <div class="swim-col-head">
+        <span class="phase-name">Unphased</span>
+        <span class="phase-count">(<N>)</span>
+      </div>
+      <!-- ...same card structure as above... -->
+      <div class="swim-col-nomatch">No matching opportunities.</div>
+    </div>
+  </div>
+</section>
+
+<!-- Omit entirely if evidence_gaps[] is empty -->
+<section id="gaps">
+  <h2>Evidence gaps (<N>)</h2>
+  <p class="meta">Cells where evidence was thin and an honest score wasn't defensible. Each gap names what evidence would unlock a score.</p>
+  <ul class="gap-list">
+    <li><strong>Customer importance × opp-4-3</strong>: <what_is_missing></li>
+    <li><strong>Market size / frequency × opp-4-3</strong>: <what_is_missing></li>
+  </ul>
+</section>
+
+<!-- Omit entirely unless a criterion scored n/a for ALL approved opportunities -->
+<section id="notes">
+  <h2>Notes</h2>
+  <ul class="notes-list">
+    <li><strong>Competitive landscape</strong> scored <code>n/a</code> for all opportunities, suggesting it isn't load-bearing for this trio's context. The trio may consider dropping this criterion in HITL.</li>
+  </ul>
+</section>
+
+<details id="steps">
+  <summary>Step index</summary>
+  <ul>
+    <!-- One <li> per (phase_id, step_id, step name) tuple traversed in upstream phases[].steps[] order.
+         List every step that appears on at least one card's data-step link. -->
+    <li id="step-<step_id>"><code>step-X-Y</code> — <step name></li>
+  </ul>
+</details>
+
+<script>
+(function () {
+  var activeFilters = new Set();
+  var bar = document.getElementById('filters');
+  var shown = document.getElementById('counter-shown');
+  var total = document.getElementById('counter-total');
+  var cards = Array.prototype.slice.call(document.querySelectorAll('details.opp-card'));
+  var cols = Array.prototype.slice.call(document.querySelectorAll('.swim-col'));
+  total.textContent = cards.length;
+
+  function passes(card) {
+    if (activeFilters.size === 0) return true;
+    if (activeFilters.has('strong-heavy') && (+card.dataset.strongCount || 0) < 3) return false;
+    if (activeFilters.has('has-weak')     && (+card.dataset.weakCount || 0) < 1) return false;
+    if (activeFilters.has('has-unknown')  && (+card.dataset.unknownCount || 0) < 1) return false;
+    return true;
+  }
+
+  function apply() {
+    var count = 0;
+    cards.forEach(function (c) {
+      var ok = passes(c);
+      c.classList.toggle('filtered-out', !ok);
+      if (ok) count++;
+    });
+    shown.textContent = count;
+    cols.forEach(function (col) {
+      var visible = col.querySelectorAll('details.opp-card:not(.filtered-out)').length;
+      var hasAnyCard = col.querySelector('details.opp-card') !== null;
+      col.classList.toggle('is-empty-filter', hasAnyCard && visible === 0);
+    });
+  }
+
+  bar.addEventListener('click', function (e) {
+    var t = e.target;
+    if (t.classList && t.classList.contains('chip')) {
+      var f = t.dataset.filter;
+      if (activeFilters.has(f)) { activeFilters.delete(f); t.classList.remove('active'); }
+      else { activeFilters.add(f); t.classList.add('active'); }
+      apply();
+    } else if (t.classList && t.classList.contains('reset')) {
+      activeFilters.clear();
+      bar.querySelectorAll('.chip.active').forEach(function (c) { c.classList.remove('active'); });
+      apply();
+    }
+  });
+
+  // Open the card if URL fragment points at one
+  if (location.hash && location.hash.indexOf('#opp-') === 0) {
+    var target = document.querySelector(location.hash);
+    if (target && target.tagName === 'DETAILS') target.open = true;
+  }
+})();
+</script>
+
+</body>
+</html>
+```
+
 ## Output principles
 
 - **Score values use full words** in both the matrix table and the rationales: `strong` / `medium` / `weak` / `unknown` / `n/a`. No emoji.
