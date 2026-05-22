@@ -30,7 +30,19 @@ Teammates need GitHub auth (`gh auth login`) since the repo is private.
 
 ## Current State
 
-**In progress:** Nothing active. Last shipped: discovery-workspace rename + single-product mode + opportunity-selection rename (2026-05-15). Same day: `OST-setup-product` and `OST-init-workspace`.
+**In progress:** OST-compare-opportunities HTML rendering shipped to `master` in canonical; needs first live use on the Metria 96-opp fixture (Task 5 of the plan is the HITL verification — not yet run). Last shipped: HTML swim-lane rendering for `OST-compare-opportunities` (2026-05-22). Earlier: discovery-workspace rename + single-product mode + opportunity-selection rename (2026-05-15). Same day: `OST-setup-product` and `OST-init-workspace`.
+
+**Recent decisions (OST-compare-opportunities HTML rendering, 2026-05-22):**
+- Added HTML as a third paired output alongside JSON + markdown. Reason: the markdown matrix is unscannable at workshop scale (Metria has 96 opps × 5 criteria = 480 cells). HTML uses a swim-lane card layout (phases as columns) sorted by strong-count then weak-count, expandable via native `<details>` for per-criterion rationales.
+- A previous session experimented with a literal matrix HTML table in the marketplace clone. That work was never pushed to GitHub and is abandoned. We went straight to the swim-lane redesign on a clean canonical base.
+- AI-generated `summary_title` per opportunity, cached in the persisted JSON so re-renders are stable and cheap. Trio can override by hand-editing the JSON. Hard exit on title-generation failure with the opp-id named.
+- Added two additive fields per opportunity (`summary_title`, `score_counts`) and one top-level field (`journey_phases`) under schema version 0.1 — backward-compatible additions, no schema version bump. `journey_phases` carries zero-opp phases through so empty columns still render (Metria's Fulfillment is zero-opp).
+- ~50 LOC of inline vanilla JS is now allowed in the HTML output for filter chip toggling. External dependencies still forbidden. The file remains self-contained and openable offline. This is the first OST skill that ships runtime JS.
+- Filter chips: `strong-heavy (≥3 strongs)`, `has weak`, `has unknown`. AND-combined when multiple active. Per-criterion filtering intentionally absent — the markdown view + Cmd-F is the deep-inspection escape hatch.
+- Card sort within column: strong-count DESC, weak-count ASC, then upstream `opportunities_compared[]` order. Deterministic, no randomness.
+- Markdown template untouched — it stays the "complete tabular view" while the HTML is the "skim view." JSON+MD+HTML still ship as a paired triple from a single render pass.
+- Subagent-driven execution caught two functional bugs in code review: print stylesheet's `display: revert` doesn't actually unhide closed `<details>` (fixed to `display: block`), and `<p>` inside `<summary>` is invalid HTML content model (replaced with `<span>` + `display: block`). Both fixed in commit `cc175f1`.
+- Spec: `docs/superpowers/specs/2026-05-22-ost-compare-opportunities-html-redesign-design.md`. Plan: `docs/superpowers/plans/2026-05-22-ost-compare-opportunities-html-redesign.md`.
 
 **Recent decisions (workspace rename / single-product mode, 2026-05-15):**
 - Renamed the top-level scaffold directory `workspace/` → `discovery/`. Reason: "workspace" was too generic; "discovery" tells you immediately what's in there. Touched the canonical knowledge anchor, 4 phase SKILL.md files with literal `workspace/` paths, and the init/setup-product skills. All 13 phase skills with `references/workspace-scope.md` symlinks pick up the rename automatically.
@@ -68,6 +80,7 @@ Teammates need GitHub auth (`gh auth login`) since the repo is private.
 - API list pricing (April 2026), not actual Pro/Max bill. Stated as caveat everywhere.
 
 **Next steps (when picked up):**
+- `OST-compare-opportunities`: needs first live workshop with a real trio on the Metria 96-opp fixture. Watch for: does the trio find the strong-heavy filter useful? Does the AI title style feel natural in Swedish, or do trios reach for the JSON to override? Does the empty `Fulfillment` column communicate "no opps here" clearly enough?
 - `OST-setup-product`: not yet tested with a real trio — only static review. First live use is the real test (does the interview flow feel natural, does the experience-map fork land cleanly, does the orchestrator route to the right next OST-* skill in its final summary). Watch for friction points and tighten.
 - `OST-init-workspace`: no known issues from smoke testing. Watch for teammate feedback on whether the `--opportunity`/`--portfolio` split is intuitive or whether a single round-type flag reads better.
 - `cost-review`: output-heavy detector tip "use Edit instead of Write" overfit in observed sessions — actual driver was subagent dispatches and Edit volume, not Write. Consider adding a sub-detector or rephrasing the tip.
