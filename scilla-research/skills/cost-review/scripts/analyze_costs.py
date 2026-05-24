@@ -354,7 +354,7 @@ def detect_signals(agg: dict) -> list:
             "output-heavy", "warn",
             f"session {s['sid'][:8]} had {s['output_tokens']/1000:.0f}K output tokens",
             s["cost"],
-            "Use Edit instead of Write for partial changes; reference files instead of re-outputting them",
+            "Check session for: subagent dispatches, full-file rewrites (Edit > Write), or verbose narration",
         ))
     if len(heavy) > 5:
         extra = heavy[5:]
@@ -362,7 +362,7 @@ def detect_signals(agg: dict) -> list:
             "output-heavy", "warn",
             f"…and {len(extra)} more sessions over 50K output tokens",
             sum(s["cost"] for s in extra),
-            "Pattern: long file writes, verbose narration, or full-file regenerations. "
+            "Common drivers: subagent dispatches, full-file rewrites, verbose narration. "
             "Audit with --json and look at output_tokens per session.",
         ))
 
@@ -441,9 +441,9 @@ def format_human_report(agg: dict, signals: list, repo: str, scope_label: str) -
     push("=== Total ===")
     push(f"{_fmt_dollars(agg['total']['cost'])}   {_fmt_tokens(agg['total']['tokens'])} tokens")
     for m in agg["per_model"]:
-        est = " (estimated)" if m["estimated"] else ""
+        label = m['model'] + (" (estimated)" if m["estimated"] else "")
         total_tokens = m['input_tokens'] + m['output_tokens'] + m['cache_read'] + m['cache_write']
-        push(f"  {m['model']:<28s}{est}  {_fmt_dollars(m['cost']):>12s}  "
+        push(f"  {label:<40s}  {_fmt_dollars(m['cost']):>12s}  "
              f"{_fmt_tokens(total_tokens):>8s} tokens   "
              f"(cache_read {_fmt_tokens(m['cache_read'])}, output {_fmt_tokens(m['output_tokens'])}, "
              f"cache_write {_fmt_tokens(m['cache_write'])}, input {_fmt_tokens(m['input_tokens'])})")
@@ -459,8 +459,9 @@ def format_human_report(agg: dict, signals: list, repo: str, scope_label: str) -
 
     if agg["daily"]:
         push("=== Daily timeline (last 30 days) ===")
-        max_cost = max(d["cost"] for d in agg["daily"])
-        for d in agg["daily"][-30:]:
+        recent = agg["daily"][-30:]
+        max_cost = max(d["cost"] for d in recent)
+        for d in recent:
             bar_len = int((d["cost"] / max_cost) * 40) if max_cost > 0 else 0
             push(f"  {d['date']}  {_fmt_dollars(d['cost']):>10s}  "
                  f"{_fmt_tokens(d['tokens']):>8s} tokens   {'█' * bar_len}")

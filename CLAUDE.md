@@ -83,9 +83,7 @@ Teammates need GitHub auth (`gh auth login`) since the repo is private.
 - `OST-compare-opportunities`: needs first live workshop with a real trio on the Metria 96-opp fixture. Watch for: does the trio find the strong-heavy filter useful? Does the AI title style feel natural in Swedish, or do trios reach for the JSON to override? Does the empty `Fulfillment` column communicate "no opps here" clearly enough?
 - `OST-setup-product`: not yet tested with a real trio — only static review. First live use is the real test (does the interview flow feel natural, does the experience-map fork land cleanly, does the orchestrator route to the right next OST-* skill in its final summary). Watch for friction points and tighten.
 - `OST-init-workspace`: no known issues from smoke testing. Watch for teammate feedback on whether the `--opportunity`/`--portfolio` split is intuitive or whether a single round-type flag reads better.
-- `cost-review`: output-heavy detector tip "use Edit instead of Write" overfit in observed sessions — actual driver was subagent dispatches and Edit volume, not Write. Consider adding a sub-detector or rephrasing the tip.
-- `cost-review`: daily timeline bar scale uses all-time max, not 30-day max — recent bars get compressed when older days dominated. Minor cosmetic.
-- `cost-review`: `(estimated)` suffix breaks per-model column alignment. Cosmetic.
+- `cost-review`: all three cosmetic issues fixed (2026-05-24): output-heavy tip broadened to mention subagent dispatches as primary driver; daily timeline bar scale now uses 30-day window max; `(estimated)` suffix included in fixed-width model column so alignment holds.
 
 **Gotchas:**
 - Plugin name in `plugin.json` matches folder name (e.g. `scilla-research` for both).

@@ -46,15 +46,17 @@ Six signal detectors run on every cost-review invocation. Each gets a one-line t
 ## output-heavy
 
 **What it means:** A single session produced more than 50K output tokens (~25K words). Often a sign of one of:
-1. The model regenerated a long file via Write instead of using Edit
-2. Long markdown reports / specs / plans being authored
-3. Verbose narration during refactoring
+1. Subagent dispatches — each subagent generates its own output tokens, which accumulate in the parent session
+2. The model regenerated a long file via Write instead of using Edit
+3. Long markdown reports / specs / plans being authored
+4. Verbose narration during refactoring
 
 **Why it costs more:** Output is the most expensive token type — $75/M on Opus.
 
 **How to spot it:** Watch for the model rewriting whole files when only a section changed. Or for explanations that re-print code blocks instead of referencing them.
 
 **Remediation:**
+- Check whether subagent dispatches drove the output. Each Agent call generates its own output tokens — consider whether the same work could be done inline or with fewer agents.
 - Prefer Edit over Write for partial changes.
 - For long reports, ask the model to write to a file rather than print to chat.
 - If you're getting long narrations, ask: "show me only the diff" or "skip the explanation."

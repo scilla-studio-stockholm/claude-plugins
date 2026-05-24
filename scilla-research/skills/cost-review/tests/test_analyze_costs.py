@@ -436,6 +436,46 @@ class TestFormatHumanReport(unittest.TestCase):
         self.assertIn("2026-05-11", out)
         self.assertIn("$213.56", out)
 
+    def test_daily_timeline_bar_scale_uses_30day_window_max(self):
+        agg = self._agg()
+        agg["daily"] = [
+            {"date": f"2026-03-{d:02d}", "cost": 1000.0, "tokens": 1_000_000}
+            for d in range(1, 6)
+        ] + [
+            {"date": f"2026-04-{d:02d}", "cost": 10.0, "tokens": 100_000}
+            for d in range(1, 30)
+        ] + [
+            {"date": "2026-05-10", "cost": 50.0, "tokens": 500_000},
+            {"date": "2026-05-11", "cost": 100.0, "tokens": 1_000_000},
+        ]
+        out = ac.format_human_report(agg, [], repo="x", scope_label="all-time")
+        lines = [l for l in out.split("\n") if "2026-05-11" in l]
+        self.assertEqual(len(lines), 1)
+        bar_chars = lines[0].count("█")
+        self.assertEqual(bar_chars, 40)
+
+    def test_estimated_model_column_alignment(self):
+        agg = {
+            "window": {"first": "2026-05-10T08:00:00Z", "last": "2026-05-10T12:00:00Z",
+                       "days": 1, "sessions": 1, "turns": 150},
+            "total": {"cost": 15.0, "tokens": 12_000},
+            "per_model": [
+                {"model": "model-alpha", "family": "opus", "estimated": False,
+                 "turns": 100, "input_tokens": 1000, "output_tokens": 2000,
+                 "cache_read": 3000, "cache_write": 4000, "cost": 10.0},
+                {"model": "model-beta", "family": "sonnet", "estimated": True,
+                 "turns": 50, "input_tokens": 500, "output_tokens": 1000,
+                 "cache_read": 1500, "cache_write": 2000, "cost": 5.0},
+            ],
+            "per_session": [], "daily": [],
+        }
+        out = ac.format_human_report(agg, [], repo="x", scope_label="all-time")
+        model_lines = [l for l in out.split("\n") if "model-alpha" in l or "model-beta" in l]
+        self.assertEqual(len(model_lines), 2)
+        tokens_col_0 = model_lines[0].index("tokens")
+        tokens_col_1 = model_lines[1].index("tokens")
+        self.assertEqual(tokens_col_0, tokens_col_1)
+
     def test_includes_signal_lines(self):
         signals = [
             {"id": "opus-on-lightweight", "severity": "warn",
