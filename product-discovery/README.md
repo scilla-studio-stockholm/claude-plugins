@@ -17,6 +17,57 @@ Updates pull automatically on session start (`autoUpdate: true`). Force-update m
 /plugin update product-discovery@scilla-studio
 ```
 
+## Skill flow
+
+```mermaid
+flowchart TD
+    subgraph phase0 ["Phase 0 — Setup"]
+        setup["setup-product"]
+        init["init-workspace"]
+        setup -.->|"calls"| init
+    end
+
+    subgraph phase1 ["Phase 1 — Opportunities"]
+        xmap["extract-experience-map"]
+        extract["opportunity-extractor"]
+        validate["validate-opportunities"]
+        cluster_o["cluster-opportunities"]
+        compare["compare-opportunities"]
+        select_o["select-opportunity"]
+
+        extract --> validate --> cluster_o --> compare --> select_o
+        xmap --> cluster_o
+    end
+
+    subgraph phase2 ["Phase 2 — Solutions"]
+        brainstorm["brainstorm-solutions"]
+        cluster_s["cluster-solutions"]
+        top3["select-top-three"]
+        brainstorm --> cluster_s --> top3
+    end
+
+    subgraph phase3 ["Phase 3 — Assumptions"]
+        gen["generate-assumptions"]
+        categorize["assumption-categorizer"]
+        gen --> categorize
+    end
+
+    subgraph phase4 ["Phase 4 — Risk mapping"]
+        riskiest["riskiest-assumptions"]
+    end
+
+    subgraph phase5 ["Phase 5 — Validation"]
+        experiment["validation-experiment-designer"]
+    end
+
+    setup --> xmap
+    setup --> extract
+    select_o --> brainstorm
+    top3 --> gen
+    categorize --> riskiest
+    riskiest --> experiment
+```
+
 ## Skills
 
 The plugin ships 15 skills organized into five phases. Each skill outputs paired JSON + markdown (and sometimes HTML) that feeds into the next.
