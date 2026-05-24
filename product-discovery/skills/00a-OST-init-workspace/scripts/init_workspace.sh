@@ -191,16 +191,19 @@ tags: [product-context, experience-map]
 
 # Experience map
 
-<!-- Two ways to populate this:
+<!-- Two ways to populate the experience map:
 
      1. Save a screenshot at _product-context/experience-map.png and run
         OST-extract-experience-map. The skill will produce a structured
         JSON + markdown rendering inside the active round folder.
 
-     2. Write the journey here directly (phases, steps, friction levels,
-        decision branches). See
-        product-discovery/knowledge/discovery/experience-mapping.md
-        for schema v0.1 and the structural pattern. -->
+     2. Run OST-setup-product and walk through the experience map
+        interview. It writes experience-map-extracted.{md,json} into
+        the active round folder.
+
+     Both paths write to the round folder, not this file. Downstream
+     skills (OST-cluster-opportunities) require experience-map-extracted.json
+     in the round folder. This file stays as a placeholder. -->
 
 TBD.
 EOF
@@ -220,20 +223,31 @@ tags: [opportunity, persistent-context]
 
 # Chosen opportunity: $opp
 
-## Opportunity (citation format)
+## Product outcome
 
-<!-- The customer-voice statement in citation format.
-     See product-discovery/knowledge/discovery/opportunity-citation-format.md.
-     A valid citation includes: who said it, what they said (verbatim or
-     paraphrased with quote markers), and the underlying job-to-be-done. -->
+<!-- Copy the product outcome formulation from _product-context/product-outcome.md
+     as a blockquote so phase-B skills have it in context. -->
 
-TBD.
+> TBD — paste the product outcome here.
 
-## Why this one
+## Chosen opportunity
 
-<!-- Why the trio picked this opportunity over the alternatives compared
-     in the opportunity-selection round. Reference the comparison-matrix
-     if useful. -->
+<!-- Format: **<opp-id>** (Phase: <phase-id>) - "<quote>" - *<source>*
+     Example: **opp-3-2** (Phase: onboarding) - "Jag fattar inte vad jag ska göra först" - *P03, licensansvarig*
+     See product-discovery/knowledge/discovery/opportunity-citation-format.md for citation rules. -->
+
+TBD — fill in the opportunity citation in the format above.
+
+### Score profile
+
+<!-- If this opportunity came through OST-select-opportunity, copy the
+     score profile table from chosen-opportunity-proposal.md. Otherwise
+     leave this section empty — it is optional context for brainstorming. -->
+
+### Rationale
+
+<!-- 2-4 sentences: why the trio picked this opportunity over alternatives.
+     Reference the comparison-matrix if useful. -->
 
 TBD.
 
@@ -259,7 +273,7 @@ set of candidates against the same outcome.
 ## Files that will land here (produced by the OST-* skills in order)
 
 - `opportunities-extracted.{md,json}` — raw opportunity citations extracted from interview transcripts (OST-opportunity-extractor).
-- `experience-map-extracted.{md,json}` — structured experience map extracted from a screenshot, if you have one (OST-extract-experience-map).
+- `experience-map-extracted.{md,json}` — structured experience map, from a screenshot via OST-extract-experience-map or from the OST-setup-product interview.
 - `experience-map-clustered.{md,json}` — opportunities clustered onto the journey phases (OST-cluster-opportunities).
 - `opportunities-validated.md` — trio's verdict per opportunity: approved / needs tweak / solution in disguise (OST-validate-opportunities).
 - `comparison-matrix.{md,json}` — qualitative matrix of approved opportunities × Torres criteria (OST-compare-opportunities).

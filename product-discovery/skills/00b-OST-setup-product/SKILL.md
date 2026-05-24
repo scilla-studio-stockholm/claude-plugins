@@ -30,21 +30,21 @@ After this skill completes, the discovery workspace is **ready to run**: every d
 2. **Gather scaffold inputs.** Ask one question at a time, wait for answer before the next:
    - **Layout mode** — ask: "Will this repo hold work for one product only, or multiple products/teams?" Map "one product" → `--single-product`; "multiple" → multi-product mode (then ask for `team` slug).
    - `product` slug (apply slug rules; transliterate Swedish chars `å→a, ä→a, ö→o`; confirm with the user if you transliterate)
-   - Round type — ask: "Is this the start of an opportunity-selection round (validating/comparing opportunities to pick which one to pursue) or a discovery round (a specific opportunity has already been ratified)?" Map to `--selection` or `--opportunity <slug>`. If discovery, ask for the opportunity slug.
+   - Round type — ask: "Have you already decided which opportunity to pursue, or are you still figuring out which one to pick?" Map "still figuring out" → `--selection` (opportunity-selection round); "already decided" → `--opportunity <slug>` (discovery round, then ask for the opportunity slug).
    - `date` — default to today; ask only if the user volunteers a back-date.
 
 3. **Run the scaffold script:**
 
    Multi-product mode:
    ```bash
-   bash "${CLAUDE_PLUGIN_ROOT}/skills/OST-init-workspace/scripts/init_workspace.sh" \
+   bash "${CLAUDE_PLUGIN_ROOT}/skills/00a-OST-init-workspace/scripts/init_workspace.sh" \
      --team <team> --product <product> \
      [--opportunity <opp>] [--selection] [--date YYYY-MM-DD]
    ```
 
    Single-product mode:
    ```bash
-   bash "${CLAUDE_PLUGIN_ROOT}/skills/OST-init-workspace/scripts/init_workspace.sh" \
+   bash "${CLAUDE_PLUGIN_ROOT}/skills/00a-OST-init-workspace/scripts/init_workspace.sh" \
      --single-product --product <product> \
      [--opportunity <opp>] [--selection] [--date YYYY-MM-DD]
    ```
@@ -70,20 +70,23 @@ After this skill completes, the discovery workspace is **ready to run**: every d
 6. **Interview: experience map** (if needed). First fork on input mode:
    - Ask: "Do you have a screenshot of your experience map?"
    - **If yes:** "Save it at `<product-root>/_product-context/experience-map.png` (or .jpg). Tell me when it's saved." Once confirmed, tell the user: "Run `OST-extract-experience-map` to convert it into the structured schema. I'll leave `experience-map.md` as TBD — the extraction skill writes its output into the active round folder, not the context folder." Skip writing this file.
-   - **If no, and the user wants to write it directly:** Walk through the schema from `experience-mapping.md` — phases (name + friction level), steps within each phase, decision branches if any. One phase at a time. Compose the markdown rendering, show, confirm, write.
-   - **If no, and the user wants to defer:** Tell them: "Leaving `experience-map.md` as TBD. Downstream skills that need the journey (`OST-cluster-opportunities`) will hard-exit until you either save a screenshot and run `OST-extract-experience-map`, or re-invoke `OST-setup-product` to fill it in." Skip.
+   - **If no, and the user wants to write it directly:** Walk through the schema from `experience-mapping.md` — phases (name + friction level), steps within each phase, decision branches if any. One phase at a time. Compose the markdown rendering AND the matching JSON (per experience-mapping schema v0.2), show both, confirm, then write **to the active round folder** as `<scope>/experience-map-extracted.md` and `<scope>/experience-map-extracted.json`. Do NOT write to `_product-context/experience-map.md` — downstream skills (`OST-cluster-opportunities`) require `experience-map-extracted.json` in the round folder.
+   - **If no, and the user wants to defer:** Tell them: "Leaving `experience-map.md` as TBD. Downstream skills that need the journey (`OST-cluster-opportunities`) will hard-exit until you either save a screenshot and run `OST-extract-experience-map`, or fill in the map by re-invoking `OST-setup-product`." Skip.
 
 7. **Interview: chosen opportunity** (if needed). One question at a time:
-   - "Who said this? (role + interview reference if you have one)"
+   - "What's the opportunity ID? (e.g. opp-3-2 — if this came from OST-select-opportunity, use the ID from the proposal)"
+   - "Which journey phase does it belong to? (e.g. onboarding, search, checkout)"
+   - "Who said this? (role + interview reference, e.g. P03, licensansvarig)"
    - "What did they say? Paste the verbatim quote if you have it; otherwise the closest paraphrase you remember."
-   - "What's the underlying job-to-be-done? What were they trying to accomplish when they said that?"
-   - "Why did the trio pick this opportunity over the alternatives compared in the opportunity-selection round?"
-   - Compose the citation per `opportunity-citation-format.md` (quote + source + tweaks marked with `[square brackets]`). Show the draft. Confirm. Write.
+   - "Why did the trio pick this opportunity over the alternatives?"
+   - Compose the citation in the format downstream skills expect: `**<opp-id>** (Phase: <phase-id>) - "<quote>" - *<source>*`. Apply tweak rules from `opportunity-citation-format.md` (tweaks in `[square brackets]`). Show the draft. Confirm.
+   - Also compose the `## Product outcome` blockquote by copying the confirmed outcome from `product-outcome.md`.
+   - Write both sections into `chosen-opportunity.md`, replacing the TBD placeholders. Write the rationale into the `### Rationale` subsection.
 
 8. **Final summary.** After all interviews, print:
    - Files written (full paths)
    - Files still TBD with the remedy for each (e.g., "experience-map.md deferred — run `OST-extract-experience-map` after saving a screenshot")
-   - Active scope from `discovery/.current-scope`
+   - Active scope: read `discovery/.current-scope` and print the path. If `.current-scope` does NOT point at the round folder just created (e.g. because it already existed from a previous product), print a warning: "Note: `.current-scope` still points at `<old path>`, not the round you just set up. To switch, run: `echo '<new round path>' > discovery/.current-scope`"
    - "Next OST-* skill to run" — pick the right one based on round type: opportunity-selection → `OST-opportunity-extractor`, discovery → `OST-brainstorm-solutions`.
 
 ## Output principles

@@ -40,14 +40,14 @@ Both modes use the same relative-path math, so all 13 phase OST-* skills work id
 
    Multi-product:
    ```bash
-   bash "${CLAUDE_PLUGIN_ROOT}/skills/OST-init-workspace/scripts/init_workspace.sh" \
+   bash "${CLAUDE_PLUGIN_ROOT}/skills/00a-OST-init-workspace/scripts/init_workspace.sh" \
      --team <team> --product <product> \
      [--opportunity <opp>] [--selection] [--date YYYY-MM-DD]
    ```
 
    Single-product:
    ```bash
-   bash "${CLAUDE_PLUGIN_ROOT}/skills/OST-init-workspace/scripts/init_workspace.sh" \
+   bash "${CLAUDE_PLUGIN_ROOT}/skills/00a-OST-init-workspace/scripts/init_workspace.sh" \
      --single-product --product <product> \
      [--opportunity <opp>] [--selection] [--date YYYY-MM-DD]
    ```
@@ -58,7 +58,7 @@ Both modes use the same relative-path math, so all 13 phase OST-* skills work id
 
 5. **Tell the user what to do next.** Pick the relevant pointer:
    - If `_product-context/product-outcome.md` was newly created: "Open `discovery/.../_product-context/product-outcome.md` and write the product outcome before running any other OST skill. Skills hard-exit when this file is empty or contains the TBD placeholder."
-   - If `_product-context/experience-map.md` was newly created and no `.png/.jpg` is present: "Either save an experience-map screenshot at `_product-context/experience-map.png` and run `OST-extract-experience-map`, or write the journey into `experience-map.md` directly."
+   - If `_product-context/experience-map.md` was newly created and no `.png/.jpg` is present: "Either save an experience-map screenshot at `_product-context/experience-map.png` and run `OST-extract-experience-map`, or run `OST-setup-product` to walk through the experience map interview (it writes `experience-map-extracted.{md,json}` into the active round folder, which is what downstream skills need)."
    - If `.current-scope` was set: "Scope is set to `<path>`. Open the round folder's `README.md` to see what files will land there. Subsequent OST-* skills will read/write inside that folder unless you pass `scope=` explicitly."
 
 ## Output principles
