@@ -19,6 +19,8 @@ Updates pull automatically on session start (`autoUpdate: true`). Force-update m
 
 ## Skill flow
 
+Red diamonds = **required HITL** (workflow blocks until the trio acts). Yellow diamonds = **optional HITL** (trio can review/override but the workflow doesn't block).
+
 ```mermaid
 flowchart TD
     subgraph phase0 ["Phase 0 — Setup"]
@@ -27,45 +29,61 @@ flowchart TD
         setup -.->|"calls"| init
     end
 
+    h_setup{{"HITL: trio confirms\noutcome, map, citation"}}:::required
+
     subgraph phase1 ["Phase 1 — Opportunities"]
         xmap["extract-experience-map"]
         extract["opportunity-extractor"]
         validate["validate-opportunities"]
+        h_validate{{"HITL: trio reviews\nverdicts"}}:::optional
         cluster_o["cluster-opportunities"]
+        h_cluster{{"HITL: trio parallel-\nclusters"}}:::optional
         compare["compare-opportunities"]
         select_o["select-opportunity"]
-
-        extract --> validate --> cluster_o --> compare --> select_o
-        xmap --> cluster_o
     end
+
+    h_ratify{{"HITL: trio ratifies\ninto chosen-opportunity.md"}}:::required
 
     subgraph phase2 ["Phase 2 — Solutions"]
         brainstorm["brainstorm-solutions"]
         cluster_s["cluster-solutions"]
         top3["select-top-three"]
-        brainstorm --> cluster_s --> top3
     end
+
+    h_top3{{"HITL: trio ratifies\ntop 3 via ratifications.md"}}:::required
 
     subgraph phase3 ["Phase 3 — Assumptions"]
         gen["generate-assumptions"]
         categorize["assumption-categorizer"]
-        gen --> categorize
     end
 
     subgraph phase4 ["Phase 4 — Risk mapping"]
         riskiest["riskiest-assumptions"]
     end
 
+    h_riskiest{{"HITL: trio reviews\nrisk calls, edits JSON"}}:::required
+
     subgraph phase5 ["Phase 5 — Validation"]
         experiment["validation-experiment-designer"]
     end
 
-    setup --> xmap
-    setup --> extract
-    select_o --> brainstorm
-    top3 --> gen
+    h_run{{"HITL: trio picks order,\nruns experiments"}}:::required
+
+    setup --> h_setup
+    h_setup --> xmap
+    h_setup --> extract
+    extract --> validate --> h_validate --> cluster_o --> h_cluster --> compare --> select_o
+    xmap --> cluster_o
+    select_o --> h_ratify --> brainstorm
+    brainstorm --> cluster_s --> top3
+    top3 --> h_top3 --> gen
+    gen --> categorize
     categorize --> riskiest
-    riskiest --> experiment
+    riskiest --> h_riskiest --> experiment
+    experiment --> h_run
+
+    classDef required fill:#fee2e2,stroke:#dc2626,stroke-width:2px,color:#991b1b
+    classDef optional fill:#fef9c3,stroke:#ca8a04,stroke-width:1px,color:#854d0e
 ```
 
 ## Skills
