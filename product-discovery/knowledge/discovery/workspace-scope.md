@@ -63,6 +63,7 @@ From a discovery scope ending in `opportunities/<opp>/<YYYY-MM-DD>/`:
 
 - `chosen-opportunity.md` → `<scope>/..`
 - `ratifications.md` → `<scope>/..` (optional)
+- `decisions.json` → `<scope>/decisions.json` (same round folder; no walk-up needed)
 - `product-outcome.md`, `experience-map.{md,json}` → `<scope>/../../../_product-context/`
 - Previous-step artifacts in the same round → `<scope>/<artifact>.{md,json}`; if missing, walk siblings (other dated rounds under the same opportunity) in date-descending order to find the most recent preceding run.
 
@@ -77,6 +78,7 @@ The walk-up depths (three levels for discovery, two for opportunity-selection) a
 
 | Step | Filename |
 |------|------|
+| Decision record | `decisions.json` |
 | Opportunity extraction | `opportunities-extracted.{md,json}` |
 | Experience map import | `experience-map-extracted.{md,json}` |
 | Experience map clustering | `experience-map-clustered.{md,json}` |
@@ -92,6 +94,10 @@ The walk-up depths (three levels for discovery, two for opportunity-selection) a
 | Validation experiments | `validation-experiments.{md,json}` |
 
 The ratified chosen-opportunity is `chosen-opportunity.md` at the opportunity-folder root. The proposal produced by the selector inside an opportunity-selection round is `chosen-opportunity-proposal.md`. The two file names differ deliberately so a ratified record cannot be silently overwritten.
+
+**Deprecated as skill inputs (read from `decisions.json` instead):**
+- `chosen-opportunity.md` — skills 07, 08, 09 previously read this; now read `decided.opportunity` from `decisions.json`. The file may still exist as a human-readable reference.
+- `ratifications.md` — skill 10 previously checked this for top-3 ratification; now checks `decided.solutions` in `decisions.json`. The file is no longer maintained.
 
 ## Slug convention
 

@@ -14,7 +14,11 @@ This anchor owns the schema, the three-method definitions, the parallel-blind or
 
 ## What the generator does
 
-The generator reads a trio-ratified `top-three-solutions.json` (the 3 specific solutions, located via the ratification-flag pattern in `<scope>/../ratifications.md`) plus the chosen-opportunity, the product outcome, and the latest extracted experience map. It spawns 9 method-pass sub-agents in parallel via the Agent tool (3 methods x 3 solutions), then runs 3 per-solution LLM dedup-passes that merge similar assumptions across methods and tag each surviving entry with a `source_methods` array.
+The generator reads a trio-ratified `top-three-solutions.json` (the 3 specific solutions, located via the ratification-flag pattern in `<scope>/../ratifications.md`) plus the chosen-opportunity, the product outcome, and the latest extracted experience map.
+
+> **Note:** As of schema v1.0, skill 10 reads `decisions.json` → `decided.solutions` directly. The `ratifications.md` lookup described above is deprecated.
+
+It spawns 9 method-pass sub-agents in parallel via the Agent tool (3 methods x 3 solutions), then runs 3 per-solution LLM dedup-passes that merge similar assumptions across methods and tag each surviving entry with a `source_methods` array.
 
 Output is a paired JSON + markdown rendering with one deduped assumption list per solution. The trio does NOT review this output directly; downstream the categorizer (assist 10) classifies each assumption into the 5-category taxonomy and the OST-riskiest-assumptions agent (assist 11) flags the most risky. The trio's gate for phase 3 is at assist 11's output.
 

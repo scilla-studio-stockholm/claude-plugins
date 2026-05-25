@@ -20,9 +20,8 @@ This skill is terminal. There is no downstream skill. The markdown output opens 
 
 1. **Resolve scope.** Follow `references/workspace-scope.md`. Discovery scope only.
 
-2. **Load context via parent walk-up:**
-   - `<scope>/../chosen-opportunity.md`
-   - `<scope>/../../../_product-context/product-outcome.md`
+2. **Load context:**
+   - `<scope>/decisions.json` (for `chosen_opportunity` and `product_outcome`)
    - Same-round predecessor: `<scope>/riskiest-assumptions.json` (with sibling-round fallback)
 
 3. **Read the knowledge anchors:**
@@ -164,7 +163,29 @@ This skill is terminal. There is no downstream skill. The markdown output opens 
     - `<scope>/validation-experiments.md`
     Create the directory if absent.
 
-14. **Render the markdown deterministically from the JSON.** Use this exact template:
+14. **Write to decisions.json:** Read the round's `decisions.json`. Set `decided.experiments`:
+
+    ```json
+    {
+      "ratified": "<today YYYY-MM-DD>",
+      "test_cards": [
+        {
+          "assumption_id": "<asm-id>",
+          "solution_id": "<sol-id>",
+          "test_type": "<test type>",
+          "hypothesis": "We believe that ...",
+          "metric": "And measure ...",
+          "success_criteria": "We are right if ... (<numeric anchor>)",
+          "estimated_cost": "<low|medium|high>",
+          "estimated_time": "<hours|days|weeks>"
+        }
+      ]
+    }
+    ```
+
+    One test card per riskiest assumption. Do not include `alternative_tests`.
+
+15. **Render the markdown deterministically from the JSON.** Use this exact template:
 
     ````markdown
     ---
@@ -179,8 +200,8 @@ This skill is terminal. There is no downstream skill. The markdown output opens 
 
     > **Trio run-list handoff.** This is the terminal artifact for the discovery critical path. Read the Test Cards; pick execution order based on resource availability, dependencies, and team capacity; run the cheapest viable test first per Bland's principle. The skill does NOT pick sequence. Capture results separately (a future Learning-Card skill is parked). If a recommended test does not fit your context, swap to one of the 2 alternatives.
 
-    Source chosen opportunity: `<scope>/../chosen-opportunity.md`
-    Source product outcome: `<scope>/../../../_product-context/product-outcome.md`
+    Source chosen opportunity: `<scope>/decisions.json`
+    Source product outcome: `<scope>/decisions.json`
     Source OST-riskiest-assumptions: `<source_riskiest_assumptions>`
     Source assumptions-categorized: `<source_assumptions_categorized>`
     Source top 3 solutions: `<source_top_three_solutions>`
@@ -278,8 +299,8 @@ This skill is terminal. There is no downstream skill. The markdown output opens 
 ## Vad skill INTE gör
 
 - Reads interview transcripts, OST-brainstorm-solutions output, comparison matrix, validated opportunities, OST-cluster-solutions output, top-three-solutions JSON directly, the assumptions JSON, the categorized JSON, or the experience map. Only the upstream `riskiest-assumptions-*.json` contract.
-- Reads `chosen-opportunity.md`, `product-outcome.md`, or `ratifications.md` directly. Identifying context flows through the upstream JSON.
-- Appends to `ratifications.md`. Terminal assist; no ratification mechanism.
+- Reads `chosen-opportunity.md`, `product-outcome.md`, or `ratifications.md` directly. Identifying context flows through `decisions.json`.
+- Appends to `ratifications.md`. Writes `decided.experiments` to `decisions.json` only.
 - Reads role anchors. Role info is data only.
 - Includes non-riskiest assumptions in output. Filter is mandatory.
 - Re-orders assumptions. Order preserved from upstream within retained set.

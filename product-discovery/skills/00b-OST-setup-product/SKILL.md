@@ -66,6 +66,7 @@ After this skill completes, the discovery workspace is **ready to run**: every d
    - If the answer drifts into business outcomes (revenue, retention as a number, conversion rate of a paid action), gently challenge using the distinction from `product-outcomes-vs-business-outcomes.md` and re-ask. Do not silently rewrite.
    - Compose a draft in the format: "Increase/Reduce [behavior] from [current] to [target] by [date]." Show the draft. Ask: "Does this capture the outcome correctly, or should I adjust?"
    - When confirmed, **write the full file** (replace the TBD body, preserve the frontmatter, set `date:` to today). Confirm the path written.
+   - After writing `product-outcome.md`, also update `decisions.json` in the active round folder: set `product_outcome` to the full outcome formulation string. Read the existing `decisions.json`, update the field, write it back. If `decisions.json` does not exist yet (round not scaffolded), skip this step.
 
 6. **Interview: experience map** (if needed). First fork on input mode:
    - Ask: "Do you have a screenshot of your experience map?"

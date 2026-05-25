@@ -9,21 +9,19 @@ You help a product trio decompose their 3 chosen solutions into the assumptions 
 
 ## Prerequisites
 
-- The trio has ratified a top-three-solutions proposal by appending a line to `<scope>/../ratifications.md` per the format in `references/top-three-selection.md`.
-- `<scope>/../chosen-opportunity.md` exists with a parseable bold-id row.
-- `<scope>/../../../_product-context/product-outcome.md` exists with a `## Outcome` section.
+- The trio has ratified the top-three solutions into `decided.solutions` in `<scope>/decisions.json`.
+- `decided.opportunity` exists in `<scope>/decisions.json` with `id`, `phase_id`, `quote`, `source`.
+- `decided.solutions` exists in `<scope>/decisions.json` with a `picks[]` array of 3 objects.
 - `<scope>/../../../_product-context/experience-map.json` (or `.md`) exists.
-- `<scope>/top-three-solutions.json` exists in the current scope or in the ratified sibling round.
+- `<scope>/top-three-solutions.json` exists in the current scope (for full per-pick fields including `generating_role` and `round_number`).
 
 ## Steps
 
 1. **Resolve scope.** Follow `references/workspace-scope.md`. Discovery scope only.
 
-2. **Load context via parent walk-up:**
-   - `<scope>/../chosen-opportunity.md`
-   - `<scope>/../../../_product-context/product-outcome.md`
-   - `<scope>/../ratifications.md` (required)
-   - Same-round predecessor: `<scope>/top-three-solutions.json` (with sibling-round fallback)
+2. **Load context:**
+   - `<scope>/decisions.json` (required — authority for ratification status and opportunity/outcome data)
+   - `<scope>/top-three-solutions.json` (required — full per-pick data including `generating_role` and `round_number`)
    - `<scope>/../../../_product-context/experience-map.json` (or `.md`) — the experience map for context
 
 3. **Read the knowledge anchors:**
@@ -34,10 +32,8 @@ You help a product trio decompose their 3 chosen solutions into the assumptions 
 
 4. **Locate inputs:**
 
-   - Read `<scope>/../ratifications.md`. Scan for lines matching the pattern `- <round-folder-date> top-three-solutions ratified by <approver> (<note>)` where round-folder-date is the round directly under the opportunity slug that contains the ratified top-three-solutions.json. The latest matching line (last in file order, append-only) gives the ratified round date. If `ratifications.md` does not exist or has no matching line, hard-exit per the format below.
-   - Read `<scope>/top-three-solutions.json`. If it does not exist, fall back to the sibling round identified by the ratified round date in the ratifications entry. If neither exists, hard-exit.
-   - Read `<scope>/../chosen-opportunity.md`. Hard-exit if missing.
-   - Read `<scope>/../../../_product-context/product-outcome.md`. Hard-exit if missing or no `## Outcome` section.
+   - Read `<scope>/decisions.json`. Hard-exit if missing. Check for `decided.solutions` key — hard-exit if absent. Check for `decided.opportunity` key — hard-exit if absent. Use `decided.solutions.picks[]` (array of 3) to confirm ratification. Use `decided.opportunity` for chosen-opportunity fields. Use top-level `product_outcome` for the outcome formulation.
+   - Read `<scope>/top-three-solutions.json`. Hard-exit if missing. This provides the full per-pick data (`generating_role`, `round_number`) not stored in decisions.json. No sibling-round fallback needed.
    - Read `<scope>/../../../_product-context/experience-map.json` (fall back to `.md` if JSON is absent). Hard-exit if neither exists.
 
 5. **Hard-exit checks.** Apply the triggers below. If any fire, write no output files. Emit a three-line error in this exact shape:
@@ -51,31 +47,29 @@ You help a product trio decompose their 3 chosen solutions into the assumptions 
 
    Triggers:
 
-   - `<scope>/../ratifications.md` missing.
-   - No matching `top-three-solutions` ratification line in `<scope>/../ratifications.md`.
-   - The referenced `top-three-solutions.json` missing in both current scope and the ratified sibling round.
-   - Source JSON does not parse.
-   - Source JSON `schema_version` is not `"0.2"`.
-   - Source `picks[]` length != 3.
-   - `<scope>/../chosen-opportunity.md` missing.
-   - `chosen-opportunity.md` missing parseable bold-id row under `## Chosen opportunity` (format: `**<opp-id>** (Phase: <phase-id>) - "<quote>" - *<source>*`).
-   - `<scope>/../../../_product-context/product-outcome.md` missing or no `## Outcome` section.
+   - `<scope>/decisions.json` missing.
+   - `decided.solutions` key absent from `<scope>/decisions.json`.
+   - `decided.opportunity` key absent from `<scope>/decisions.json`.
+   - `<scope>/top-three-solutions.json` missing.
+   - `top-three-solutions.json` does not parse.
+   - `top-three-solutions.json` `schema_version` is not `"0.2"`.
+   - `top-three-solutions.json` `picks[]` length != 3.
    - Neither `<scope>/../../../_product-context/experience-map.json` nor `experience-map.md` exists.
    - Any of the four knowledge anchors missing.
 
 7. **Parse inputs.**
 
-   - From the top-three JSON: extract `team`, `product_outcome`, `chosen_opportunity` (object with `id`, `phase_id`, `quote`, `source`), and `picks[]` (array of 3 objects with `id`, `title`, `generating_role`, `round_number`, `description`, `rationale`). Index `picks[]` by `id`.
-   - From `chosen-opportunity.md`: extract the bold-id row's `id`, `phase_id`, `quote`, `source`.
-   - From `product-outcome.md`: extract the `## Outcome` formulation (the prose under that heading).
+   - From `decisions.json`: extract `team` (top-level), `product_outcome` (top-level), `decided.opportunity` (object with `id`, `phase_id`, `quote`, `source`), and `decided.solutions.picks[]` (array of 3 objects with `id`, `title`, `description`, `rationale`).
+   - From `top-three-solutions.json`: extract the full `picks[]` array (which includes `generating_role` and `round_number` per pick in addition to `id`, `title`, `description`, `rationale`). Index by `id`.
+   - Merge: for each pick in `decisions.json` → `decided.solutions.picks[]`, look up its `id` in the `top-three-solutions.json` picks to obtain `generating_role` and `round_number`. If any `id` in `decided.solutions.picks[]` is missing from `top-three-solutions.json`, hard-exit. (This can happen if the trio swapped a pick in `decisions.json` — remedy: re-run `OST-select-top-three` to regenerate `top-three-solutions.json` with the updated picks.)
    - Load the experience map JSON content for storymap sub-agent prompts. Keep as-is.
 
-8. **Cross-check chosen-opp id.** The source top-three JSON's `chosen_opportunity.id` MUST match the chosen-opportunity.md bold-id row's `id`. If not, hard-exit with:
+8. **Cross-check chosen-opp id.** The `top-three-solutions.json` `chosen_opportunity.id` MUST match `decisions.json` → `decided.opportunity.id`. If not, hard-exit with:
 
    ```text
-   ERROR: chosen-opportunity id mismatch between source JSON and context.md
+   ERROR: chosen-opportunity id mismatch between top-three-solutions.json and decisions.json
    - Looked for: identical id strings
-   - Found: source JSON id "<x>" vs context.md bold-id "<y>"
+   - Found: top-three-solutions.json chosen_opportunity.id "<x>" vs decisions.json decided.opportunity.id "<y>"
    - Remedy: decide which version is authoritative; reconcile manually
    ```
 
@@ -125,6 +119,7 @@ You help a product trio decompose their 3 chosen solutions into the assumptions 
    - `title`: `"Assumptions: <chosen_opportunity.id> - <first 5-10 words of chosen_opportunity.quote, trailing punctuation stripped>"`.
    - `product_outcome`: the verbatim outcome formulation.
    - `chosen_opportunity`: the object with `id`, `phase_id`, `quote`, `source` (carried from upstream).
+   - `source_decisions`: relative path to `decisions.json` from the repo root (e.g., `"discovery/fast/fsok/opportunities/sok-pa-karta/2026-05-11/decisions.json"`).
    - `source_top_three_solutions`: relative path to the source top-three JSON from the repo root (e.g., `"discovery/fast/fsok/opportunities/sok-pa-karta/2026-05-11/top-three-solutions.json"`).
    - `source_experience_map`: basename of the source experience-map JSON.
    - `generation_summary`: the fixed v0.1 block:
@@ -173,9 +168,8 @@ You help a product trio decompose their 3 chosen solutions into the assumptions 
 
     # Assumptions: <chosen_opportunity.id>
 
+    Source decisions: `<source_decisions>`
     Source top 3 solutions: `<source_top_three_solutions>`
-    Source chosen opportunity: `<scope>/../chosen-opportunity.md`
-    Source product outcome: `<scope>/../../../_product-context/product-outcome.md`
     Source experience map: `<source_experience_map>`
     Schema version: 0.1
     Paired JSON: `assumptions-<YYYY-MM-DD>.json`
@@ -242,9 +236,9 @@ You help a product trio decompose their 3 chosen solutions into the assumptions 
 - Scores, ranks, or flags assumptions as riskiest. (Assist 11.)
 - Generates test cards, validation plans, or experiment designs. (Future phase 4.)
 - Applies cross-solution dedup or marks shared assumptions across solutions.
-- Modifies upstream files (ratifications.md, top-three JSON, chosen-opportunity.md, product-outcome.md, experience map).
+- Modifies upstream files (decisions.json, top-three JSON, experience map).
 - Writes outside the resolved scope. Output lives in `<scope>/`.
-- Appends to `<scope>/../ratifications.md`. Ratification is the trio's manual step downstream.
+- Appends to `decisions.json`. Ratification writes are the responsibility of the ratifying skill upstream.
 - Adds an in-skill HITL banner. Trio gate is at assist 11.
 - Runs a JSON self-validation pass. Trust the invariant check.
 - Retries sub-agents on partial failures. Hard-exit; operator re-runs end-to-end.
