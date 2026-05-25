@@ -45,6 +45,8 @@ Forbidden vocabulary (eyeball list):
 
 ## The ratification-flag pattern
 
+> **Note:** As of schema v1.0, trio ratification is recorded in `decisions.json` → `decided.solutions`. The `ratifications.md` append pattern described below is deprecated. Skills read `decisions.json` for ratification status.
+
 A convention introduced in v0.1; carried unchanged into v0.2. `ratifications.md` lives at the opportunity-folder root (`<scope>/../ratifications.md`) and is a markdown file with a top-level `# Ratifications` heading and a flat bulleted list. Each line records one ratification event:
 
 ```markdown

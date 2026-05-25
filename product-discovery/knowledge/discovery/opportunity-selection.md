@@ -65,6 +65,8 @@ Do not introduce effort thinking in `rationale`, `reason_not_picked`, `why_relev
 
 ## Ratification format
 
+> **Note:** As of schema v1.0, the ratified opportunity is recorded in `decisions.json` → `decided.opportunity`. Creating `chosen-opportunity.md` is optional (human reference only).
+
 The selector produces a proposal at `<scope>/chosen-opportunity-proposal.{json,md}`. The trio reviews the proposal, overrides if it disagrees, and ratifies the final pick into the opportunity folder. This file is the decision-of-record consumed by downstream phase-2 skills (the solution brainstormer at assist 6 and the top-3 selector at assist 8).
 
 The ratified file mirrors the selector's proposal markdown structure, minus the alternatives section and the HITL banner. Required structure:
