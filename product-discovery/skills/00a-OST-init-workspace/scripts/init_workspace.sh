@@ -257,6 +257,23 @@ $DATE by <names>
 EOF
 }
 
+# ----- decisions.json template -----
+decisions_json_template() {
+  local product="$1"
+  local team="$2"
+  local round="$3"
+  cat <<ENDJSON
+{
+  "schema_version": "1.0",
+  "product": "$product",
+  "team": ${team:+"\"$team\""}${team:-"null"},
+  "round": "$round",
+  "product_outcome": "",
+  "decided": {}
+}
+ENDJSON
+}
+
 # ----- round-folder READMEs -----
 SELECTION_ROUND_README=$(cat <<'EOF'
 # Opportunity-selection round (phase A)
@@ -417,6 +434,7 @@ if [[ -n "$OPPORTUNITY" ]]; then
   mk_file "$OPP_DIR/chosen-opportunity.md" "$(chosen_opportunity_template "$OPPORTUNITY")"
   mk_dir "$ROUND_DIR"
   mk_file "$ROUND_DIR/README.md" "$DISCOVERY_ROUND_README"
+  mk_file "$ROUND_DIR/decisions.json" "$(decisions_json_template "$PRODUCT" "$TEAM" "$ROUND_DIR")"
   CURRENT_SCOPE_TARGET="$ROUND_DIR"
 fi
 
@@ -424,6 +442,7 @@ if [[ "$SELECTION" -eq 1 ]]; then
   ROUND_DIR="$PRODUCT_ROOT/opportunity-selection/$DATE"
   mk_dir "$ROUND_DIR"
   mk_file "$ROUND_DIR/README.md" "$SELECTION_ROUND_README"
+  mk_file "$ROUND_DIR/decisions.json" "$(decisions_json_template "$PRODUCT" "$TEAM" "$ROUND_DIR")"
   CURRENT_SCOPE_TARGET="$ROUND_DIR"
 fi
 
