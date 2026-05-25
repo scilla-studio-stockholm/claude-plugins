@@ -17,9 +17,8 @@ The output is a **divergent candidate set**, not a recommendation. There is no c
 
 1. **Resolve scope.** Follow the scope-resolution protocol in `references/workspace-scope.md`. The resolved scope is a discovery scope of the form `discovery/<team>/<product>/opportunities/<opp>/<YYYY-MM-DD>/`. Hard-exit if the resolved scope contains `/opportunity-selection/` (this skill runs in phase B only).
 
-2. **Load context via parent walk-up.** Per `references/workspace-scope.md`:
-   - `<scope>/../chosen-opportunity.md` — the ratified chosen opportunity
-   - `<scope>/../../../_product-context/product-outcome.md` — the product outcome
+2. **Load context from the round folder.** Per `references/workspace-scope.md`:
+   - `<scope>/decisions.json` — the ratified opportunity context (`decided.opportunity`) and product outcome (`product_outcome`)
 
 3. **Read the knowledge anchors:**
    - `references/solution-brainstorm.md` - the schema (v0.1), the three-round structure, the role-diversification framing, the anti-duplication rule, the broad-solution-scope definition.
@@ -28,29 +27,24 @@ The output is a **divergent candidate set**, not a recommendation. There is no c
    - `references/opportunity-solution-tree-teresa-torres.md` - Torres principle "explore multiple solutions for one opportunity".
 
 4. **Locate inputs:**
-   - `<scope>/../chosen-opportunity.md`
-   - `<scope>/../../../_product-context/product-outcome.md`
+   - `<scope>/decisions.json`
    - `references/role-product-manager.md`
    - `references/role-ux-designer.md`
    - `references/role-tech-lead.md`
 
 5. **Hard-exit checks** (see Hard-exit format below). Do not write any output files when these fire:
-   - `<scope>/../chosen-opportunity.md` missing.
-   - `<scope>/../../../_product-context/product-outcome.md` missing.
-   - chosen-opportunity.md missing `## Chosen opportunity` section with parseable id/quote/source line of the form `**<opp-id>** (Phase: <phase-id>) - "<quote>" - *<source>*`.
-   - chosen-opportunity.md missing `## Product outcome` blockquote.
-   - Product outcome file missing `## Outcome` or `## Team` section.
+   - `<scope>/decisions.json` missing.
+   - `decided.opportunity` key absent from `decisions.json`.
    - Any of the three role anchors missing.
 
-6. **Parse `<scope>/../chosen-opportunity.md`.**
-   - Extract chosen-opp `id`, `phase_id`, `quote`, `source` from the bold-id line under `## Chosen opportunity`.
-   - Extract title from the frontmatter `title:` field. The selector renders this as `"Chosen opportunity - <opp-title> (<team>)"` (with a regular dash); derive `<opp-title>` by stripping the `"Chosen opportunity - "` prefix and the trailing ` (<team>)`.
-   - Extract rationale prose from the `### Rationale` subsection (used to frame the sub-agent prompt; not carried into the output schema).
-   - Extract score profile from the `### Score profile` table (used as context for the sub-agent prompt; not carried into the output schema).
+6. **Extract chosen-opportunity context from `decisions.json`.**
+   - Read `decided.opportunity.id`, `decided.opportunity.phase_id`, `decided.opportunity.quote`, `decided.opportunity.source` directly from the structured JSON — no parsing needed.
+   - Read `decided.opportunity.scores` for score profile context (used to frame the sub-agent prompt; not carried into the output schema).
+   - Read `decided.opportunity.rationale` for rationale prose (used to frame the sub-agent prompt; not carried into the output schema).
 
-7. **Parse `<scope>/../../../_product-context/product-outcome.md`.**
-   - Extract the outcome formulation under `## Outcome`.
-   - Extract team name from `## Team`.
+7. **Extract product outcome and team from `decisions.json`.**
+   - Read `product_outcome` for the outcome formulation.
+   - Read top-level `team` for the team slug.
 
 8. **Read the three role anchors** verbatim. Hold their full content in context for sub-agent prompt construction.
 
@@ -76,11 +70,9 @@ The output is a **divergent candidate set**, not a recommendation. There is no c
 11. **Round 3: same orchestration as round 2, with the pool now 12 ideas (round 1 + round 2).**
    Collect, parse, assign ids `sol-r3-{role-prefix}-1..2`, attach `round_number: 3`. Total: 6 more (running total: 18).
 
-12. **Compose the v0.1 JSON.** Top-level fields per the schema in `references/solution-brainstorm.md`. Specifically: `schema_version` is the literal `"0.1"`; `team` carries from Step 5 (`## Team` heading in `product-outcome.md`); `title` carries from Step 4 (extracted from chosen-opportunity frontmatter); `product_outcome` carries from Step 5 (`## Outcome` heading); `chosen_opportunity` carries the four fields from Step 4 (id, phase_id, quote, source); `source_chosen_opportunity_file` is the repo-root-relative path to the ratified chosen-opportunity at `<scope>/../chosen-opportunity.md` (resolve to a literal path before writing). `solutions[]` is the concatenation of the three rounds in order (rounds 1, 2, 3). Within each round the order is PM ideas (1..2), then UX (1..2), then TL (1..2). Always write `generation_summary` as the fixed v0.1 block: `{"rounds": 3, "roles": ["product-manager", "ux-designer", "tech-lead"], "ideas_per_role_per_round": 2, "total_solutions": 18}`.
+12. **Compose the v0.1 JSON.** Top-level fields per the schema in `references/solution-brainstorm.md`. Specifically: `schema_version` is the literal `"0.1"`; `team` carries from Step 7 (top-level `team` in `decisions.json`); `title` is derived from the opportunity id (e.g. `opp-42`); `product_outcome` carries from Step 7 (`product_outcome` in `decisions.json`); `chosen_opportunity` carries the four fields from Step 6 (id, phase_id, quote, source); `source_chosen_opportunity_file` is the repo-root-relative path to `<scope>/decisions.json` (resolve to a literal path before writing). `solutions[]` is the concatenation of the three rounds in order (rounds 1, 2, 3). Within each round the order is PM ideas (1..2), then UX (1..2), then TL (1..2). Always write `generation_summary` as the fixed v0.1 block: `{"rounds": 3, "roles": ["product-manager", "ux-designer", "tech-lead"], "ideas_per_role_per_round": 2, "total_solutions": 18}`.
 
-13. **Verify chosen-opp consistency** (defensive post-composition check). The just-composed JSON's `chosen_opportunity.id`, `chosen_opportunity.phase_id`, `chosen_opportunity.quote`, and `chosen_opportunity.source` must each equal the values parsed from the bold-id line in Step 4. Mismatch → hard-exit per the format below; do not write any output files.
-
-    The check is defensive: by construction the values should match (both come from the same parse in Step 4), but an explicit verification makes the invariant visible and catches any composition bug that rewrites the id (e.g., autocorrect, re-formatting, accidental copy from a sub-agent prompt). Hard-exit trigger added to the Hard-exit format table below.
+13. **Note on chosen-opp consistency.** Since both the composed JSON and the sub-agent prompts pull `chosen_opportunity` directly from `decisions.json` structured fields (Step 6), there is no parse ambiguity. No separate consistency check is needed.
 
 14. **Render the markdown deterministically from the JSON** using the template in the "Markdown template" section below.
 
@@ -88,7 +80,7 @@ The output is a **divergent candidate set**, not a recommendation. There is no c
     - `<scope>/solution-candidates.json`
     - `<scope>/solution-candidates.md`
 
-    Use today's date in `YYYY-MM-DD` format for the round folder name (already part of `<scope>`). The two files share the same root name. Create the scope directory if it doesn't exist. Upstream files (`chosen-opportunity.md`, `product-outcome.md`, role anchors) are not modified.
+    Use today's date in `YYYY-MM-DD` format for the round folder name (already part of `<scope>`). The two files share the same root name. Create the scope directory if it doesn't exist. Upstream files (`decisions.json`, role anchors) are not modified.
 
 ## Hard-exit format
 
@@ -105,12 +97,8 @@ The hard-exit triggers:
 
 | Trigger | Looked for | Remedy |
 |---|---|---|
-| Chosen-opportunity file missing at `<scope>/../chosen-opportunity.md` | Trio's ratified chosen-opportunity file in the opportunity folder | Review the proposal in `<scope>/../../opportunity-selection/<round>/chosen-opportunity-proposal.md`, ratify into `<scope>/../chosen-opportunity.md` per the format in `references/opportunity-selection.md` |
-| Product outcome file missing at `<scope>/../../../_product-context/product-outcome.md` | Trio's product outcome file | Restore from git or re-author using the template structure |
-| chosen-opportunity.md missing `## Chosen opportunity` section with parseable id/quote/source line | The bold-id line `**<opp-id>** (Phase: <phase-id>) - "<quote>" - *<source>*` | Re-ratify using the format in `references/opportunity-selection.md` |
-| chosen-opp consistency check failed (composed JSON's `chosen_opportunity.*` does not match Step 6 parse) | Composed JSON `chosen_opportunity.{id, phase_id, quote, source}` equals the values from chosen-opportunity.md bold-id line | Re-run the skill; if persistent, the composition step is rewriting the id (inspect prompt for ambiguity around chosen-opp handling) |
-| chosen-opportunity.md missing `## Product outcome` blockquote | An outcome formulation in the ratified file | Re-ratify; copy outcome from `<scope>/../../../_product-context/product-outcome.md` |
-| Product outcome file missing `## Outcome` or `## Team` section | Headings `## Outcome` and `## Team` followed by content | Re-author `<scope>/../../../_product-context/product-outcome.md` using the template structure |
+| `decisions.json` not found in the round folder at `<scope>/decisions.json` | Trio's ratified decisions file in the round folder | Run `OST-select-opportunity` to produce `decisions.json`, or restore from git |
+| `decided.opportunity` missing from `decisions.json` | `decided.opportunity` key with `id`, `phase_id`, `quote`, `source` fields | Re-run `OST-select-opportunity` to ratify an opportunity into `decisions.json` |
 | Any of the three role anchors missing | All three at `knowledge/foundations/role-{product-manager,ux-designer,tech-lead}.md` | Restore from git |
 | A round produced ≠ 6 ideas after sub-agent collection | 2 ideas × 3 roles per round (6 per round) | Re-run; if persistent, the role prompts need tuning |
 | A sub-agent returned malformed JSON | A JSON array of 2 `{title, description}` objects | Re-run; if persistent, the role-prompt JSON instruction needs tightening |
@@ -130,8 +118,7 @@ tags: [solution-brainstorm, ost, schema-v0.1]
 
 # Solution candidates: <title> (<team>)
 
-Source chosen opportunity: `<scope>/../chosen-opportunity.md`
-Source product outcome: `<scope>/../../../_product-context/product-outcome.md`
+Source: `<scope>/decisions.json`
 Schema version: 0.1
 Paired JSON: `solution-candidates-<YYYY-MM-DD>.json`
 
@@ -174,15 +161,15 @@ Generation summary: 3 rounds × 3 roles × 2 ideas = 18 total. Roles: Product Ma
 - **Build-on entries** in rounds 2 and 3 reference the prior idea inline in the description (e.g., "Builds on sol-r1-pm-2 by adding ..." or "Builds on the 'auto-renewal nudge' idea by ..."). No structural reference field.
 - **No silent degradation.** Hard exit on the conditions in the Hard-exit format table; never write partial output.
 - **No JSON self-validation pass.** Trust the prompt; downstream skills surface any malformed JSON.
-- **Upstream files are immutable.** Never modify `chosen-opportunity.md`, `product-outcome.md`, or the role anchors. The skill writes only the two `solution-candidates.*` files inside `<scope>/`.
+- **Upstream files are immutable.** Never modify `decisions.json` or the role anchors. The skill writes only the two `solution-candidates.*` files inside `<scope>/`.
 - **Single orchestrator pass.** Three rounds executed in sequence; sub-agent calls happen via the Agent tool but the skill itself doesn't iterate or retry beyond the structured rounds.
 
 ## What this skill does NOT do
 
 - **Read interview transcripts.** Solutions are generative, not evidence-traced.
-- **Read the comparison matrix, validated table, clustered experience map, or extracted opportunities.** All chosen-opportunity context is in `<scope>/../chosen-opportunity.md`.
-- **Read the selector's proposal in `<scope>/../../opportunity-selection/<round>/`.** The skill reads only the trio-ratified file at `<scope>/../chosen-opportunity.md`.
-- **Modify upstream files.** `chosen-opportunity.md`, `product-outcome.md`, and the role anchors stay immutable.
+- **Read the comparison matrix, validated table, clustered experience map, or extracted opportunities.** All chosen-opportunity context is in `<scope>/decisions.json`.
+- **Read the selector's proposal in `<scope>/../../opportunity-selection/<round>/`.** The skill reads only the trio-ratified data in `<scope>/decisions.json`.
+- **Modify upstream files.** `decisions.json` and the role anchors stay immutable.
 - **Cluster, score, rank, or select solutions.** Those are downstream (assist 7 clusterer, assist 8 top-3 selector).
 - **Generate assumptions, risk maps, or test cards.** Those are downstream (assists 9-12).
 - **Pre-cluster or theme-tag the 18 candidates.** Pure-divergent output.
