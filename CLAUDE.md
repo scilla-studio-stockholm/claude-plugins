@@ -30,38 +30,33 @@ Teammates need GitHub auth (`gh auth login`) since the repo is private.
 
 ## Current State
 
-**Last session (2026-05-25):** decisions.json refactor + prerequisites README + PR workflow test.
+**Last session (2026-05-25):** decisions.json refactor, OST viewer template, Linear→GitHub pipeline setup.
 
 **Changes shipped (2026-05-25):**
-- **decisions.json refactor (PR #3, merged)** — Single `decisions.json` per discovery round replaces per-skill JSON files as the durable record. Schema at `knowledge/discovery/decisions-json-schema.md`. HITL gate skills (06, 09, 12, 13) write their section; downstream skills (07, 08, 10) read from it. `chosen-opportunity.md` and `ratifications.md` deprecated as skill inputs.
-- **Prerequisites section in README** — Documents what trios need before starting (product outcome, experience map, cleaned transcripts).
-- **Review fix** — Skill 09 step contradiction resolved; skill 10 pick-swap remedy note added.
+- **decisions.json refactor (PR #3)** — Single `decisions.json` per round replaces per-skill JSON files. Schema at `knowledge/discovery/decisions-json-schema.md`. HITL gate skills write; downstream skills read. `chosen-opportunity.md` and `ratifications.md` deprecated as skill inputs.
+- **OST viewer template (PR #5, SCI-30)** — Standalone viewer app at `templates/viewer/index.html` renders skill JSON output using scilla brand tokens. Dual-mount `serve.py` serves viewer from plugin + data from workspace. 6 view renderers. Spec at `docs/superpowers/specs/2026-05-25-ost-viewer-template-design.md`.
+- **Prerequisites section in README** — Documents what trios need before starting.
 
-**OST-compare-opportunities HTML design (2026-05-22, still current):**
-- Swim-lane card layout (phases as columns), sorted by strong-count DESC then weak-count ASC, expandable `<details>` for rationales. Self-contained file, ~50 LOC inline JS for filter chips.
-- Three additive JSON fields: `summary_title`, `score_counts`, `journey_phases`. Schema stays v0.1.
-- Filter chips: `strong-heavy (≥3 strongs)`, `has weak`, `has unknown`. AND-combined.
-- JSON+MD+HTML ship as a paired triple from a single render pass. Markdown is the tabular view, HTML is the skim view.
-
-**Known issue: `summary_title` quality in Metria fixture.** The 96 titles in `comparison-matrix.json` are quote fragments, not the 3-6 word noun phrases the spec requires. This is from the original render before the title generation instructions were finalized. A fresh render will regenerate them correctly. Low priority — cosmetic only.
+**Design decisions (still current):**
+- **Three-layer artifact model:** (1) brainstorming slop (disposable), (2) Opportunity Solution Tree (living cross-round, not yet built), (3) `decisions.json` (per-round ratified decisions).
+- **Viewer architecture:** Skills write JSON only, never HTML. Viewer fetches JSON via local server, renders client-side. Template lives in plugin repo, auto-updates via `autoUpdate: true`. Designer iterates on HTML/CSS without running skills.
+- **`extract-experience-map` belongs in Phase 0** — one-time setup, not recurring.
+- **Implicit ratification** — skills write `decided.*` at run time; trio approves or edits.
 
 **Cost-review decisions (still relevant):**
 - Stdlib-only Python, single `scripts/analyze_costs.py`. Topic filter is generic substring (≥3 hits). API list pricing, not actual bill.
 
-**Open ticket:**
-- [SCI-27](https://linear.app/scilla/issue/SCI-27) — Rename `ratifications.md` to `trio-decisions.md` across OST plugin. Lower priority now that `ratifications.md` is deprecated as a skill input; consider closing as won't-fix.
-
-**Design decisions made this session:**
-- **Three-layer artifact model:** (1) brainstorming slop (intermediate outputs, markdown-only, disposable), (2) the Opportunity Solution Tree (living cross-round artifact, not yet built), (3) `decisions.json` (per-round ratified decisions). The OST is the library; each round is one checkout from it.
-- **`extract-experience-map` belongs in Phase 0** — it's a one-time setup step, not recurring. Renumbering to `00c` is a future task.
-- **Implicit ratification** — skills write `decided.*` at run time; trio approves or edits. Shift from explicit creation of `chosen-opportunity.md`/`ratifications.md`.
+**Open tickets:**
+- [SCI-27](https://linear.app/scilla/issue/SCI-27) — Rename `ratifications.md` → `trio-decisions.md`. Consider closing as won't-fix.
+- [SCI-31](https://linear.app/scilla/issue/SCI-31) — Replace hardcoded score colors in viewer with `--sc-*` tokens. Low priority.
+- [SCI-32](https://linear.app/scilla/issue/SCI-32) — Remove inline HTML generation from skill 05. After viewer is validated with a real trio.
 
 **Next steps (when picked up):**
-- First live workshop with a real trio (OST-compare-opportunities + OST-setup-product).
-- Build the Opportunity Solution Tree as a living artifact (separate design needed — accumulates validated opportunities across rounds under a product outcome).
-- Move intermediate files to `_working/` subfolder (follow-up to decisions.json refactor).
+- Iterate on viewer design using scilla brand tokens (open `serve.py`, edit `index.html`, refresh).
+- First live workshop with a real trio (OST-setup-product + viewer).
+- Build the Opportunity Solution Tree as a living artifact (separate design needed).
+- Move intermediate files to `_working/` subfolder.
 - Move `extract-experience-map` to Phase 0 (`00c`).
-- SCI-27: consider closing as won't-fix given `ratifications.md` deprecation.
 
 **Gotchas:**
 - Plugin name in `plugin.json` matches folder name (e.g. `scilla-research` for both).
