@@ -1,0 +1,142 @@
+/* Scilla Design System — 2026-03-20 */
+:root {
+  /* Brand Colors */
+  --sc-blue-monday: #0022FF;
+  --sc-blue-monday-hover: #0018CC;
+  --sc-pink-moon: #FFEBFF;
+  --sc-purple-rain: #2E2C86;
+  --sc-purple-mountains: #D8CEF2;
+  --sc-red-right-hand: #FF4040;
+  --sc-coral-bracelet: #FF8A80;
+  --sc-yellow-submarine: #FFDF49;
+  --sc-blue-christmas: #0082FC;
+  --sc-blue-nile: #D5DEFF;
+  --sc-essex-green: #44D362;
+  --sc-green-river: #B2E0D5;
+  --sc-mint-car: #E0F8EB;
+  --sc-black-celebration: #000000;
+  --sc-friday-night-fever: #282828;
+  --sc-black-tie-white-noise: #F4F4F4;
+
+  /* Greyscale */
+  --sc-grey-950: #000000;
+  --sc-grey-900: #282828;
+  --sc-grey-800: #404040;
+  --sc-grey-700: #585858;
+  --sc-grey-600: #707070;
+  --sc-grey-500: #888888;
+  --sc-grey-400: #A0A0A0;
+  --sc-grey-300: #B8B8B8;
+  --sc-grey-200: #D0D0D0;
+  --sc-grey-100: #F4F4F4;
+  --sc-grey-50: #FAFAFA;
+  --sc-grey-0: #FFFFFF;
+
+  /* Semantic Colors */
+  --sc-color-primary: var(--sc-blue-monday);
+  --sc-color-primary-hover: var(--sc-blue-monday-hover);
+  --sc-color-bg: var(--sc-pink-moon);
+  --sc-color-bg-card: #FFFFFF;
+  --sc-color-text-primary: var(--sc-blue-monday);
+  --sc-color-text-secondary: var(--sc-purple-rain);
+  --sc-color-border: var(--sc-purple-rain);
+  --sc-color-border-light: var(--sc-purple-mountains);
+  --sc-color-status-critical: var(--sc-red-right-hand);
+  --sc-color-status-critical-bg: rgba(255, 64, 64, 0.12);
+  --sc-color-status-success: var(--sc-essex-green);
+  --sc-color-status-warning: var(--sc-yellow-submarine);
+  --sc-color-status-info: var(--sc-blue-christmas);
+
+  /* Status Backgrounds */
+  --sc-color-status-warning-bg: #FFF9E0;
+
+  /* Font Family */
+  --sc-font-family: 'Inter', sans-serif;
+
+  /* Font Sizes — Fluid Typography */
+  --sc-font-size-h1-hero: clamp(2rem, 6vw, 4rem);
+  --sc-font-size-h1: clamp(2rem, 4vw, 2.625rem);
+  --sc-font-size-h2: 1.75rem;
+  --sc-font-size-h3: clamp(1.3125rem, 2vw, 1.4375rem);
+  --sc-font-size-h4: 1.125rem;
+  --sc-font-size-h5: 1rem;
+  --sc-font-size-h6: 0.875rem;
+  --sc-font-size-h7: 0.75rem;
+
+  /* Semantic Font Size Aliases */
+  --sc-font-size-body: var(--sc-font-size-h4);
+  --sc-font-size-nav: var(--sc-font-size-h5);
+  --sc-font-size-sm: var(--sc-font-size-h6);
+  --sc-font-size-xs: var(--sc-font-size-h7);
+
+  /* Line Heights — Per Level */
+  --sc-line-height-h1-hero: 1.25;
+  --sc-line-height-h1: 1.19;
+  --sc-line-height-h2: 1.29;
+  --sc-line-height-h3: 1.52;
+  --sc-line-height-h4: 1.56;
+  --sc-line-height-h5: 1.5;
+  --sc-line-height-h6: 1.5;
+  --sc-line-height-h7: 1.5;
+
+  /* Line Height Aliases */
+  --sc-line-height-tight: 1.2;
+  --sc-line-height-normal: 1.5;
+  --sc-line-height-relaxed: 1.56;
+
+  /* Font Weights */
+  --sc-font-weight-regular: 400;
+  --sc-font-weight-medium: 500;
+  --sc-font-weight-semi: 600;
+  --sc-font-weight-bold: 700;
+
+  /* Letter Spacing */
+  --sc-letter-spacing-tight: -0.02em;
+  --sc-letter-spacing-normal: 0;
+  --sc-letter-spacing-wide: 0.05em;
+
+  /* Spacing Scale */
+  --sc-spacing-xs: 0.5rem;
+  --sc-spacing-sm: 1rem;
+  --sc-spacing-md: 1.5rem;
+  --sc-spacing-lg: 2rem;
+  --sc-spacing-xl: 3rem;
+  --sc-spacing-2xl: 4rem;
+
+  /* Border Radius */
+  --sc-radius-sm: 0.5rem;
+  --sc-radius-md: 1rem;
+  --sc-radius-lg: 1.5rem;
+  --sc-radius-xl: 2rem;
+  --sc-radius-pill: 9999px;
+
+  /* Border Widths */
+  --sc-border-width-card: 1px 3px 4px 1px;
+  --sc-border-width-subtle: 1px;
+  --sc-border-width-uniform: 2px;
+
+  /* Shadows — Soft */
+  --sc-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --sc-shadow-md: 0px 2px 4px 0px rgba(40, 40, 40, 0.15);
+  --sc-shadow-lg: 0px 4px 7px 0px rgba(40, 40, 40, 0.2);
+  --sc-shadow-xl: 0px 8px 16px 0px rgba(40, 40, 40, 0.25);
+  --sc-shadow-card: rgba(40, 40, 40, 0.2) 0px 4px 7px 0px;
+  --sc-shadow-card-hover: rgba(40, 40, 40, 0.3) 0px 6px 12px 0px;
+
+  /* Shadows — Brutalist */
+  --sc-shadow-brutalist-sm: 2px 2px 0px var(--sc-blue-monday);
+  --sc-shadow-brutalist-md: 4px 4px 0px var(--sc-blue-monday);
+  --sc-shadow-brutalist-lg: 6px 6px 0px var(--sc-blue-monday);
+  --sc-shadow-brutalist-sheet: 0px -4px 0px var(--sc-blue-monday);
+
+  /* Transitions */
+  --sc-transition-fast: 0.15s ease;
+  --sc-transition-normal: 0.2s ease;
+  --sc-transition-slow: 0.3s ease;
+
+  /* Focus Ring */
+  --sc-focus-ring-width: 2px;
+  --sc-focus-ring-offset: 2px;
+  --sc-focus-ring-color: var(--sc-blue-monday);
+  --sc-focus-ring-opacity: 0.2;
+}

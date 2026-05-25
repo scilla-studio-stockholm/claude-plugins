@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OST Viewer</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  /* === Base === */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sc-font-family);
+    font-size: var(--sc-font-size-body);
+    line-height: var(--sc-line-height-relaxed);
+    color: var(--sc-grey-900);
+    background: var(--sc-grey-50);
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: var(--sc-spacing-md) var(--sc-spacing-sm) var(--sc-spacing-2xl);
+  }
+
+  /* === Header === */
+  .viewer-header {
+    border-bottom: var(--sc-border-width-subtle) solid var(--sc-grey-200);
+    padding-bottom: var(--sc-spacing-sm);
+    margin-bottom: var(--sc-spacing-sm);
+  }
+
+  .viewer-header h1 {
+    font-size: var(--sc-font-size-h2);
+    font-weight: var(--sc-font-weight-bold);
+    letter-spacing: var(--sc-letter-spacing-tight);
+    color: var(--sc-grey-900);
+    margin-bottom: var(--sc-spacing-xs);
+  }
+
+  .viewer-header .meta {
+    color: var(--sc-grey-500);
+    font-size: var(--sc-font-size-sm);
+  }
+
+  .viewer-header .meta code {
+    font-size: var(--sc-font-size-xs);
+    background: var(--sc-grey-0);
+    padding: 1px 5px;
+    border-radius: 3px;
+    border: var(--sc-border-width-subtle) solid var(--sc-grey-200);
+  }
+
+  /* === Tabs === */
+  .viewer-tabs {
+    display: flex;
+    gap: var(--sc-spacing-xs);
+    flex-wrap: wrap;
+    border-bottom: var(--sc-border-width-subtle) solid var(--sc-grey-200);
+    padding-bottom: var(--sc-spacing-xs);
+    margin-bottom: var(--sc-spacing-md);
+  }
+
+  .viewer-tab {
+    font-family: var(--sc-font-family);
+    font-size: var(--sc-font-size-sm);
+    font-weight: var(--sc-font-weight-medium);
+    padding: var(--sc-spacing-xs) var(--sc-spacing-sm);
+    border: var(--sc-border-width-subtle) solid var(--sc-grey-200);
+    border-radius: var(--sc-radius-sm);
+    background: var(--sc-grey-0);
+    color: var(--sc-grey-700);
+    cursor: pointer;
+    transition: all var(--sc-transition-fast);
+  }
+
+  .viewer-tab:hover {
+    border-color: var(--sc-grey-400);
+    color: var(--sc-grey-900);
+  }
+
+  .viewer-tab.active {
+    background: var(--sc-blue-monday);
+    color: var(--sc-grey-0);
+    border-color: var(--sc-blue-monday);
+  }
+
+  /* === View container === */
+  #view-container {
+    min-height: 200px;
+  }
+
+  /* === Error state === */
+  .viewer-error {
+    text-align: center;
+    padding: var(--sc-spacing-2xl) var(--sc-spacing-sm);
+    color: var(--sc-grey-500);
+  }
+
+  .viewer-error h2 {
+    font-size: var(--sc-font-size-h3);
+    font-weight: var(--sc-font-weight-semi);
+    color: var(--sc-grey-700);
+    margin-bottom: var(--sc-spacing-xs);
+  }
+
+  .viewer-error code {
+    display: inline-block;
+    background: var(--sc-grey-100);
+    padding: var(--sc-spacing-xs) var(--sc-spacing-sm);
+    border-radius: var(--sc-radius-sm);
+    font-size: var(--sc-font-size-sm);
+    margin-top: var(--sc-spacing-xs);
+  }
+
+  /* === Common view styles === */
+  .view-section {
+    margin-bottom: var(--sc-spacing-lg);
+  }
+
+  .view-section h2 {
+    font-size: var(--sc-font-size-h3);
+    font-weight: var(--sc-font-weight-semi);
+    letter-spacing: var(--sc-letter-spacing-tight);
+    margin-bottom: var(--sc-spacing-sm);
+    padding-bottom: var(--sc-spacing-xs);
+    border-bottom: var(--sc-border-width-subtle) solid var(--sc-grey-100);
+  }
+
+  .view-section h3 {
+    font-size: var(--sc-font-size-h4);
+    font-weight: var(--sc-font-weight-semi);
+    margin-bottom: var(--sc-spacing-xs);
+  }
+
+  blockquote {
+    margin: 0;
+    padding: var(--sc-spacing-sm) var(--sc-spacing-md);
+    border-left: 3px solid var(--sc-blue-monday);
+    background: var(--sc-grey-0);
+    border-radius: 0 var(--sc-radius-sm) var(--sc-radius-sm) 0;
+    font-size: var(--sc-font-size-sm);
+  }
+
+  /* === Score colors === */
+  .score-strong  { background: var(--sc-mint-car); color: #1a5c2a; }
+  .score-medium  { background: var(--sc-color-status-warning-bg); color: #6b4a05; }
+  .score-weak    { background: rgba(255, 64, 64, 0.08); color: var(--sc-red-right-hand); }
+  .score-unknown { background: var(--sc-grey-100); color: var(--sc-grey-600); }
+  .score-na      { background: transparent; color: var(--sc-grey-400); border: 1px dashed var(--sc-grey-200); }
+
+  .score-pill {
+    display: inline-block;
+    font-size: var(--sc-font-size-xs);
+    font-weight: var(--sc-font-weight-semi);
+    padding: 1px 8px;
+    border-radius: var(--sc-radius-pill);
+  }
+
+  /* === Filter bar (comparison matrix) === */
+  .filter-bar {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    background: var(--sc-grey-50);
+    padding: var(--sc-spacing-xs) 0;
+    margin-bottom: var(--sc-spacing-xs);
+    display: flex;
+    gap: var(--sc-spacing-xs);
+    flex-wrap: wrap;
+    align-items: center;
+    border-bottom: var(--sc-border-width-subtle) solid var(--sc-grey-200);
+  }
+
+  .filter-chip {
+    font-family: var(--sc-font-family);
+    font-size: var(--sc-font-size-sm);
+    padding: 6px var(--sc-spacing-sm);
+    border-radius: var(--sc-radius-pill);
+    border: var(--sc-border-width-subtle) solid var(--sc-grey-200);
+    background: var(--sc-grey-0);
+    color: var(--sc-grey-900);
+    cursor: pointer;
+    user-select: none;
+    transition: all var(--sc-transition-fast);
+  }
+
+  .filter-chip:hover {
+    border-color: var(--sc-grey-400);
+  }
+
+  .filter-chip.active {
+    background: var(--sc-blue-monday);
+    color: var(--sc-grey-0);
+    border-color: var(--sc-blue-monday);
+  }
+
+  .filter-reset {
+    font-family: var(--sc-font-family);
+    font-size: var(--sc-font-size-xs);
+    padding: 6px var(--sc-spacing-xs);
+    border-radius: var(--sc-radius-sm);
+    border: var(--sc-border-width-subtle) solid var(--sc-grey-200);
+    background: transparent;
+    color: var(--sc-grey-500);
+    cursor: pointer;
+  }
+
+  .filter-counter {
+    margin-left: auto;
+    font-size: var(--sc-font-size-sm);
+    color: var(--sc-grey-500);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* === Swim-lane grid (comparison matrix) === */
+  .swim-lane-section { overflow-x: auto; }
+
+  .swim-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--col-count), minmax(240px, 1fr));
+    gap: var(--sc-spacing-xs);
+    min-width: max-content;
+  }
+
+  .swim-col {
+    background: var(--sc-grey-0);
+    border: var(--sc-border-width-subtle) solid var(--sc-grey-200);
+    border-radius: var(--sc-radius-sm);
+    padding: var(--sc-spacing-xs);
+    border-left: 3px solid var(--sc-grey-300);
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .swim-col[data-phase-index="0"] { border-left-color: var(--sc-blue-monday); }
+  .swim-col[data-phase-index="1"] { border-left-color: var(--sc-purple-rain); }
+  .swim-col[data-phase-index="2"] { border-left-color: var(--sc-essex-green); }
+  .swim-col[data-phase-index="3"] { border-left-color: var(--sc-coral-bracelet); }
+  .swim-col[data-phase-index="4"] { border-left-color: var(--sc-yellow-submarine); }
+  .swim-col[data-phase-index="unphased"] { border-left-color: var(--sc-grey-500); border-left-style: dashed; }
+
+  .swim-col-head {
+    position: sticky;
+    top: 3rem;
+    background: var(--sc-grey-0);
+    padding: 6px 4px var(--sc-spacing-xs);
+    margin-bottom: 6px;
+    z-index: 2;
+    border-bottom: var(--sc-border-width-subtle) solid var(--sc-grey-100);
+  }
+
+  .phase-name {
+    font-weight: var(--sc-font-weight-semi);
+    font-size: var(--sc-font-size-sm);
+  }
+
+  .phase-count {
+    color: var(--sc-grey-500);
+    font-size: var(--sc-font-size-xs);
+    margin-left: 6px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .swim-col-empty {
+    font-size: var(--sc-font-size-sm);
+    color: var(--sc-grey-500);
+    font-style: italic;
+    padding: var(--sc-spacing-xs) 4px;
+  }
+
+  .swim-col-nomatch {
+    font-size: var(--sc-font-size-sm);
+    color: var(--sc-grey-500);
+    font-style: italic;
+    padding: var(--sc-spacing-xs) 4px;
+    display: none;
+  }
+
+  .swim-col.is-empty-filter .swim-col-nomatch { display: block; }
+
+  /* === Opportunity cards (comparison matrix) === */
+  details.opp-card {
+    background: var(--sc-grey-50);
+    border: var(--sc-border-width-subtle) solid var(--sc-grey-200);
+    border-radius: var(--sc-radius-sm);
+    padding: var(--sc-spacing-xs) 12px;
+    margin-bottom: 6px;
+    scroll-margin-top: 4rem;
+    box-shadow: var(--sc-shadow-sm);
+  }
+
+  details.opp-card[open] {
+    background: var(--sc-grey-0);
+    border-color: var(--sc-grey-400);
+    box-shadow: var(--sc-shadow-md);
+  }
+
+  details.opp-card.filtered-out { display: none; }
+
+  details.opp-card > summary {
+    cursor: pointer;
+    list-style: none;
+    outline: none;
+  }
+
+  details.opp-card > summary:focus-visible {
+    outline: var(--sc-focus-ring-width) solid var(--sc-focus-ring-color);
+    outline-offset: var(--sc-focus-ring-offset);
+    border-radius: 3px;
+  }
+
+  details.opp-card > summary::-webkit-details-marker { display: none; }
+
+  details.opp-card > summary::after {
+    content: "\25BE";
+    float: right;
+    color: var(--sc-grey-400);
+    font-size: var(--sc-font-size-sm);
+    transition: transform var(--sc-transition-fast);
+  }
+
+  details.opp-card[open] > summary::after { transform: rotate(180deg); }
+
+  .card-title {
+    display: block;
+    font-weight: var(--sc-font-weight-semi);
+    font-size: var(--sc-font-size-sm);
+    margin: 0 1.5rem 2px 0;
+    line-height: var(--sc-line-height-tight);
+  }
+
+  .card-step {
+    float: right;
+    font-size: var(--sc-font-size-xs);
+    color: var(--sc-grey-500);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    margin-left: 4px;
+    text-decoration: none;
+  }
+
+  .card-step:hover { text-decoration: underline; }
+
+  .card-standouts {
+    display: block;
+    font-size: var(--sc-font-size-xs);
+    margin: 2px 0;
+    line-height: 1.5;
+  }
+
+  .card-standouts .label {
+    color: var(--sc-grey-500);
+    display: inline-block;
+    min-width: 3.6em;
+  }
+
+  .card-standouts.strong .label { color: #1a5c2a; font-weight: var(--sc-font-weight-semi); }
+  .card-standouts.weak .label { color: var(--sc-red-right-hand); font-weight: var(--sc-font-weight-semi); }
+
+  .card-no-standouts {
+    display: block;
+    font-size: var(--sc-font-size-xs);
+    color: var(--sc-grey-500);
+    font-style: italic;
+    margin: 2px 0;
+  }
+
+  /* === Card expansion === */
+  .card-detail {
+    margin-top: var(--sc-spacing-xs);
+    padding-top: var(--sc-spacing-xs);
+    border-top: 1px dashed var(--sc-grey-200);
+    overflow-wrap: anywhere;
+  }
+
+  .card-detail blockquote {
+    font-size: var(--sc-font-size-sm);
+    margin: 0 0 6px;
+    padding: var(--sc-spacing-xs) 12px;
+    border-left: 2px solid var(--sc-blue-monday);
+  }
+
+  .card-detail cite {
+    display: block;
+    font-style: normal;
+    font-size: var(--sc-font-size-xs);
+    color: var(--sc-grey-500);
+    margin-bottom: var(--sc-spacing-xs);
+  }
+
+  .rationale-row {
+    font-size: var(--sc-font-size-xs);
+    margin-bottom: var(--sc-spacing-xs);
+    padding: 6px var(--sc-spacing-xs);
+    background: var(--sc-grey-50);
+    border-radius: 3px;
+    border-left: 2px solid var(--sc-grey-200);
+  }
+
+  .rationale-row.strong  { border-left-color: #1a5c2a; }
+  .rationale-row.medium  { border-left-color: #6b4a05; }
+  .rationale-row.weak    { border-left-color: var(--sc-red-right-hand); }
+  .rationale-row.unknown { border-left-color: var(--sc-grey-600); }
+  .rationale-row.na      { border-left-color: var(--sc-grey-400); border-left-style: dashed; }
+
+  .rationale-head {
+    display: flex;
+    gap: 6px;
+    align-items: baseline;
+    margin-bottom: 2px;
+  }
+
+  .crit-name { font-weight: var(--sc-font-weight-semi); }
+
+  .rationale-row p { margin: 2px 0 0; }
+
+  .rationale-cites {
+    font-size: 0.72rem;
+    color: var(--sc-grey-500);
+    margin-top: 2px;
+  }
+
+  /* === Gaps / excluded / notes lists === */
+  .item-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .item-list li {
+    background: var(--sc-grey-0);
+    border: var(--sc-border-width-subtle) solid var(--sc-grey-200);
+    border-radius: var(--sc-radius-sm);
+    padding: var(--sc-spacing-xs) var(--sc-spacing-sm);
+    margin-bottom: var(--sc-spacing-xs);
+    font-size: var(--sc-font-size-sm);
+  }
+
+  .item-list strong {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-weight: var(--sc-font-weight-semi);
+    color: var(--sc-blue-monday);
+  }
+
+  /* === Decisions view === */
+  .decision-card {
+    background: var(--sc-grey-0);
+    border: var(--sc-border-width-subtle) solid var(--sc-grey-200);
+    border-radius: var(--sc-radius-sm);
+    padding: var(--sc-spacing-sm) var(--sc-spacing-md);
+    margin-bottom: var(--sc-spacing-sm);
+    box-shadow: var(--sc-shadow-sm);
+  }
+
+  .decision-card h3 {
+    font-size: var(--sc-font-size-h4);
+    font-weight: var(--sc-font-weight-semi);
+    margin-bottom: var(--sc-spacing-xs);
+    display: flex;
+    align-items: center;
+    gap: var(--sc-spacing-xs);
+  }
+
+  .decision-card .date-badge {
+    font-size: var(--sc-font-size-xs);
+    font-weight: var(--sc-font-weight-medium);
+    color: var(--sc-grey-500);
+    background: var(--sc-grey-100);
+    padding: 2px 8px;
+    border-radius: var(--sc-radius-pill);
+  }
+
+  .decision-card p {
+    margin-bottom: var(--sc-spacing-xs);
+    font-size: var(--sc-font-size-sm);
+  }
+
+  .decision-card .pick-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .decision-card .pick-list li {
+    padding: var(--sc-spacing-xs) var(--sc-spacing-sm);
+    border-left: 3px solid var(--sc-blue-monday);
+    background: var(--sc-grey-50);
+    margin-bottom: 6px;
+    border-radius: 0 var(--sc-radius-sm) var(--sc-radius-sm) 0;
+    font-size: var(--sc-font-size-sm);
+  }
+
+  .decision-card .pick-list li strong {
+    color: var(--sc-blue-monday);
+    font-weight: var(--sc-font-weight-semi);
+  }
+
+  /* === Riskiest assumptions 2x2 === */
+  .risk-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sc-spacing-sm);
+    margin-bottom: var(--sc-spacing-lg);
+  }
+
+  .risk-quadrant {
+    background: var(--sc-grey-0);
+    border: var(--sc-border-width-subtle) solid var(--sc-grey-200);
+    border-radius: var(--sc-radius-sm);
+    padding: var(--sc-spacing-sm);
+    min-height: 120px;
+  }
+
+  .risk-quadrant.high-imp-weak-ev {
+    border-color: var(--sc-red-right-hand);
+    border-width: 2px;
+  }
+
+  .risk-quadrant h4 {
+    font-size: var(--sc-font-size-xs);
+    font-weight: var(--sc-font-weight-semi);
+    text-transform: uppercase;
+    letter-spacing: var(--sc-letter-spacing-wide);
+    color: var(--sc-grey-500);
+    margin-bottom: var(--sc-spacing-xs);
+  }
+
+  .assumption-item {
+    font-size: var(--sc-font-size-sm);
+    padding: var(--sc-spacing-xs);
+    background: var(--sc-grey-50);
+    border-radius: 3px;
+    margin-bottom: 6px;
+  }
+
+  .assumption-item strong { color: var(--sc-blue-monday); }
+
+  /* === Test cards (experiments) === */
+  .test-card {
+    background: var(--sc-grey-0);
+    border: var(--sc-border-width-subtle) solid var(--sc-grey-200);
+    border-radius: var(--sc-radius-sm);
+    padding: var(--sc-spacing-sm) var(--sc-spacing-md);
+    margin-bottom: var(--sc-spacing-sm);
+    box-shadow: var(--sc-shadow-sm);
+  }
+
+  .test-card h3 {
+    font-size: var(--sc-font-size-h4);
+    font-weight: var(--sc-font-weight-semi);
+    margin-bottom: var(--sc-spacing-xs);
+  }
+
+  .test-card dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px var(--sc-spacing-sm);
+    font-size: var(--sc-font-size-sm);
+  }
+
+  .test-card dt {
+    font-weight: var(--sc-font-weight-semi);
+    color: var(--sc-grey-600);
+  }
+
+  .test-card dd { margin: 0; }
+
+  .cost-badge, .time-badge {
+    display: inline-block;
+    font-size: var(--sc-font-size-xs);
+    font-weight: var(--sc-font-weight-medium);
+    padding: 1px 8px;
+    border-radius: var(--sc-radius-pill);
+    background: var(--sc-grey-100);
+    color: var(--sc-grey-700);
+  }
+
+  /* === Solutions list === */
+  .solution-card {
+    background: var(--sc-grey-0);
+    border: var(--sc-border-width-subtle) solid var(--sc-grey-200);
+    border-radius: var(--sc-radius-sm);
+    padding: var(--sc-spacing-sm) var(--sc-spacing-md);
+    margin-bottom: var(--sc-spacing-sm);
+    box-shadow: var(--sc-shadow-sm);
+  }
+
+  .solution-card h3 {
+    font-size: var(--sc-font-size-h4);
+    font-weight: var(--sc-font-weight-semi);
+    margin-bottom: var(--sc-spacing-xs);
+  }
+
+  .solution-card p {
+    font-size: var(--sc-font-size-sm);
+    margin-bottom: var(--sc-spacing-xs);
+  }
+
+  /* === Experience map === */
+  .exp-map-phase {
+    margin-bottom: var(--sc-spacing-md);
+  }
+
+  .exp-map-phase h3 {
+    font-size: var(--sc-font-size-h4);
+    font-weight: var(--sc-font-weight-semi);
+    padding: var(--sc-spacing-xs) var(--sc-spacing-sm);
+    border-left: 3px solid var(--sc-blue-monday);
+    background: var(--sc-grey-50);
+    border-radius: 0 var(--sc-radius-sm) var(--sc-radius-sm) 0;
+    margin-bottom: var(--sc-spacing-xs);
+  }
+
+  .exp-map-step {
+    margin-left: var(--sc-spacing-md);
+    padding: var(--sc-spacing-xs) var(--sc-spacing-sm);
+    border-left: 1px solid var(--sc-grey-200);
+    margin-bottom: 4px;
+    font-size: var(--sc-font-size-sm);
+  }
+
+  .exp-map-opp {
+    margin-left: var(--sc-spacing-2xl);
+    padding: 4px var(--sc-spacing-xs);
+    background: var(--sc-grey-50);
+    border-radius: 3px;
+    margin-bottom: 4px;
+    font-size: var(--sc-font-size-xs);
+    border-left: 2px solid var(--sc-purple-mountains);
+  }
+
+  /* === Print === */
+  @media print {
+    body { max-width: none; padding: 1cm; background: white; }
+    .viewer-tabs, .filter-bar { display: none; }
+    .view-section { page-break-inside: avoid; }
+    a { color: inherit; text-decoration: none; }
+    details.opp-card, details.opp-card[open] { background: white; border-color: var(--sc-grey-200); box-shadow: none; }
+    details > *:not(summary) { display: block; }
+    details > summary::after { display: none; }
+    .swim-col-head { position: static; }
+    .swim-grid { grid-template-columns: repeat(var(--col-count), minmax(0, 1fr)); }
+  }
+</style>
+</head>
+<body>
+
+<header class="viewer-header" id="viewer-header"></header>
+<nav class="viewer-tabs" id="viewer-tabs"></nav>
+<main id="view-container"></main>
+
+<script>
+(function () {
+  'use strict';
+
+  // === Data layer ===
+
+  async function loadJSON(path) {
+    var resp = await fetch(path);
+    if (!resp.ok) return null;
+    return resp.json();
+  }
+
+  async function loadRound(roundPath) {
+    var base = '/' + roundPath.replace(/^\/+/, '').replace(/\/+$/, '');
+    var decisions = await loadJSON(base + '/decisions.json');
+    var listing = await loadJSON(base + '/');
+    var files = Array.isArray(listing) ? listing : [];
+    return { decisions: decisions, files: files, basePath: base };
+  }
+
+  // === View registry ===
+
+  var views = {
+    'decisions.json':              { label: 'Decisions',          render: renderDecisions },
+    'comparison-matrix.json':      { label: 'Comparison Matrix',  render: renderComparisonMatrix },
+    'riskiest-assumptions.json':   { label: 'Riskiest Assumptions', render: renderRiskiest },
+    'validation-experiments.json': { label: 'Experiments',        render: renderExperiments },
+    'solution-candidates.json':    { label: 'Solutions',          render: renderSolutions },
+    'experience-map-clustered.json': { label: 'Experience Map',   render: renderExperienceMap },
+  };
+
+  var currentView = null;
+  var roundData = null;
+
+  // === Navigation ===
+
+  function buildTabs(availableFiles) {
+    var tabBar = document.getElementById('viewer-tabs');
+    tabBar.innerHTML = '';
+    var order = Object.keys(views);
+    order.forEach(function (filename) {
+      if (availableFiles.indexOf(filename) === -1) return;
+      var btn = document.createElement('button');
+      btn.className = 'viewer-tab';
+      btn.textContent = views[filename].label;
+      btn.dataset.file = filename;
+      btn.type = 'button';
+      tabBar.appendChild(btn);
+    });
+    tabBar.addEventListener('click', function (e) {
+      if (e.target.dataset && e.target.dataset.file) {
+        switchView(e.target.dataset.file);
+      }
+    });
+  }
+
+  function setActiveTab(filename) {
+    var tabs = document.querySelectorAll('.viewer-tab');
+    tabs.forEach(function (t) {
+      t.classList.toggle('active', t.dataset.file === filename);
+    });
+  }
+
+  async function switchView(filename) {
+    if (!roundData) return;
+    currentView = filename;
+    setActiveTab(filename);
+    var container = document.getElementById('view-container');
+    container.innerHTML = '';
+
+    var entry = views[filename];
+    if (!entry) return;
+
+    if (filename === 'decisions.json') {
+      entry.render(roundData.decisions, container);
+      return;
+    }
+
+    var json = await loadJSON(roundData.basePath + '/' + filename);
+    if (!json) {
+      container.innerHTML = '<div class="viewer-error"><h2>Could not load</h2><p>Failed to fetch <code>' + filename + '</code></p></div>';
+      return;
+    }
+    entry.render(json, container);
+  }
+
+  // === Header ===
+
+  function renderHeader(decisions, roundPath) {
+    var header = document.getElementById('viewer-header');
+    var product = decisions ? (decisions.product || 'Unknown product') : 'Unknown product';
+    var team = decisions && decisions.team ? ' (' + decisions.team + ')' : '';
+    var outcome = decisions ? (decisions.product_outcome || '') : '';
+
+    document.title = 'OST Viewer — ' + product + team;
+    header.innerHTML = '<h1>' + esc(product) + esc(team) + '</h1>'
+      + '<p class="meta">Round: <code>' + esc(roundPath) + '</code></p>'
+      + (outcome ? '<blockquote>' + esc(outcome) + '</blockquote>' : '');
+  }
+
+  // === Renderers ===
+
+  function renderDecisions(json, container) {
+    if (!json) {
+      container.innerHTML = '<div class="viewer-error"><h2>No decisions.json</h2><p>This round has no ratified decisions yet.</p></div>';
+      return;
+    }
+    var html = '';
+    var d = json.decided || {};
+
+    if (d.opportunity) {
+      var opp = d.opportunity;
+      html += '<div class="decision-card"><h3>Chosen Opportunity <span class="date-badge">' + esc(opp.ratified || '') + '</span></h3>';
+      html += '<p><strong>' + esc(opp.id || '') + '</strong> (' + esc(opp.phase_id || '') + ')</p>';
+      html += '<blockquote>' + esc(opp.quote || '') + '</blockquote>';
+      html += '<p><em>' + esc(opp.source || '') + '</em></p>';
+      if (opp.rationale) html += '<p>' + esc(opp.rationale) + '</p>';
+      if (opp.scores) {
+        html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">';
+        Object.keys(opp.scores).forEach(function (k) {
+          html += '<span class="score-pill score-' + opp.scores[k] + '">' + esc(k.replace(/_/g, ' ')) + ': ' + esc(opp.scores[k]) + '</span>';
+        });
+        html += '</div>';
+      }
+      if (opp.evidence_gaps && opp.evidence_gaps.length) {
+        html += '<div class="view-section" style="margin-top:12px"><h3>Evidence Gaps</h3><ul class="item-list">';
+        opp.evidence_gaps.forEach(function (g) {
+          html += '<li><strong>' + esc(g.criterion || '') + '</strong>: ' + esc(g.gap || '') + '</li>';
+        });
+        html += '</ul></div>';
+      }
+      html += '</div>';
+    }
+
+    if (d.solutions) {
+      html += '<div class="decision-card"><h3>Top 3 Solutions <span class="date-badge">' + esc(d.solutions.ratified || '') + '</span></h3>';
+      html += '<ul class="pick-list">';
+      (d.solutions.picks || []).forEach(function (p) {
+        html += '<li><strong>' + esc(p.id || '') + '</strong> — ' + esc(p.title || '') + '<br>' + esc(p.rationale || '') + '</li>';
+      });
+      html += '</ul></div>';
+    }
+
+    if (d.assumptions) {
+      html += '<div class="decision-card"><h3>Riskiest Assumptions <span class="date-badge">' + esc(d.assumptions.ratified || '') + '</span></h3>';
+      html += '<ul class="pick-list">';
+      (d.assumptions.riskiest || []).forEach(function (a) {
+        html += '<li><strong>' + esc(a.id || '') + '</strong> (' + esc(a.category || '') + '): ' + esc(a.text || '') + '</li>';
+      });
+      html += '</ul></div>';
+    }
+
+    if (d.experiments) {
+      html += '<div class="decision-card"><h3>Validation Experiments <span class="date-badge">' + esc(d.experiments.ratified || '') + '</span></h3>';
+      html += '<ul class="pick-list">';
+      (d.experiments.test_cards || []).forEach(function (t) {
+        html += '<li><strong>' + esc(t.test_type || '') + '</strong> for ' + esc(t.assumption_id || '') + ': ' + esc(t.hypothesis || '') + '</li>';
+      });
+      html += '</ul></div>';
+    }
+
+    if (!html) {
+      container.innerHTML = '<div class="viewer-error"><h2>Empty decisions</h2><p>No ratified decisions found in this round.</p></div>';
+      return;
+    }
+
+    container.innerHTML = '<div class="view-section"><h2>Ratified Decisions</h2>' + html + '</div>';
+  }
+
+  function renderComparisonMatrix(json, container) {
+    var phases = json.journey_phases || [];
+    var opps = json.opportunities_compared || [];
+    var excluded = json.opportunities_excluded || [];
+    var gaps = json.evidence_gaps || [];
+    var criteria = json.criteria || [];
+    var outcome = json.product_outcome || '';
+    var html = '';
+
+    if (outcome) {
+      html += '<div class="view-section"><h2>Product outcome</h2><blockquote>' + esc(outcome) + '</blockquote></div>';
+    }
+
+    if (excluded.length) {
+      html += '<div class="view-section"><h2>Excluded from comparison (' + excluded.length + ')</h2><ul class="item-list">';
+      excluded.forEach(function (ex) {
+        html += '<li><strong>' + esc(ex.id || '') + '</strong> (verdict: ' + esc(ex.verdict || '') + ') — ' + esc(ex.reason || '') + '</li>';
+      });
+      html += '</ul></div>';
+    }
+
+    var byPhase = {};
+    var unphased = [];
+    opps.forEach(function (o) {
+      if (o.phase_id) {
+        if (!byPhase[o.phase_id]) byPhase[o.phase_id] = [];
+        byPhase[o.phase_id].push(o);
+      } else {
+        unphased.push(o);
+      }
+    });
+
+    function sortOpps(arr) {
+      arr.sort(function (a, b) {
+        var sa = (a.score_counts || {}).strong || 0;
+        var sb = (b.score_counts || {}).strong || 0;
+        if (sb !== sa) return sb - sa;
+        var wa = (a.score_counts || {}).weak || 0;
+        var wb = (b.score_counts || {}).weak || 0;
+        return wa - wb;
+      });
+    }
+
+    Object.keys(byPhase).forEach(function (pid) { sortOpps(byPhase[pid]); });
+    sortOpps(unphased);
+
+    var hasUnphased = unphased.length > 0;
+    var colCount = phases.length + (hasUnphased ? 1 : 0);
+
+    html += '<div class="filter-bar" id="cm-filters">';
+    html += '<button class="filter-chip" data-filter="strong-heavy" type="button">strong-heavy (≥3 strongs)</button>';
+    html += '<button class="filter-chip" data-filter="has-weak" type="button">has weak</button>';
+    html += '<button class="filter-chip" data-filter="has-unknown" type="button">has unknown</button>';
+    html += '<button class="filter-reset" type="button">Reset</button>';
+    html += '<span class="filter-counter"><span id="cm-shown">' + opps.length + '</span> of <span id="cm-total">' + opps.length + '</span> shown</span>';
+    html += '</div>';
+
+    html += '<div class="swim-lane-section"><h2>Opportunities by journey phase (' + opps.length + ')</h2>';
+    html += '<div class="swim-grid" style="--col-count: ' + colCount + ';">';
+
+    phases.forEach(function (phase, idx) {
+      var phaseOpps = byPhase[phase.id] || [];
+      html += '<div class="swim-col" data-phase-index="' + (idx % 5) + '" id="phase-' + esc(phase.id) + '">';
+      html += '<div class="swim-col-head"><span class="phase-name">' + esc(phase.name) + '</span><span class="phase-count">(' + phaseOpps.length + ')</span></div>';
+
+      if (phaseOpps.length === 0) {
+        html += '<div class="swim-col-empty">No opportunities in this phase.</div>';
+      } else {
+        phaseOpps.forEach(function (o) { html += renderOppCard(o, criteria); });
+      }
+
+      html += '<div class="swim-col-nomatch">No matching opportunities.</div>';
+      html += '</div>';
+    });
+
+    if (hasUnphased) {
+      html += '<div class="swim-col" data-phase-index="unphased" id="phase-unphased">';
+      html += '<div class="swim-col-head"><span class="phase-name">Unphased</span><span class="phase-count">(' + unphased.length + ')</span></div>';
+      unphased.forEach(function (o) { html += renderOppCard(o, criteria); });
+      html += '<div class="swim-col-nomatch">No matching opportunities.</div>';
+      html += '</div>';
+    }
+
+    html += '</div></div>';
+
+    if (gaps.length) {
+      html += '<div class="view-section"><h2>Evidence gaps (' + gaps.length + ')</h2>';
+      html += '<p style="color:var(--sc-grey-500);font-size:var(--sc-font-size-sm);margin-bottom:var(--sc-spacing-xs)">Cells where evidence was thin and an honest score wasn\'t defensible.</p>';
+      html += '<ul class="item-list">';
+      gaps.forEach(function (g) {
+        html += '<li><strong>' + esc(g.criterion_id || '') + ' × ' + esc(g.opportunity_id || '') + '</strong>: ' + esc(g.what_is_missing || '') + '</li>';
+      });
+      html += '</ul></div>';
+    }
+
+    container.innerHTML = html;
+    initComparisonFilters();
+  }
+
+  function renderOppCard(opp, criteria) {
+    var sc = opp.score_counts || {};
+    var h = '<details class="opp-card" id="' + esc(opp.id || '') + '"'
+      + ' data-strong-count="' + (sc.strong || 0) + '"'
+      + ' data-weak-count="' + (sc.weak || 0) + '"'
+      + ' data-unknown-count="' + (sc.unknown || 0) + '">';
+
+    h += '<summary>';
+    if (opp.step_id) h += '<a class="card-step" href="#step-' + esc(opp.step_id) + '">' + esc(opp.step_id) + '</a>';
+    h += '<span class="card-title">' + esc(opp.summary_title || opp.id || '') + '</span>';
+
+    var strongCrits = [];
+    var weakCrits = [];
+    (opp.scores || []).forEach(function (s) {
+      if (s.score === 'strong') strongCrits.push(s.criterion_name || s.criterion_id || '');
+      if (s.score === 'weak') weakCrits.push(s.criterion_name || s.criterion_id || '');
+    });
+
+    if (strongCrits.length) {
+      h += '<span class="card-standouts strong"><span class="label">strong:</span> ' + esc(strongCrits.join(', ')) + '</span>';
+    }
+    if (weakCrits.length) {
+      h += '<span class="card-standouts weak"><span class="label">weak:</span> ' + esc(weakCrits.join(', ')) + '</span>';
+    }
+    if (!strongCrits.length && !weakCrits.length) {
+      h += '<span class="card-no-standouts">No standout scores.</span>';
+    }
+
+    h += '</summary>';
+
+    h += '<div class="card-detail">';
+    if (opp.quote) h += '<blockquote>"' + esc(opp.quote) + '"</blockquote>';
+    if (opp.source) h += '<cite>' + esc(opp.source) + '</cite>';
+
+    (opp.scores || []).forEach(function (s) {
+      var score = s.score || 'unknown';
+      h += '<div class="rationale-row ' + score + '">';
+      h += '<div class="rationale-head"><span class="crit-name">' + esc(s.criterion_name || s.criterion_id || '') + '</span>';
+      h += '<span class="score-pill score-' + score + '">' + esc(score) + '</span></div>';
+      if (s.rationale) h += '<p>' + esc(s.rationale) + '</p>';
+      if (s.opp_refs && s.opp_refs.length) {
+        h += '<p class="rationale-cites">Cites: ' + esc(s.opp_refs.join(', ')) + '</p>';
+      }
+      h += '</div>';
+    });
+
+    h += '</div></details>';
+    return h;
+  }
+
+  function initComparisonFilters() {
+    var activeFilters = new Set();
+    var bar = document.getElementById('cm-filters');
+    if (!bar) return;
+    var shown = document.getElementById('cm-shown');
+    var total = document.getElementById('cm-total');
+    var cards = Array.prototype.slice.call(document.querySelectorAll('details.opp-card'));
+    var cols = Array.prototype.slice.call(document.querySelectorAll('.swim-col'));
+    if (total) total.textContent = cards.length;
+
+    function passes(card) {
+      if (activeFilters.size === 0) return true;
+      if (activeFilters.has('strong-heavy') && (+card.dataset.strongCount || 0) < 3) return false;
+      if (activeFilters.has('has-weak') && (+card.dataset.weakCount || 0) < 1) return false;
+      if (activeFilters.has('has-unknown') && (+card.dataset.unknownCount || 0) < 1) return false;
+      return true;
+    }
+
+    function apply() {
+      var count = 0;
+      cards.forEach(function (c) {
+        var ok = passes(c);
+        c.classList.toggle('filtered-out', !ok);
+        if (ok) count++;
+      });
+      if (shown) shown.textContent = count;
+      cols.forEach(function (col) {
+        var visible = col.querySelectorAll('details.opp-card:not(.filtered-out)').length;
+        var hasAnyCard = col.querySelector('details.opp-card') !== null;
+        col.classList.toggle('is-empty-filter', hasAnyCard && visible === 0);
+      });
+    }
+
+    bar.addEventListener('click', function (e) {
+      var t = e.target;
+      if (t.classList && t.classList.contains('filter-chip')) {
+        var f = t.dataset.filter;
+        if (activeFilters.has(f)) { activeFilters.delete(f); t.classList.remove('active'); }
+        else { activeFilters.add(f); t.classList.add('active'); }
+        apply();
+      } else if (t.classList && t.classList.contains('filter-reset')) {
+        activeFilters.clear();
+        bar.querySelectorAll('.filter-chip.active').forEach(function (c) { c.classList.remove('active'); });
+        apply();
+      }
+    });
+  }
+
+  function renderRiskiest(json, container) {
+    var assumptions = json.assumptions || [];
+    var html = '<div class="view-section"><h2>Riskiest Assumptions</h2>';
+
+    var highWeak = [], highStrong = [], lowWeak = [], lowStrong = [];
+    assumptions.forEach(function (a) {
+      var imp = a.importance || 'low';
+      var ev = a.evidence || 'weak';
+      if (imp === 'high' && ev === 'weak') highWeak.push(a);
+      else if (imp === 'high' && ev === 'strong') highStrong.push(a);
+      else if (imp === 'low' && ev === 'weak') lowWeak.push(a);
+      else lowStrong.push(a);
+    });
+
+    html += '<div class="risk-grid">';
+    html += renderQuadrant('High importance / Weak evidence', highWeak, true);
+    html += renderQuadrant('High importance / Strong evidence', highStrong, false);
+    html += renderQuadrant('Low importance / Weak evidence', lowWeak, false);
+    html += renderQuadrant('Low importance / Strong evidence', lowStrong, false);
+    html += '</div></div>';
+
+    container.innerHTML = html;
+  }
+
+  function renderQuadrant(title, items, isRiskiest) {
+    var h = '<div class="risk-quadrant' + (isRiskiest ? ' high-imp-weak-ev' : '') + '">';
+    h += '<h4>' + esc(title) + '</h4>';
+    if (items.length === 0) {
+      h += '<p style="color:var(--sc-grey-400);font-size:var(--sc-font-size-xs);font-style:italic">None</p>';
+    }
+    items.forEach(function (a) {
+      h += '<div class="assumption-item"><strong>' + esc(a.id || '') + '</strong>';
+      if (a.solution_id) h += ' <span style="color:var(--sc-grey-500);font-size:var(--sc-font-size-xs)">(' + esc(a.solution_id) + ')</span>';
+      h += '<br>' + esc(a.text || '');
+      if (a.category) h += ' <span class="score-pill score-unknown">' + esc(a.category) + '</span>';
+      h += '</div>';
+    });
+    h += '</div>';
+    return h;
+  }
+
+  function renderExperiments(json, container) {
+    var cards = json.test_cards || [];
+    var html = '<div class="view-section"><h2>Validation Experiments (' + cards.length + ')</h2>';
+
+    cards.forEach(function (tc) {
+      html += '<div class="test-card">';
+      html += '<h3>' + esc(tc.test_type || 'Test') + '</h3>';
+      html += '<dl>';
+      html += '<dt>Assumption</dt><dd>' + esc(tc.assumption_id || '') + '</dd>';
+      html += '<dt>Hypothesis</dt><dd>' + esc(tc.hypothesis || '') + '</dd>';
+      html += '<dt>Metric</dt><dd>' + esc(tc.metric || '') + '</dd>';
+      html += '<dt>Success criteria</dt><dd>' + esc(tc.success_criteria || '') + '</dd>';
+      html += '<dt>Cost</dt><dd><span class="cost-badge">' + esc(tc.estimated_cost || '') + '</span></dd>';
+      html += '<dt>Time</dt><dd><span class="time-badge">' + esc(tc.estimated_time || '') + '</span></dd>';
+      html += '</dl></div>';
+    });
+
+    if (!cards.length) {
+      html += '<div class="viewer-error"><p>No test cards in this file.</p></div>';
+    }
+    html += '</div>';
+    container.innerHTML = html;
+  }
+
+  function renderSolutions(json, container) {
+    var solutions = json.solutions || json.clusters || [];
+    var html = '<div class="view-section"><h2>Solution Candidates (' + solutions.length + ')</h2>';
+
+    solutions.forEach(function (sol, i) {
+      html += '<div class="solution-card">';
+      html += '<h3>' + esc(sol.title || sol.id || ('Solution ' + (i + 1))) + '</h3>';
+      if (sol.description) html += '<p>' + esc(sol.description) + '</p>';
+      if (sol.rationale) html += '<p style="color:var(--sc-grey-600)">' + esc(sol.rationale) + '</p>';
+      if (sol.role) html += '<p><span class="score-pill score-unknown">' + esc(sol.role) + '</span></p>';
+      html += '</div>';
+    });
+
+    if (!solutions.length) {
+      html += '<div class="viewer-error"><p>No solutions in this file.</p></div>';
+    }
+    html += '</div>';
+    container.innerHTML = html;
+  }
+
+  function renderExperienceMap(json, container) {
+    var phases = json.phases || [];
+    var html = '<div class="view-section"><h2>Experience Map</h2>';
+
+    phases.forEach(function (phase) {
+      html += '<div class="exp-map-phase">';
+      html += '<h3>' + esc(phase.name || phase.id || '') + '</h3>';
+
+      (phase.steps || []).forEach(function (step) {
+        html += '<div class="exp-map-step"><strong>' + esc(step.id || '') + '</strong> ' + esc(step.name || '') + '</div>';
+
+        (step.opportunities || phase.opportunities || []).forEach(function (opp) {
+          if (opp.step_id && opp.step_id !== step.id) return;
+          html += '<div class="exp-map-opp"><strong>' + esc(opp.id || '') + '</strong> ';
+          if (opp.quote) html += '"' + esc(opp.quote.substring(0, 120)) + (opp.quote.length > 120 ? '…' : '') + '"';
+          if (opp.verdict) html += ' <span class="score-pill score-' + (opp.verdict === 'approved' ? 'strong' : opp.verdict === 'needs_tweak' ? 'medium' : 'weak') + '">' + esc(opp.verdict) + '</span>';
+          html += '</div>';
+        });
+      });
+
+      if (!phases[0] || !phases[0].steps || !phases[0].steps.length) {
+        (phase.opportunities || []).forEach(function (opp) {
+          html += '<div class="exp-map-opp"><strong>' + esc(opp.id || '') + '</strong> ';
+          if (opp.quote) html += '"' + esc(opp.quote.substring(0, 120)) + (opp.quote.length > 120 ? '…' : '') + '"';
+          html += '</div>';
+        });
+      }
+
+      html += '</div>';
+    });
+
+    if (!phases.length) {
+      html += '<div class="viewer-error"><p>No phases in this file.</p></div>';
+    }
+    html += '</div>';
+    container.innerHTML = html;
+  }
+
+  // === Utilities ===
+
+  function esc(str) {
+    if (typeof str !== 'string') return '';
+    var d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  // === Init ===
+
+  async function main() {
+    var params = new URLSearchParams(window.location.search);
+    var roundPath = params.get('round');
+
+    if (!roundPath) {
+      document.getElementById('view-container').innerHTML =
+        '<div class="viewer-error"><h2>No round specified</h2>'
+        + '<p>Add <code>?round=path/to/round</code> to the URL.</p>'
+        + '<p>Example: <code>/_viewer/?round=metria/opp-1/2026-05-25</code></p></div>';
+      return;
+    }
+
+    roundData = await loadRound(roundPath);
+    renderHeader(roundData.decisions, roundPath);
+
+    if (!roundData.decisions && roundData.files.length === 0) {
+      document.getElementById('view-container').innerHTML =
+        '<div class="viewer-error"><h2>Empty round</h2>'
+        + '<p>No JSON files found at <code>' + esc(roundPath) + '</code></p></div>';
+      return;
+    }
+
+    buildTabs(roundData.files);
+
+    var defaultView = roundData.files.indexOf('decisions.json') !== -1
+      ? 'decisions.json'
+      : roundData.files.find(function (f) { return views[f]; });
+
+    if (defaultView) switchView(defaultView);
+  }
+
+  main();
+})();
+</script>
+</body>
+</html>
