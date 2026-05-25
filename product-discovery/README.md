@@ -17,6 +17,28 @@ Updates pull automatically on session start (`autoUpdate: true`). Force-update m
 /plugin update product-discovery@scilla-studio
 ```
 
+## Prerequisites
+
+Before starting, the product trio (PM, UX designer, tech lead) needs to have the following ready:
+
+### Required
+
+| What | Why | Format |
+|---|---|---|
+| **Product outcome** | Every downstream skill filters and scores against this. Without it, opportunities can't be evaluated. | A rough draft is fine — `OST-setup-product` will shape it into "Increase/Reduce [behavior] from [current] to [target] by [date]." |
+| **Experience map** | Provides the journey structure for clustering opportunities into phases and steps. | Either a **screenshot** (PNG/JPG — `OST-extract-experience-map` converts it to structured data) or a **mental model** the trio can walk through in the setup interview. |
+| **Cleaned interview transcripts** | Source material for extracting customer-voice opportunities. `OST-opportunity-extractor` reads these to find pain, friction, unmet needs, and workarounds. | Text files with speaker labels (e.g. `P01:` or `Interviewee:`). Raw transcripts from Otter/Zoom/etc. should be cleaned first — use `scilla-research:transcript-cleaner` if needed. |
+
+### Optional (depends on starting point)
+
+| What | When needed | Format |
+|---|---|---|
+| **Chosen opportunity ID & citation** | Only if the trio has *already decided* which opportunity to pursue and wants to skip the selection phase. | Opportunity ID (e.g. `opp-3-2`), journey phase, verbatim quote, source (interviewee + reference), and why it was chosen. |
+
+### What you do NOT need upfront
+
+The plugin generates everything else — validated opportunity lists, clustered maps, comparison matrices, solution candidates, assumption inventories, and experiment designs. The trio reviews and ratifies at HITL gates along the way.
+
 ## Skill flow
 
 Red diamonds = **required HITL** (workflow blocks until the trio acts). Yellow diamonds = **optional HITL** (trio can review/override but the workflow doesn't block).
