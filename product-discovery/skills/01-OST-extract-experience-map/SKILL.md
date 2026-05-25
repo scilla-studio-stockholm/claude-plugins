@@ -48,25 +48,35 @@ This skill is assist 2 in the OST discovery workflow.
    - `schema_version`: always `"0.1"`
    - IDs: `fas-N` for phases, `step-N-M` for steps
 
-8. **Apply tiered strictness.**
+8. **If step descriptions are mostly illegible, ask the user for help.**
+   Trigger: more than half of all steps have no extractable `description` after step 7. Do not silently omit descriptions and proceed — the viewer shows raw step IDs when descriptions are missing, which is unusable.
+
+   Present these three options and let the user choose:
+   1. **Talk through the map.** Walk through the phases one by one. For each phase, list the step IDs and any partial text extracted, then ask the user to dictate or type the description for each step. Accept free-form text or speech input.
+   2. **Provide a higher-resolution image.** Ask the user to re-export the screenshot at higher resolution (e.g. 2x zoom, or export from the source tool at full resolution) and provide the new path. Re-run step 6–7 with the new image.
+   3. **Provide cropped images per phase.** Ask the user to provide one zoomed-in screenshot per phase (or per group of phases). For each image, run a focused extraction pass for only the steps in that phase, then merge results into the main JSON.
+
+   After collecting descriptions via any of these paths, continue from step 9 with the enriched data.
+
+9. **Apply tiered strictness.**
    - If a required field cannot be extracted with confidence: respond with the hard-exit message in the "Hard-exit format" section below and stop. Do not write any output files.
    - Exception for `product_outcome`: if it is missing from the screenshot but `<scope>/../../_product-context/product-outcome.md` exists, read the outcome from that file and add a Warning entry to the markdown output.
    - If an optional field is ambiguous: omit the key from the JSON and add an entry to the Warnings section.
 
-9. **Compose the JSON object** strictly against schema v0.1. For optional fields without an extractable value, omit the key entirely; never write `null`. Always omit `phases[].opportunities`.
+10. **Compose the JSON object** strictly against schema v0.1. For optional fields without an extractable value, omit the key entirely; never write `null`. Always omit `phases[].opportunities`.
 
-10. **Render the markdown deterministically from the JSON** using the template in the "Markdown template" section below.
+11. **Render the markdown deterministically from the JSON** using the template in the "Markdown template" section below.
 
-11. **Write paired output** to:
+12. **Write paired output** to:
    - `<scope>/experience-map-extracted.json`
    - `<scope>/experience-map-extracted.md`
 
-12. **Launch the viewer.**
+13. **Launch the viewer.**
    - Locate the viewer assets at `~/.claude/plugins/marketplaces/scilla-studio/product-discovery/templates/`.
    - If the directory does not exist, skip this step with a note: "Viewer not available — install the scilla-studio marketplace to enable auto-open."
    - Compute the discovery root: walk up from `<scope>` until you find the directory that contains `.current-scope` or is named `discovery/`. This becomes the `--data` argument.
    - Compute the round path: the relative path from the discovery root to `<scope>` (e.g. `metria/opp-1/2026-05-25`). This becomes the `?round=` query parameter.
-   - Check if port 3000 is already in use (`lsof -ti:3000`). If not, start the server in the background:
+   - Check if port 3000 is already in use (`lsof -ti:3000`). If it is, verify the running server points at the correct discovery root by inspecting its command line (`ps -p <pid> -o args=`). If the `--data` argument does not match `<discovery-root>`, kill the process and start a fresh server. If the port is free, start the server:
      ```
      python3 ~/.claude/plugins/marketplaces/scilla-studio/product-discovery/templates/serve.py \
        --templates ~/.claude/plugins/marketplaces/scilla-studio/product-discovery/templates/viewer \
@@ -77,7 +87,6 @@ This skill is assist 2 in the OST discovery workflow.
      ```
      open "http://localhost:3000/_viewer/?round=<round-path>"
      ```
-   - If the server is already running, just open the browser URL. The viewer picks up new/changed JSON files on tab switch without a server restart.
 
 ## Hard-exit format
 
