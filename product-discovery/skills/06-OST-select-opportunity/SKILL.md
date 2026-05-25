@@ -15,7 +15,7 @@ The selector applies a locked three-step decision rule:
 2. **Rank** the remaining by strongest aggregate profile across the other four criteria.
 3. **Tiebreak** on fewer evidence gaps.
 
-The output is a **proposal**, not a decision-of-record. The trio reviews and ratifies the final pick by creating a new opportunity folder at `discovery/<team>/<product>/opportunities/<opp-slug>/` and placing `chosen-opportunity.md` there (which assist 6 reads). This skill does NOT write to that folder.
+The output is a **proposal**, not a decision-of-record. The trio reviews the proposal markdown. If approved, `decided.opportunity` in `decisions.json` is the ratified record. The trio may edit `decisions.json` directly to adjust scores or rationale before approving. Creating `chosen-opportunity.md` at the opportunity-folder root is optional (human reference only — downstream skills read from `decisions.json`).
 
 **Out of scope:** transcript reading, citation validation (`OST-validate-opportunities` upstream), re-clustering (`OST-cluster-opportunities` upstream), re-comparing (`OST-compare-opportunities` upstream), summing scores, picking more than one opportunity, generating solutions (assist 6 onward), and weighing effort or feasibility (Torres principle).
 
@@ -95,6 +95,29 @@ The output is a **proposal**, not a decision-of-record. The trio reviews and rat
 
     Upstream `comparison-matrix.json` and `product-outcome.md` are not modified. Create `<scope>/` if it doesn't exist. Do NOT write to any `chosen-opportunity.md` under `opportunities/` - that is the trio's ratification step.
 
+17. **Write to decisions.json:** Read the round's `decisions.json`. Set `decided.opportunity` with these fields extracted from the proposal:
+
+    ```json
+    {
+      "ratified": "<today YYYY-MM-DD>",
+      "id": "<chosen_opportunity.id>",
+      "phase_id": "<chosen_opportunity.phase_id>",
+      "quote": "<chosen_opportunity.quote>",
+      "source": "<chosen_opportunity.source>",
+      "scores": {
+        "outcome_alignment": "<score>",
+        "customer_importance": "<score>",
+        "market_size_frequency": "<score>",
+        "strategic_fit": "<score>",
+        "competitive_landscape": "<score>"
+      },
+      "rationale": "<rationale>",
+      "evidence_gaps": [<evidence_gaps_carried items>]
+    }
+    ```
+
+    Write the updated `decisions.json` back.
+
 ## Hard-exit format
 
 When a hard-exit condition fires, respond with this exact pattern (substitute actual values) and stop. Do not write any output files.
@@ -137,7 +160,7 @@ Source product outcome: `<scope>/../../_product-context/product-outcome.md`
 Schema version: 0.1
 Paired JSON: `chosen-opportunity-proposal.json`
 
-> **Trio HITL:** This is the AI's proposal. Review the rationale, override if you disagree, then create a new opportunity folder at `discovery/<team>/<product>/opportunities/<opp-slug>/` (slug from the chosen opportunity's title per `references/workspace-scope.md`) and ratify into `<that folder>/chosen-opportunity.md`.
+> **Trio HITL:** This is the AI's proposal. Review the rationale and override if you disagree. If approved, `decided.opportunity` in `decisions.json` is the ratified record — you may edit it directly to adjust scores or rationale before approving. Creating `chosen-opportunity.md` in an opportunity folder is optional (human reference only — downstream skills read from `decisions.json`).
 
 ## Product outcome
 
@@ -210,8 +233,8 @@ These gaps from the chosen opportunity were judged not to affect phase-2 solutio
 - **The HITL banner** (`> **Trio HITL:** ...`) is rendered verbatim every run.
 - **No silent degradation.** Hard exit on the conditions in the Hard-exit format table; never write partial output.
 - **No JSON self-validation pass.** Trust the prompt; downstream skills surface any malformed JSON.
-- **Upstream files are immutable.** Never modify `comparison-matrix-*.json` or `product-outcome.md`. The skill writes only the two `chosen-opportunity-<date>.*` files.
-- **Never write to any `chosen-opportunity.md` under `opportunities/`.** The skill writes only `chosen-opportunity-proposal.*` into `<scope>/`. Ratification into a new opportunity folder is the trio's manual step.
+- **Upstream files are immutable.** Never modify `comparison-matrix-*.json` or `product-outcome.md`. The skill writes the two `chosen-opportunity-proposal.*` files and `decisions.json`.
+- **Never write to any `chosen-opportunity.md` under `opportunities/`.** The skill writes only `chosen-opportunity-proposal.*` into `<scope>/` and updates `decided.opportunity` in `decisions.json`. Creating `chosen-opportunity.md` in an opportunity folder is the trio's optional manual step.
 - **Single pass.** No retries, no iteration over the inputs.
 
 ## What this skill does NOT do
@@ -220,7 +243,7 @@ These gaps from the chosen opportunity were judged not to affect phase-2 solutio
 - **Read the clustered experience-map JSON, validated table, or extracted opportunities.** All quotes, sources, scores, and rationales the selector needs are already in the matrix.
 - **Re-validate, re-cluster, or re-compare.** Those are upstream skills.
 - **Modify upstream files.** `comparison-matrix-*.json` and `product-outcome.md` stay immutable.
-- **Write to `discovery/<team>/<product>/opportunities/<opp-slug>/chosen-opportunity.md`.** That is the trio's ratification step.
+- **Write to `discovery/<team>/<product>/opportunities/<opp-slug>/chosen-opportunity.md`.** That is the trio's optional manual step; downstream skills read from `decisions.json`.
 - **Pick more than one opportunity.** HITL flavor is locked as picks-one + alternatives.
 - **Produce a shortlist.** Even on tied picks, the AI commits to one and names the tie in the rationale.
 - **Produce a free-form recommendation without alternatives.** Every other approved opportunity from the matrix appears in `alternatives_considered[]`.
