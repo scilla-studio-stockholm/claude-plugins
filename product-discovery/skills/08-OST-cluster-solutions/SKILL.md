@@ -18,8 +18,7 @@ The output is a **proposal** that assist 8 (top-3 selector) consumes. The trio r
 1. **Resolve scope.** Follow `references/workspace-scope.md`. Discovery scope only; hard-exit if the resolved scope contains `/opportunity-selection/`.
 
 2. **Load context via parent walk-up:**
-   - `<scope>/../chosen-opportunity.md`
-   - `<scope>/../../../_product-context/product-outcome.md`
+   - `<scope>/decisions.json`
    - Same-round predecessor: `<scope>/solution-candidates.json`. If missing in `<scope>`, walk siblings (other dated rounds under the same opportunity) in date-descending order.
 
 3. **Read the knowledge anchors:**
@@ -28,24 +27,23 @@ The output is a **proposal** that assist 8 (top-3 selector) consumes. The trio r
 
 4. **Locate inputs:**
    - `<scope>/solution-candidates.json` (same-round predecessor; walk siblings in date-descending order if missing in `<scope>`).
-   - `<scope>/../chosen-opportunity.md`
-   - `<scope>/../../../_product-context/product-outcome.md`
+   - `<scope>/decisions.json`
 
 5. **Hard-exit checks** (see Hard-exit format below). Do not write any output files when these fire:
    - Missing knowledge anchor `solution-cluster.md` or `solution-brainstorm.md` (expected under `knowledge/discovery/`).
    - `<scope>/solution-candidates.json` missing (no same-round or sibling predecessor found).
-   - `<scope>/../chosen-opportunity.md` missing.
-   - `<scope>/../../../_product-context/product-outcome.md` missing.
+   - `<scope>/decisions.json` missing.
+   - `decided.opportunity` key absent from `decisions.json`.
    - Source JSON does not parse.
    - Source JSON `schema_version` is not `"0.1"`.
    - Source `solutions[]` does not contain exactly 18 entries.
-   - Chosen-opp id in source JSON does not match the bold-id row in `<scope>/../chosen-opportunity.md`.
+   - Chosen-opp id in source JSON does not match `decided.opportunity.id` in `decisions.json`.
 
 6. **Parse inputs.**
    - Parse the source candidates JSON. Carry `team`, `product_outcome`, `chosen_opportunity` (full sub-object) verbatim. Index `solutions[]` by `id`. Confirm count == 18.
-   - Parse `<scope>/../chosen-opportunity.md`. Find the bold-id row: a line starting with `**` followed by an opp-id (e.g., `**opp-5-1** (Phase: ...)`). Extract the opp-id.
-   - Cross-check: source-JSON `chosen_opportunity.id` must equal context-md bold-id. Mismatch → hard-exit (see triggers).
-   - Parse `<scope>/../../../_product-context/product-outcome.md` for verbatim outcome formulation (used for grounding in the LLM prompt, not for output composition - the `product_outcome` field in output is carried from source-JSON which is the authoritative copy at brainstorm-time).
+   - Read `<scope>/decisions.json`. Extract `decided.opportunity` (fields: `id`, `phase_id`, `quote`, `source`) and `product_outcome`.
+   - Cross-check: source-JSON `chosen_opportunity.id` must equal `decided.opportunity.id` from `decisions.json`. Mismatch → hard-exit (see triggers). This ensures the chosen opportunity hasn't changed between brainstorm and clustering.
+   - Use `product_outcome` from `decisions.json` for grounding in the LLM prompt (the `product_outcome` field in output is carried from source-JSON, which is the authoritative copy at brainstorm-time).
 
 7. **Compose the clustering prompt.** Build a single LLM prompt with these sections, in this order:
 
@@ -125,7 +123,7 @@ The output is a **proposal** that assist 8 (top-3 selector) consumes. The trio r
 
 13. **Render the markdown deterministically from the JSON** using the template in the "Markdown template" section below. Write to `<scope>/clustered-solutions.md`.
 
-    Use today's date in `YYYY-MM-DD` format. The two files share the same root name. Upstream files (`solution-candidates.json`, `chosen-opportunity.md`, `product-outcome.md`) are not modified. This skill does not modify the opportunity folder root (`<scope>/..`) or `_product-context/`.
+    Use today's date in `YYYY-MM-DD` format. The two files share the same root name. Upstream files (`solution-candidates.json`, `decisions.json`) are not modified. This skill does not modify the opportunity folder root (`<scope>/..`) or `_product-context/`.
 
 ## Hard-exit format
 
@@ -144,12 +142,12 @@ The hard-exit triggers:
 |---|---|---|
 | Missing knowledge anchor `solution-cluster.md` or `solution-brainstorm.md` | The anchor file present at the expected path under `knowledge/discovery/` | Restore the anchor from git. |
 | `<scope>/solution-candidates.json` missing (no same-round or sibling predecessor found) | `solution-candidates.json` in `<scope>` or sibling dated rounds under the same opportunity | Run `OST-brainstorm-solutions` |
-| `<scope>/../chosen-opportunity.md` missing | Trio-ratified chosen-opportunity file at the opportunity folder root | Trio ratifies after assist 5 (`OST-select-opportunity`) |
-| `<scope>/../../../_product-context/product-outcome.md` missing | Trio's product outcome file in `_product-context/` | Restore from git or re-author using the template structure |
+| `<scope>/decisions.json` missing | `decisions.json` in `<scope>` | Run `OST-select-opportunity` to produce `decisions.json` |
+| `decided.opportunity` key absent from `decisions.json` | `decided.opportunity` object with `id`, `phase_id`, `quote`, `source` | Run `OST-select-opportunity` to ratify an opportunity into `decisions.json` |
 | Source JSON does not parse | Schema-conformant v0.1 JSON | Re-run `OST-brainstorm-solutions` |
-| Source JSON `schema_version` is not `"0.1"` | `"schema_version": "0.1"` | Re-run `OST-brainstorm-solutions` against the latest chosen-opportunity |
+| Source JSON `schema_version` is not `"0.1"` | `"schema_version": "0.1"` | Re-run `OST-brainstorm-solutions` against the latest decided opportunity |
 | Source `solutions[]` count != 18 | Exactly 18 source candidates | Re-run `OST-brainstorm-solutions` (3 sub-agents × 3 rounds × 2 ideas = 18) |
-| Chosen-opp id mismatch (source-JSON vs. context-md bold-id) | Same opp-id in both files | Inspect `<scope>/../chosen-opportunity.md` and source candidates JSON; re-ratify or re-run the upstream brainstorm |
+| Chosen-opp id mismatch (source-JSON vs. decisions.json) | Same opp-id in source candidates JSON `chosen_opportunity.id` and `decisions.json` `decided.opportunity.id` | Inspect `decisions.json` and source candidates JSON; re-ratify or re-run the upstream brainstorm |
 | LLM output not valid JSON | A single JSON object | Re-run the skill; if persistent, inspect the prompt for ambiguity |
 | Member sum != 18, unknown member id, or duplicate id across clusters | All 18 source ids present exactly once across `clusters[].members[]` | Re-run the skill; if persistent, tighten the prompt's invariant rules |
 | `cluster_count` != `clusters.length` | Top-level count matches array length | Re-run the skill |
@@ -170,8 +168,8 @@ tags: [solution-cluster, ost, schema-v0.1]
 # Clustered solutions: <chosen_opportunity.id>
 
 Source candidates: `<source_solution_candidates>`
-Source chosen opportunity: `<scope>/../chosen-opportunity.md`
-Source product outcome: `<scope>/../../../_product-context/product-outcome.md`
+Source chosen opportunity: `<scope>/decisions.json` → `decided.opportunity`
+Source product outcome: `<scope>/decisions.json` → `product_outcome`
 Schema version: 0.1
 Paired JSON: `clustered-solutions.json`
 
@@ -227,7 +225,7 @@ Members (<N>):
 - **The assist-8-consumer banner** (`> **Assist 8 consumes this map.** ...`) is rendered verbatim every run.
 - **No silent degradation.** Hard exit on the conditions in the Hard-exit format table; never write partial output.
 - **No JSON self-validation pass after composition.** Trust the invariant check; downstream skills surface any malformed JSON.
-- **Upstream files are immutable.** Never modify `solution-candidates.json`, `chosen-opportunity.md`, or `product-outcome.md`. The skill writes only the two `clustered-solutions.*` files inside `<scope>/`.
+- **Upstream files are immutable.** Never modify `solution-candidates.json` or `decisions.json`. The skill writes only the two `clustered-solutions.*` files inside `<scope>/`.
 - **This skill does not modify the opportunity folder root (`<scope>/..`) or `_product-context/`.** The cluster map is a proposal, not a ratified artifact.
 - **Single pass.** No retries, no iteration over the inputs.
 
@@ -241,7 +239,7 @@ Members (<N>):
 - **Add assumptions, risks, or test cards per cluster.** That's assist 9+.
 - **Re-run the brainstormer or request additional candidates.** It consumes what it gets.
 - **Read interview transcripts.** Candidates come from the brainstormer.
-- **Read the experience map, validated opportunities table, opportunity-comparison matrix, or chosen-opportunity selector output.** Everything the clusterer needs is in `<scope>/solution-candidates.json`, `<scope>/../chosen-opportunity.md`, and `<scope>/../../../_product-context/product-outcome.md`.
+- **Read the experience map, validated opportunities table, opportunity-comparison matrix, or chosen-opportunity selector output.** Everything the clusterer needs is in `<scope>/solution-candidates.json` and `<scope>/decisions.json`.
 - **Use a `Cites:` line or per-member trace-back invariant.** Members are carried verbatim; no trace-back needed beyond `id` matching.
 - **Apply effort or feasibility weighing.** Torres principle is in effect through the whole discovery pipeline; no exceptions here.
 - **Parse `build_on` references from description prose.** Deferred to v0.2 if assist 8 reports needing it.
