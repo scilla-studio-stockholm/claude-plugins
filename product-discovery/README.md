@@ -41,6 +41,8 @@ The plugin generates everything else — validated opportunity lists, clustered 
 
 ## Skill flow
 
+Each round produces a single `decisions.json` that accumulates the trio's ratified decisions at each gate. Intermediate artifacts (comparison matrices, brainstorm outputs, assumption inventories) are working documents consumed within their phase. See `knowledge/discovery/decisions-json-schema.md` for the schema.
+
 Red diamonds = **required HITL** (workflow blocks until the trio acts). Yellow diamonds = **optional HITL** (trio can review/override but the workflow doesn't block).
 
 ```mermaid
@@ -64,7 +66,7 @@ flowchart TD
         select_o["select-opportunity"]
     end
 
-    h_ratify{{"HITL: trio ratifies\ninto chosen-opportunity.md"}}:::required
+    h_ratify{{"HITL: trio ratifies\ninto decisions.json"}}:::required
 
     subgraph phase2 ["Phase 2 — Solutions"]
         brainstorm["brainstorm-solutions"]
@@ -72,7 +74,7 @@ flowchart TD
         top3["select-top-three"]
     end
 
-    h_top3{{"HITL: trio ratifies\ntop 3 via ratifications.md"}}:::required
+    h_top3{{"HITL: trio ratifies\ntop 3 into decisions.json"}}:::required
 
     subgraph phase3 ["Phase 3 — Assumptions"]
         gen["generate-assumptions"]

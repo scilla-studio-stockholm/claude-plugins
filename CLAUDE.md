@@ -30,19 +30,21 @@ Teammates need GitHub auth (`gh auth login`) since the repo is private.
 
 ## Current State
 
-**Last session (2026-05-24):** HITL verification of OST-compare-opportunities swim-lane HTML against Metria 96-opp fixture. Repo cleanup: numbered skill folders, deleted `skills-design/`, cleaned dangling references.
+**Last session (2026-05-25):** decisions.json refactor across all OST skills.
 
 **Changes shipped this session:**
-- CSS fix: added `overflow-wrap: anywhere` on `.swim-col` and `.card-detail` to prevent long quotes and rationales from overflowing card width. Also `min-width: 0` on `.swim-col` to let grid columns shrink below content width.
-- Step index in HTML now grouped by phase with sequential numbering across all phases for at-a-glance ordering.
-- Skill folders renamed with numeric prefixes (`00a-OST-init-workspace` through `13-OST-validation-experiment-designer`). `name:` field in SKILL.md frontmatter unchanged — skill invocation unaffected.
-- Deleted `product-discovery/skills-design/` (build-time design docs, all decisions captured in CLAUDE.md and SKILL.md files). Cleaned all 14 dangling `skills-design/` references across 13 SKILL.md files.
-
-**HITL verification status (Metria fixture):**
-- Steps 5, 6, 8, 10 pass (JSON augmentation, markdown unchanged, self-contained HTML, sort order correct).
-- Step 7 (visual check in browser): text wrapping fixed, remaining items need manual confirmation (filter chips, print preview, Safari).
-- Steps 9, 11 not yet run (offline test, title cache re-render).
-- A one-off Python render script (`render_swimlane.py`) was used to augment the JSON and render the HTML without re-running the full 480-cell analysis. Located in the Metria fixture folder — not part of the plugin.
+- **decisions.json refactor** — Introduced `decisions.json` as the single durable record per discovery round. Schema at `knowledge/discovery/decisions-json-schema.md`. Changes across 12 tasks:
+  - `init-workspace`: scaffolds `decisions.json` in round folders (both `--opportunity` and `--selection` modes)
+  - `setup-product`: writes `product_outcome` to `decisions.json` after product outcome interview
+  - `select-opportunity` (skill 06): writes `decided.opportunity` to `decisions.json` at HITL gate
+  - `brainstorm-solutions` (07), `cluster-solutions` (08): read from `decisions.json` instead of `chosen-opportunity.md`/`product-outcome.md`
+  - `select-top-three` (09): reads from `decisions.json`, writes `decided.solutions` at HITL gate
+  - `generate-assumptions` (10): reads from `decisions.json`, drops `ratifications.md` dependency
+  - `riskiest-assumptions` (12): writes `decided.assumptions` to `decisions.json` at HITL gate
+  - `validation-experiment-designer` (13): writes `decided.experiments` to `decisions.json`
+  - `workspace-scope.md`: added `decisions.json` to canonical filenames, deprecation notes for `chosen-opportunity.md` and `ratifications.md` as skill inputs
+  - Knowledge reference files: deprecation notes in `top-three-selection.md`, `assumption-generation.md`, `opportunity-selection.md`
+  - README.md: added decisions.json explanation, updated Mermaid HITL gate labels
 
 **OST-compare-opportunities HTML design (2026-05-22, still current):**
 - Swim-lane card layout (phases as columns), sorted by strong-count DESC then weak-count ASC, expandable `<details>` for rationales. Self-contained file, ~50 LOC inline JS for filter chips.
@@ -50,14 +52,18 @@ Teammates need GitHub auth (`gh auth login`) since the repo is private.
 - Filter chips: `strong-heavy (≥3 strongs)`, `has weak`, `has unknown`. AND-combined.
 - JSON+MD+HTML ship as a paired triple from a single render pass. Markdown is the tabular view, HTML is the skim view.
 
+**Known issue: `summary_title` quality in Metria fixture.** The 96 titles in `comparison-matrix.json` are quote fragments, not the 3-6 word noun phrases the spec requires. This is from the original render before the title generation instructions were finalized. A fresh render will regenerate them correctly. Low priority — cosmetic only.
+
 **Cost-review decisions (still relevant):**
 - Stdlib-only Python, single `scripts/analyze_costs.py`. Topic filter is generic substring (≥3 hits). API list pricing, not actual bill.
-- All three cosmetic issues fixed (2026-05-24).
+
+**Open ticket:**
+- [SCI-27](https://linear.app/scilla/issue/SCI-27) — Rename `ratifications.md` to `trio-decisions.md` across OST plugin. Lower priority now that `ratifications.md` is deprecated as a skill input; consider closing as won't-fix.
 
 **Next steps (when picked up):**
-- `OST-compare-opportunities`: finish remaining HITL verification steps (filter chips, print preview, Safari, offline, title cache). Then first live workshop with a real trio.
-- `OST-setup-product`: not yet tested with a real trio.
-- `OST-init-workspace`: watch for teammate feedback on `--opportunity`/`--selection` split.
+- `OST-compare-opportunities`: first live workshop with a real trio. Optionally clear and regenerate `summary_title` values in the Metria fixture beforehand.
+- `OST-setup-product`: not yet tested with a real trio. The decisions.json refactor should make the first trio run smoother.
+- SCI-27: consider closing as won't-fix given the deprecation.
 
 **Gotchas:**
 - Plugin name in `plugin.json` matches folder name (e.g. `scilla-research` for both).
