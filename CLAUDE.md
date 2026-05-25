@@ -30,11 +30,12 @@ Teammates need GitHub auth (`gh auth login`) since the repo is private.
 
 ## Current State
 
-**Last session (2026-05-25):** decisions.json refactor, OST viewer template, Linear→GitHub pipeline setup.
+**Last session (2026-05-25):** decisions.json refactor, OST viewer template, Journey Map renderer, Linear→GitHub pipeline setup.
 
 **Changes shipped (2026-05-25):**
 - **decisions.json refactor (PR #3)** — Single `decisions.json` per round replaces per-skill JSON files. Schema at `knowledge/discovery/decisions-json-schema.md`. HITL gate skills write; downstream skills read. `chosen-opportunity.md` and `ratifications.md` deprecated as skill inputs.
-- **OST viewer template (PR #5, SCI-30)** — Standalone viewer app at `templates/viewer/index.html` renders skill JSON output using scilla brand tokens. Dual-mount `serve.py` serves viewer from plugin + data from workspace. 6 view renderers. Spec at `docs/superpowers/specs/2026-05-25-ost-viewer-template-design.md`.
+- **OST viewer template (PR #5, SCI-30)** — Standalone viewer app at `templates/viewer/index.html` renders skill JSON output using scilla brand tokens. Dual-mount `serve.py` serves viewer from plugin + data from workspace. 7 view renderers. Spec at `docs/superpowers/specs/2026-05-25-ost-viewer-template-design.md`.
+- **Journey Map renderer (PR #9, SCI-33)** — New "Journey Map" tab renders `experience-map-extracted.json` (skill 01 output) as a flowchart-style journey visualization with phase columns, step cards, SVG arrow overlay, decision branches, rejection paths, and hover highlighting. Design based on Claude Design prototype. Spec at `docs/superpowers/specs/2026-05-25-experience-map-renderer-design.md`.
 - **Prerequisites section in README** — Documents what trios need before starting.
 
 **Design decisions (still current):**
@@ -50,8 +51,10 @@ Teammates need GitHub auth (`gh auth login`) since the repo is private.
 - [SCI-27](https://linear.app/scilla/issue/SCI-27) — Rename `ratifications.md` → `trio-decisions.md`. Consider closing as won't-fix.
 - [SCI-31](https://linear.app/scilla/issue/SCI-31) — Replace hardcoded score colors in viewer with `--sc-*` tokens. Low priority.
 - [SCI-32](https://linear.app/scilla/issue/SCI-32) — Remove inline HTML generation from skill 05. After viewer is validated with a real trio.
+- [SCI-33](https://linear.app/scilla/issue/SCI-33) — Add Journey Map renderer to OST Viewer. PR #9 open.
 
 **Next steps (when picked up):**
+- Review and merge PR #9 (Journey Map renderer, SCI-33).
 - Iterate on viewer design using scilla brand tokens (open `serve.py`, edit `index.html`, refresh).
 - First live workshop with a real trio (OST-setup-product + viewer).
 - Build the Opportunity Solution Tree as a living artifact (separate design needed).

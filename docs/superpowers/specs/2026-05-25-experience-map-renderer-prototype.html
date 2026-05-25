@@ -1,0 +1,736 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>License journey — Experience map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+  /* ─── neutral, professional reframing of the Scilla palette ─── */
+  :root {
+    --map-bg:        #FAFAF8;
+    --map-ink:       #1A1A1F;
+    --map-ink-soft:  #5A5A66;
+    --map-ink-faint: #9396A2;
+    --map-rule:      #E5E5E0;
+    --map-rule-strong: #C8C8C0;
+    --card-bg:       #FFFFFF;
+    --accent:        #0022FF;
+    --accent-soft:   #E8EBFF;
+    --reject:        #B83232;
+    --reject-soft:   #FBECEC;
+    --branch-bg:     #FFFFFF;
+
+    /* phase column tints — desaturated, low-opacity */
+    --phase-1: #F0EFEA;
+    --phase-2: #ECEEF3;
+    --phase-3: #EAEFEC;
+    --phase-4: #EFECEA;
+    --phase-5: #ECEEF3;
+    --phase-6: #EFEAEC;
+    --phase-7: #EAEFEC;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--map-bg);
+    color: var(--map-ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.4;
+    overflow: hidden;
+  }
+  body { display: flex; flex-direction: column; }
+
+  /* ─── top bar ─── */
+  .top {
+    flex: 0 0 auto;
+    padding: 18px 32px 16px;
+    border-bottom: 1px solid var(--map-rule);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    background: #FFFFFF;
+  }
+  .top .title-block { min-width: 0; flex: 1 1 auto; }
+  .top h1 {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--map-ink);
+    margin: 0;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .top h1 .dim { color: var(--map-ink-faint); font-weight: 500; }
+  .top .sub {
+    font-size: 12px;
+    color: var(--map-ink-soft);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+  .top .meta {
+    display: flex;
+    gap: 28px;
+    font-size: 11px;
+    color: var(--map-ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+  }
+  .top .meta div { display: flex; flex-direction: column; gap: 2px; }
+  .top .meta b {
+    color: var(--map-ink);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-transform: none;
+  }
+
+  /* ─── legend ─── */
+  .legend {
+    flex: 0 0 auto;
+    padding: 10px 32px;
+    background: #FFFFFF;
+    border-bottom: 1px solid var(--map-rule);
+    display: flex;
+    gap: 28px;
+    font-size: 11px;
+    color: var(--map-ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+    align-items: center;
+  }
+  .legend .swatch {
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .legend svg { display: block; }
+  .legend .dec-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--branch-bg);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: none;
+  }
+  .legend .reject-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: var(--reject-soft);
+    color: var(--reject);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  /* ─── map canvas ─── */
+  .map-wrap {
+    flex: 1 1 auto;
+    position: relative;
+    overflow: hidden;
+  }
+  .map {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: 1fr;
+    /* small vertical gutter so cards breathe; columns butt against each other */
+  }
+  .phase {
+    position: relative;
+    padding: 18px 22px 20px 14px;
+    border-right: 1px dashed var(--map-rule);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .phase:last-child { border-right: none; }
+  .phase[data-num="1"] { background: var(--phase-1); }
+  .phase[data-num="2"] { background: var(--phase-2); }
+  .phase[data-num="3"] { background: var(--phase-3); }
+  .phase[data-num="4"] { background: var(--phase-4); }
+  .phase[data-num="5"] { background: var(--phase-5); }
+  .phase[data-num="6"] { background: var(--phase-6); }
+  .phase[data-num="7"] { background: var(--phase-7); }
+
+  .phase-head {
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--map-rule-strong);
+  }
+  .phase-num {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--map-ink-faint);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .phase-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--map-ink);
+    line-height: 1.25;
+    letter-spacing: -0.005em;
+    text-wrap: balance;
+  }
+
+  /* ─── steps stack ─── */
+  .steps {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    position: relative;
+  }
+  /* row offset — supports forks placed in same vertical band */
+  .row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    position: relative;
+  }
+  .row.fork {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .step {
+    position: relative;
+    background: var(--card-bg);
+    border: 1px solid var(--map-rule-strong);
+    border-radius: 6px;
+    padding: 10px 11px 11px;
+    min-height: 54px;
+    box-shadow: 0 1px 0 rgba(20,20,30,0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    cursor: default;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  }
+  .step:hover {
+    border-color: var(--accent);
+    box-shadow: 2px 2px 0 var(--accent);
+    transform: translate(-1px, -1px);
+    z-index: 5;
+  }
+  .step .id {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--map-ink-faint);
+    letter-spacing: 0.02em;
+  }
+  .step .label {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--map-ink);
+    line-height: 1.3;
+    letter-spacing: -0.005em;
+    text-wrap: balance;
+  }
+  .step.decision { border-color: var(--accent); border-left-width: 3px; padding-left: 9px; }
+  .step.decision .dec-flag {
+    position: absolute;
+    top: -7px; right: 8px;
+    background: var(--accent);
+    color: #FFFFFF;
+    font-size: 9px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 3px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .row.terminal {
+    margin-top: auto;
+    padding-top: 0;
+  }
+  .row.terminal .step.reject {
+    width: 78%;
+    margin-left: auto;     /* park it to the right of the column */
+    padding: 9px 10px 10px;
+    min-height: 0;
+  }
+  .row.terminal::before {
+    content: 'avslagspunkt';
+    display: block;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--reject);
+    opacity: 0.6;
+    margin: 4px 0 6px auto;
+    text-align: right;
+    width: 78%;
+  }
+
+  /* small dot for the start/end markers */
+  .endpoint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--map-ink-soft);
+  }
+  .endpoint .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .endpoint.end .dot { background: #2A8C4A; }
+
+  /* ─── arrow svg overlay ─── */
+  .arrows {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: visible;
+  }
+  .arrows path {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.4;
+    stroke-linecap: round;
+  }
+  .step.reject {
+    background: var(--reject-soft);
+    border-color: var(--reject);
+    border-style: dashed;
+  }
+  .step.reject .label { color: var(--reject); }
+  .step.reject .id { color: var(--reject); opacity: 0.7; }
+  .arrows path.reject {
+    stroke: var(--reject);
+    stroke-dasharray: 5 4;
+    stroke-width: 1.5;
+  }
+  .arrow-label {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    background: var(--branch-bg);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 999px;
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+    line-height: 1.4;
+    pointer-events: auto;
+    z-index: 10;
+  }
+  .arrow-label.reject {
+    border-color: var(--reject);
+    color: var(--reject);
+    background: #FFFFFF;
+  }
+
+  /* footer hint */
+  .hint {
+    position: absolute;
+    bottom: 10px; left: 12px;
+    font-size: 10px;
+    color: var(--map-ink-faint);
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    letter-spacing: 0.04em;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── data ─────────────────────────────────────────────────── -->
+<script type="application/json" id="journey-data">
+{
+  "title": "Licenstilldelning — kundresa",
+  "subtitle": "Från förfrågan till aktiverad licens",
+  "meta": [
+    { "label": "Faser", "value": "7" },
+    { "label": "Steg",  "value": "18" },
+    { "label": "Beslutspunkter", "value": "4" },
+    { "label": "Genomsnitt", "value": "12 d" }
+  ],
+  "phases": [
+    {
+      "num": 1, "title": "Förfrågan inkommer",
+      "rows": [
+        [{ "id": "1.1", "label": "Förfrågan mottagen", "next": [{ "to": "1.2" }] }],
+        [{ "id": "1.2", "label": "Tilldela säljare",   "next": [{ "to": "2.1" }] }]
+      ]
+    },
+    {
+      "num": 2, "title": "Behovsanalys & avtal",
+      "rows": [
+        [{ "id": "2.1", "label": "Kundmöte & behovsanalys", "next": [{ "to": "2.2" }] }],
+        [{ "id": "2.2", "label": "Offert skapas",            "next": [{ "to": "3.1" }] }]
+      ]
+    },
+    {
+      "num": 3, "title": "Avtalsskrivning",
+      "rows": [
+        [{ "id": "3.1", "label": "Avtal upprättas", "decision": true, "next": [
+          { "to": "4.1", "label": "Ny kund" },
+          { "to": "5.1", "label": "Befintlig kund" }
+        ]}]
+      ]
+    },
+    {
+      "num": 4, "title": "Kreditkontroll & ekonomi",
+      "rows": [
+        [{ "id": "4.1", "label": "Kreditupplysning beställs", "decision": true, "next": [
+          { "to": "4.r", "label": "<40", "style": "reject" },
+          { "to": "4.2", "label": "≥40" }
+        ]}],
+        [{ "id": "4.2", "label": "Riskbedömning",       "next": [{ "to": "4.3" }] }],
+        [{ "id": "4.3", "label": "Betalningsvillkor",   "next": [{ "to": "4.4" }] }],
+        [{ "id": "4.4", "label": "Faktureringsuppgifter","next": [{ "to": "5.1" }] }],
+        [{ "id": "4.r", "label": "Avslag — kund informeras", "terminal": "reject" }]
+      ]
+    },
+    {
+      "num": 5, "title": "Licens-upplägg",
+      "rows": [
+        [{ "id": "5.1", "label": "Kundkonto skapas",     "next": [{ "to": "5.2" }] }],
+        [{ "id": "5.2", "label": "Licenstyp konfigureras", "decision": true, "next": [
+          { "to": "5.3a", "label": "SSO" },
+          { "to": "5.3b", "label": "API" }
+        ]}],
+        [
+          { "id": "5.3a", "label": "SSO-koppling",      "next": [{ "to": "5.4" }] },
+          { "id": "5.3b", "label": "API-nycklar",       "next": [{ "to": "5.4" }] }
+        ],
+        [{ "id": "5.4", "label": "Användare provisioneras", "next": [{ "to": "5.5" }] }],
+        [{ "id": "5.5", "label": "Test & verifiering",       "next": [{ "to": "6.1" }] }]
+      ]
+    },
+    {
+      "num": 6, "title": "Rabatter",
+      "rows": [
+        [{ "id": "6.1", "label": "Rabattförhandling", "decision": true, "next": [
+          { "to": "6.2", "label": "Ja" },
+          { "to": "7.1", "label": "Nej" }
+        ]}],
+        [{ "id": "6.2", "label": "Rabatt tillämpas",  "next": [{ "to": "7.1" }] }]
+      ]
+    },
+    {
+      "num": 7, "title": "Aktivering & leverans",
+      "rows": [
+        [{ "id": "7.1", "label": "Licens aktiveras",   "next": [{ "to": "7.2" }] }],
+        [{ "id": "7.2", "label": "Välkomst-e-post skickas" }]
+      ]
+    }
+  ]
+}
+</script>
+
+<!-- ─── markup ───────────────────────────────────────────────── -->
+<header class="top">
+  <div class="title-block">
+    <h1 id="t-title">Loading…</h1>
+    <div class="sub" id="t-sub"></div>
+  </div>
+  <div class="meta" id="t-meta"></div>
+</header>
+
+<div class="legend">
+  <span class="swatch">
+    <svg width="32" height="10" viewBox="0 0 32 10"><path d="M2 5 L28 5" stroke="var(--accent)" stroke-width="1.4" fill="none" stroke-linecap="round"/><path d="M24 1.5 L29 5 L24 8.5" stroke="var(--accent)" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Steg-flöde
+  </span>
+  <span class="swatch"><span class="dec-pill">Ja / Nej</span> Beslutsgren</span>
+  <span class="swatch">
+    <svg width="32" height="10" viewBox="0 0 32 10"><path d="M2 5 L28 5" stroke="var(--reject)" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-dasharray="4 3"/></svg>
+    Avslagsväg
+  </span>
+  <span class="swatch" style="margin-left:auto;font-family:'JetBrains Mono',monospace;text-transform:none;letter-spacing:0;color:var(--map-ink-faint)">data: journey.json</span>
+</div>
+
+<div class="map-wrap" id="mapwrap">
+  <div class="map" id="map"></div>
+  <svg class="arrows" id="arrows" xmlns="http://www.w3.org/2000/svg"></svg>
+  <div class="hint">hover any step to highlight</div>
+</div>
+
+<script>
+(() => {
+  const data = JSON.parse(document.getElementById('journey-data').textContent);
+
+  // Top bar — split title on em-dash for visual hierarchy
+  const titleEl = document.getElementById('t-title');
+  const parts = data.title.split(/\s+—\s+/);
+  if (parts.length === 2) {
+    titleEl.innerHTML = `${parts[0]} <span class="dim">— ${parts[1]}</span>`;
+  } else {
+    titleEl.textContent = data.title;
+  }
+  document.getElementById('t-sub').textContent   = data.subtitle;
+  const metaEl = document.getElementById('t-meta');
+  metaEl.innerHTML = data.meta.map(m =>
+    `<div><span>${m.label}</span><b>${m.value}</b></div>`
+  ).join('');
+
+  // Build phase columns
+  const map = document.getElementById('map');
+  const stepIndex = new Map(); // id → { el, phaseEl }
+
+  data.phases.forEach(phase => {
+    const col = document.createElement('div');
+    col.className = 'phase';
+    col.dataset.num = phase.num;
+
+    const head = document.createElement('div');
+    head.className = 'phase-head';
+    head.innerHTML = `
+      <span class="phase-num">Fas ${phase.num}</span>
+      <span class="phase-title">${phase.title}</span>
+    `;
+    col.appendChild(head);
+
+    const stepsWrap = document.createElement('div');
+    stepsWrap.className = 'steps';
+
+    phase.rows.forEach(row => {
+      const rowEl = document.createElement('div');
+      rowEl.className = 'row' + (row.length > 1 ? ' fork' : '');
+      if (row.some(s => s.terminal === 'reject')) rowEl.classList.add('terminal');
+      row.forEach(step => {
+        const s = document.createElement('div');
+        s.className = 'step';
+        if (step.decision) s.classList.add('decision');
+        if (step.terminal === 'reject') s.classList.add('reject');
+        s.dataset.id = step.id;
+        s.innerHTML = `
+          ${step.decision ? '<span class="dec-flag">Beslut</span>' : ''}
+          <span class="id">${step.id}</span>
+          <span class="label">${step.label}</span>
+        `;
+        rowEl.appendChild(s);
+        stepIndex.set(step.id, { el: s, data: step });
+      });
+      stepsWrap.appendChild(rowEl);
+    });
+
+    col.appendChild(stepsWrap);
+    map.appendChild(col);
+  });
+
+  // ─── arrow drawing ──────────────────────────────────────────
+  const svg = document.getElementById('arrows');
+  const wrap = document.getElementById('mapwrap');
+  const labels = [];
+
+  function rectIn(el, base) {
+    const r = el.getBoundingClientRect();
+    const b = base.getBoundingClientRect();
+    return {
+      left:   r.left - b.left,
+      right:  r.right - b.left,
+      top:    r.top - b.top,
+      bottom: r.bottom - b.top,
+      cx:     (r.left + r.right) / 2 - b.left,
+      cy:     (r.top  + r.bottom) / 2 - b.top,
+      w: r.width, h: r.height,
+    };
+  }
+
+  function makeArrow(d, style) {
+    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('d', d);
+    p.setAttribute('marker-end', style === 'reject' ? 'url(#head-r)' : 'url(#head)');
+    if (style === 'reject') p.classList.add('reject');
+    svg.appendChild(p);
+  }
+
+  function makeLabel(x, y, text, style) {
+    const el = document.createElement('div');
+    el.className = 'arrow-label' + (style === 'reject' ? ' reject' : '');
+    el.style.left = x + 'px';
+    el.style.top  = y + 'px';
+    el.textContent = text;
+    wrap.appendChild(el);
+    labels.push(el);
+  }
+
+  function draw() {
+    // clear
+    svg.innerHTML = `
+      <defs>
+        <marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M1,1 L9,5 L1,9" fill="none" stroke="var(--accent)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+        <marker id="head-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M1,1 L9,5 L1,9" fill="none" stroke="var(--reject)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+    `;
+    labels.forEach(l => l.remove());
+    labels.length = 0;
+
+    // top channel — runs above all steps, used for long cross-phase jumps
+    const firstStepEl = document.querySelector('.steps .row:first-child .step');
+    const firstR = firstStepEl ? rectIn(firstStepEl, wrap) : null;
+    const channelY = firstR ? firstR.top - 12 : 90;
+
+    data.phases.forEach(phase => {
+      phase.rows.forEach(row => {
+        row.forEach(step => {
+          if (!step.next) return;
+          const from = stepIndex.get(step.id);
+          if (!from) return;
+          const fr = rectIn(from.el, wrap);
+          const fromPhaseEl = from.el.closest('.phase');
+          const fromPhaseNum = +fromPhaseEl.dataset.num;
+
+          step.next.forEach((edge, idx) => {
+            const to = stepIndex.get(edge.to);
+            if (!to) return;
+            const tr = rectIn(to.el, wrap);
+            const toPhaseNum = +to.el.closest('.phase').dataset.num;
+
+            const sameCol  = fromPhaseNum === toPhaseNum;
+            const sameRow  = Math.abs(fr.cy - tr.cy) < 6;
+            const phaseGap = Math.abs(toPhaseNum - fromPhaseNum);
+
+            let d, lx, ly;
+
+            if (sameCol && sameRow) {
+              // sibling merge (e.g. 5.3a → 5.4 horizontal then merge — not used here)
+              const x1 = fr.right + 2, x2 = tr.left - 4;
+              d = `M${x1},${fr.cy} L${x2},${tr.cy}`;
+              lx = (x1 + x2) / 2; ly = fr.cy - 14;
+            }
+            else if (sameCol && edge.style === 'reject') {
+              // reject: exit horizontally from source's right side, drop down
+              // an off-ramp lane in the column-right gutter, then bend left
+              // into the right side of the parked terminal node.
+              const phaseR = rectIn(fromPhaseEl, wrap);
+              const lane = phaseR.right - 10;
+              const sx = fr.right + 1;
+              const sy = fr.cy + 6;
+              const ex = tr.right + 1;
+              const ey = tr.cy;
+              const r = 5;
+              d = [
+                `M${sx},${sy}`,
+                `L${lane - r},${sy}`,
+                `Q${lane},${sy} ${lane},${sy + r}`,
+                `L${lane},${ey - r}`,
+                `Q${lane},${ey} ${lane - r},${ey}`,
+                `L${ex},${ey}`,
+              ].join(' ');
+              // label sits on the lane below the source, well off the card
+              lx = lane - 14; ly = fr.bottom + 14;
+            }
+            else if (sameCol) {
+              // straight vertical link inside a column
+              const x = fr.cx;
+              const y1 = fr.bottom + 1;
+              const y2 = tr.top - 3;
+              d = `M${x},${y1} L${x},${y2}`;
+              // for decisions, place label just below source; otherwise midpoint
+              if (step.decision) {
+                lx = x; ly = y1 + 12;
+              } else {
+                lx = x; ly = (y1 + y2) / 2;
+              }
+            }
+            else if (phaseGap > 1) {
+              // long cross-phase jump — route via top channel above steps
+              const x1 = fr.right + 2, y1 = fr.cy;
+              const x2 = tr.left - 4,  y2 = tr.cy;
+              const r = 6;
+              const upX  = x1 + 10;
+              const dnX  = x2 - 10;
+              d = [
+                `M${x1},${y1}`,
+                `L${upX - r},${y1}`,
+                `Q${upX},${y1} ${upX},${y1 - r}`,
+                `L${upX},${channelY + r}`,
+                `Q${upX},${channelY} ${upX + r},${channelY}`,
+                `L${dnX - r},${channelY}`,
+                `Q${dnX},${channelY} ${dnX},${channelY + r}`,
+                `L${dnX},${y2 - r}`,
+                `Q${dnX},${y2} ${dnX + r},${y2}`,
+                `L${x2},${y2}`,
+              ].join(' ');
+              // label on the rising vertical segment near source
+              lx = upX; ly = (y1 + channelY) / 2 + 4;
+            }
+            else {
+              // adjacent phase — exit right, enter left, S-curve when needed
+              const x1 = fr.right + 2, y1 = fr.cy;
+              const x2 = tr.left - 4,  y2 = tr.cy;
+              const mid = (x1 + x2) / 2;
+              if (Math.abs(y1 - y2) < 6) {
+                d = `M${x1},${y1} L${x2},${y2}`;
+              } else {
+                d = `M${x1},${y1} C${mid},${y1} ${mid},${y2} ${x2},${y2}`;
+              }
+              // labels near source on decision; midpoint otherwise
+              const t = step.decision ? 0.28 : 0.5;
+              if (Math.abs(y1 - y2) < 6) {
+                lx = x1 + (x2 - x1) * t; ly = y1 - 12;
+              } else {
+                const omt = 1 - t;
+                lx = omt*omt*omt*x1 + 3*omt*omt*t*mid + 3*omt*t*t*mid + t*t*t*x2;
+                ly = omt*omt*omt*y1 + 3*omt*omt*t*y1 + 3*omt*t*t*y2 + t*t*t*y2;
+              }
+            }
+
+            makeArrow(d, edge.style);
+            if (edge.label) makeLabel(lx, ly, edge.label, edge.style);
+          });
+        });
+      });
+    });
+  }
+
+  // initial + on resize
+  const ro = new ResizeObserver(() => requestAnimationFrame(draw));
+  ro.observe(wrap);
+  requestAnimationFrame(draw);
+  window.addEventListener('load', draw);
+
+  // hover highlight: dim non-connected steps
+  const allSteps = [...document.querySelectorAll('.step')];
+  document.body.addEventListener('mouseover', e => {
+    const s = e.target.closest('.step');
+    if (!s) return;
+    const id = s.dataset.id;
+    const connected = new Set([id]);
+    // outgoing
+    const stepData = stepIndex.get(id)?.data;
+    if (stepData?.next) stepData.next.forEach(n => connected.add(n.to));
+    // incoming
+    data.phases.forEach(p => p.rows.forEach(r => r.forEach(st => {
+      st.next?.forEach(n => { if (n.to === id) connected.add(st.id); });
+    })));
+    allSteps.forEach(el => {
+      el.style.opacity = connected.has(el.dataset.id) ? '1' : '0.35';
+    });
+  });
+  document.body.addEventListener('mouseout', e => {
+    if (e.target.closest('.step')) {
+      allSteps.forEach(el => el.style.opacity = '');
+    }
+  });
+})();
+</script>
+</body>
+</html>
