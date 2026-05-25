@@ -30,21 +30,12 @@ Teammates need GitHub auth (`gh auth login`) since the repo is private.
 
 ## Current State
 
-**Last session (2026-05-25):** decisions.json refactor across all OST skills.
+**Last session (2026-05-25):** decisions.json refactor + prerequisites README + PR workflow test.
 
-**Changes shipped this session:**
-- **decisions.json refactor** — Introduced `decisions.json` as the single durable record per discovery round. Schema at `knowledge/discovery/decisions-json-schema.md`. Changes across 12 tasks:
-  - `init-workspace`: scaffolds `decisions.json` in round folders (both `--opportunity` and `--selection` modes)
-  - `setup-product`: writes `product_outcome` to `decisions.json` after product outcome interview
-  - `select-opportunity` (skill 06): writes `decided.opportunity` to `decisions.json` at HITL gate
-  - `brainstorm-solutions` (07), `cluster-solutions` (08): read from `decisions.json` instead of `chosen-opportunity.md`/`product-outcome.md`
-  - `select-top-three` (09): reads from `decisions.json`, writes `decided.solutions` at HITL gate
-  - `generate-assumptions` (10): reads from `decisions.json`, drops `ratifications.md` dependency
-  - `riskiest-assumptions` (12): writes `decided.assumptions` to `decisions.json` at HITL gate
-  - `validation-experiment-designer` (13): writes `decided.experiments` to `decisions.json`
-  - `workspace-scope.md`: added `decisions.json` to canonical filenames, deprecation notes for `chosen-opportunity.md` and `ratifications.md` as skill inputs
-  - Knowledge reference files: deprecation notes in `top-three-selection.md`, `assumption-generation.md`, `opportunity-selection.md`
-  - README.md: added decisions.json explanation, updated Mermaid HITL gate labels
+**Changes shipped (2026-05-25):**
+- **decisions.json refactor (PR #3, merged)** — Single `decisions.json` per discovery round replaces per-skill JSON files as the durable record. Schema at `knowledge/discovery/decisions-json-schema.md`. HITL gate skills (06, 09, 12, 13) write their section; downstream skills (07, 08, 10) read from it. `chosen-opportunity.md` and `ratifications.md` deprecated as skill inputs.
+- **Prerequisites section in README** — Documents what trios need before starting (product outcome, experience map, cleaned transcripts).
+- **Review fix** — Skill 09 step contradiction resolved; skill 10 pick-swap remedy note added.
 
 **OST-compare-opportunities HTML design (2026-05-22, still current):**
 - Swim-lane card layout (phases as columns), sorted by strong-count DESC then weak-count ASC, expandable `<details>` for rationales. Self-contained file, ~50 LOC inline JS for filter chips.
@@ -60,10 +51,17 @@ Teammates need GitHub auth (`gh auth login`) since the repo is private.
 **Open ticket:**
 - [SCI-27](https://linear.app/scilla/issue/SCI-27) — Rename `ratifications.md` to `trio-decisions.md` across OST plugin. Lower priority now that `ratifications.md` is deprecated as a skill input; consider closing as won't-fix.
 
+**Design decisions made this session:**
+- **Three-layer artifact model:** (1) brainstorming slop (intermediate outputs, markdown-only, disposable), (2) the Opportunity Solution Tree (living cross-round artifact, not yet built), (3) `decisions.json` (per-round ratified decisions). The OST is the library; each round is one checkout from it.
+- **`extract-experience-map` belongs in Phase 0** — it's a one-time setup step, not recurring. Renumbering to `00c` is a future task.
+- **Implicit ratification** — skills write `decided.*` at run time; trio approves or edits. Shift from explicit creation of `chosen-opportunity.md`/`ratifications.md`.
+
 **Next steps (when picked up):**
-- `OST-compare-opportunities`: first live workshop with a real trio. Optionally clear and regenerate `summary_title` values in the Metria fixture beforehand.
-- `OST-setup-product`: not yet tested with a real trio. The decisions.json refactor should make the first trio run smoother.
-- SCI-27: consider closing as won't-fix given the deprecation.
+- First live workshop with a real trio (OST-compare-opportunities + OST-setup-product).
+- Build the Opportunity Solution Tree as a living artifact (separate design needed — accumulates validated opportunities across rounds under a product outcome).
+- Move intermediate files to `_working/` subfolder (follow-up to decisions.json refactor).
+- Move `extract-experience-map` to Phase 0 (`00c`).
+- SCI-27: consider closing as won't-fix given `ratifications.md` deprecation.
 
 **Gotchas:**
 - Plugin name in `plugin.json` matches folder name (e.g. `scilla-research` for both).
