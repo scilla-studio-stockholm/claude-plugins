@@ -61,7 +61,7 @@ You help a product trio decompose their 3 chosen solutions into the assumptions 
 
    - From `decisions.json`: extract `team` (top-level), `product_outcome` (top-level), `decided.opportunity` (object with `id`, `phase_id`, `quote`, `source`), and `decided.solutions.picks[]` (array of 3 objects with `id`, `title`, `description`, `rationale`).
    - From `top-three-solutions.json`: extract the full `picks[]` array (which includes `generating_role` and `round_number` per pick in addition to `id`, `title`, `description`, `rationale`). Index by `id`.
-   - Merge: for each pick in `decisions.json` → `decided.solutions.picks[]`, look up its `id` in the `top-three-solutions.json` picks to obtain `generating_role` and `round_number`. If any `id` in `decided.solutions.picks[]` is missing from `top-three-solutions.json`, hard-exit.
+   - Merge: for each pick in `decisions.json` → `decided.solutions.picks[]`, look up its `id` in the `top-three-solutions.json` picks to obtain `generating_role` and `round_number`. If any `id` in `decided.solutions.picks[]` is missing from `top-three-solutions.json`, hard-exit. (This can happen if the trio swapped a pick in `decisions.json` — remedy: re-run `OST-select-top-three` to regenerate `top-three-solutions.json` with the updated picks.)
    - Load the experience map JSON content for storymap sub-agent prompts. Keep as-is.
 
 8. **Cross-check chosen-opp id.** The `top-three-solutions.json` `chosen_opportunity.id` MUST match `decisions.json` → `decided.opportunity.id`. If not, hard-exit with:

@@ -121,7 +121,7 @@ The output is a **proposal** that assist 9 (assumption generator) consumes after
 
 12. **Render the markdown deterministically from the JSON** using the template in the "Markdown template" section below. Write to `<scope>/top-three-solutions.md`.
 
-    Use today's date in `YYYY-MM-DD` format. The two files share the same root name. Upstream files (`solution-candidates.json`, `decisions.json`) are not modified after this step.
+    Use today's date in `YYYY-MM-DD` format. The two files share the same root name. Upstream files (`solution-candidates.json`) are not modified.
 
 13. **Write to decisions.json:** Read `<scope>/decisions.json`. Set `decided.solutions`:
 
