@@ -79,6 +79,7 @@ The `round` query parameter is the path relative to `discovery/`.
 | `validation-experiments.json` | Experiments | Test cards with hypothesis/metric/criteria |
 | `solution-candidates.json` | Solutions | 18 candidates grouped by round |
 | `experience-map-clustered.json` | Experience Map | Phase/step/opportunity hierarchy |
+| `experience-map-extracted.json` | Journey Map | Flowchart-style journey visualization with phase columns, step cards, SVG arrow overlay, decision branches, and hover highlighting. See `2026-05-25-experience-map-renderer-design.md` for full spec. |
 
 Unrecognized JSON files are ignored (not shown as tabs). New view types are added by adding a renderer function and registering the filename.
 

@@ -1,0 +1,168 @@
+{
+  "schema_version": "0.1",
+  "team": "Norrsken",
+  "title": "Licenstilldelning",
+  "product_outcome": "Reduce manual steps and actors needed to assign a license for an IPM customer",
+  "narrativ": "Från förfrågan till aktiverad licens — hela kundresan genom licensprocessen",
+  "phases": [
+    {
+      "id": "fas-1",
+      "order": 1,
+      "name": "Förfrågan inkommer",
+      "friction_level": "low",
+      "steps": [
+        {
+          "id": "step-1-1",
+          "description": "Förfrågan mottagen"
+        },
+        {
+          "id": "step-1-2",
+          "description": "Tilldela säljare"
+        }
+      ]
+    },
+    {
+      "id": "fas-2",
+      "order": 2,
+      "name": "Behovsanalys & avtal",
+      "friction_level": "low",
+      "steps": [
+        {
+          "id": "step-2-1",
+          "description": "Kundmöte & behovsanalys"
+        },
+        {
+          "id": "step-2-2",
+          "description": "Offert skapas"
+        }
+      ]
+    },
+    {
+      "id": "fas-3",
+      "order": 3,
+      "name": "Avtalsskrivning",
+      "friction_level": "medium",
+      "steps": [
+        {
+          "id": "step-3-1",
+          "description": "Avtal upprättas",
+          "decision_branches": [
+            { "label": "Ny kund", "leads_to": "step-4-1" },
+            { "label": "Befintlig kund", "leads_to": "step-5-1" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fas-4",
+      "order": 4,
+      "name": "Kreditkontroll & ekonomi",
+      "friction_level": "medium",
+      "steps": [
+        {
+          "id": "step-4-1",
+          "description": "Kreditupplysning beställs",
+          "decision_branches": [
+            { "label": "Rating <40", "leads_to": "step-4-r" },
+            { "label": "Rating ≥40", "leads_to": "step-4-2" }
+          ]
+        },
+        {
+          "id": "step-4-2",
+          "description": "Riskbedömning"
+        },
+        {
+          "id": "step-4-3",
+          "description": "Betalningsvillkor"
+        },
+        {
+          "id": "step-4-4",
+          "description": "Faktureringsuppgifter"
+        },
+        {
+          "id": "step-4-r",
+          "description": "Avslag — kund informeras"
+        }
+      ]
+    },
+    {
+      "id": "fas-5",
+      "order": 5,
+      "name": "Licens-upplägg",
+      "friction_level": "high",
+      "steps": [
+        {
+          "id": "step-5-1",
+          "description": "Kundkonto skapas"
+        },
+        {
+          "id": "step-5-2",
+          "description": "Licenstyp konfigureras",
+          "decision_branches": [
+            { "label": "SSO", "leads_to": "step-5-3a" },
+            { "label": "API", "leads_to": "step-5-3b" }
+          ]
+        },
+        {
+          "id": "step-5-3a",
+          "description": "SSO-koppling"
+        },
+        {
+          "id": "step-5-3b",
+          "description": "API-nycklar"
+        },
+        {
+          "id": "step-5-4",
+          "description": "Användare provisioneras"
+        },
+        {
+          "id": "step-5-5",
+          "description": "Test & verifiering"
+        }
+      ]
+    },
+    {
+      "id": "fas-6",
+      "order": 6,
+      "name": "Rabatter",
+      "friction_level": "high",
+      "steps": [
+        {
+          "id": "step-6-1",
+          "description": "Rabattförhandling",
+          "decision_branches": [
+            { "label": "Ja", "leads_to": "step-6-2" },
+            { "label": "Nej", "leads_to": "step-7-1" }
+          ]
+        },
+        {
+          "id": "step-6-2",
+          "description": "Rabatt tillämpas"
+        }
+      ]
+    },
+    {
+      "id": "fas-7",
+      "order": 7,
+      "name": "Aktivering & leverans",
+      "friction_level": "low",
+      "steps": [
+        {
+          "id": "step-7-1",
+          "description": "Licens aktiveras"
+        },
+        {
+          "id": "step-7-2",
+          "description": "Välkomst-e-post skickas"
+        }
+      ]
+    }
+  ],
+  "extensions": {
+    "systems_in_use": [
+      "Outlook", "Freshdesk", "Credit Safe", "SalesForce",
+      "Admin V2", "Debiteringssystemet", "KeyCloak", "Delfi",
+      "Vendure", "Jira", "Xledger", "Excel", "Teams", "Confluence"
+    ]
+  }
+}
