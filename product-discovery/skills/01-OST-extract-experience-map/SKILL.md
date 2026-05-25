@@ -16,7 +16,7 @@ This skill is assist 2 in the OST discovery workflow.
 1. **Resolve scope.** Follow `references/workspace-scope.md`. Portfolio scope only.
 
 2. **Resolve target paths:**
-   - Output: `<scope>/experience-map-extracted.{md,json}`
+   - Output: `<scope>/../../_product-context/experience-map-extracted.{md,json}`
 
 3. **Load context (optional):**
    - `<scope>/../../_product-context/product-outcome.md` — fallback for the `product_outcome` field if it's missing from the screenshot.
@@ -68,8 +68,8 @@ This skill is assist 2 in the OST discovery workflow.
 11. **Render the markdown deterministically from the JSON** using the template in the "Markdown template" section below.
 
 12. **Write paired output** to:
-   - `<scope>/experience-map-extracted.json`
-   - `<scope>/experience-map-extracted.md`
+   - `<scope>/../../_product-context/experience-map-extracted.json`
+   - `<scope>/../../_product-context/experience-map-extracted.md`
 
 13. **Launch the viewer.**
    - Locate the viewer assets at `~/.claude/plugins/marketplaces/scilla-studio/product-discovery/templates/`.
