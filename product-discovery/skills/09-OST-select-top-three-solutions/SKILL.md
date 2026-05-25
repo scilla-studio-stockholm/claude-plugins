@@ -9,17 +9,16 @@ You help a product trio pick the 3 specific solutions with the strongest probabi
 
 This skill is assist 8 in the OST discovery workflow.
 
-The output is a **proposal** that assist 9 (assumption generator) consumes after trio ratification. The trio reviews the markdown, edits if needed, then appends one line to `<scope>/../ratifications.md` (the ratification-flag pattern defined in `references/top-three-selection.md`). This skill does NOT write outside `<scope>/`.
+The output is a **proposal** that assist 9 (assumption generator) consumes after trio ratification. The trio reviews the markdown output. If approved, `decided.solutions` in `decisions.json` is the ratified record. The trio may edit `decisions.json` to swap picks or adjust rationale. This skill does NOT write outside `<scope>/`.
 
-**Out of scope:** clustering or grouping solutions (`OST-cluster-solutions` is a separate optional skill, not consumed here), generating assumptions per pick (assist 9), re-brainstorming (assist 6), reading interview transcripts or the comparison matrix (everything needed is in the brainstormer JSON + the two parent-walk-up context files), surfacing alternatives or runners-up as a structured field (trio reads brainstormer markdown directly), scoring or ranking numerically, weighing effort or feasibility (Torres principle, carried), applying mechanism diversification as a constraint.
+**Out of scope:** clustering or grouping solutions (`OST-cluster-solutions` is a separate optional skill, not consumed here), generating assumptions per pick (assist 9), re-brainstorming (assist 6), reading interview transcripts or the comparison matrix (everything needed is in the brainstormer JSON + `decisions.json`), surfacing alternatives or runners-up as a structured field (trio reads brainstormer markdown directly), scoring or ranking numerically, weighing effort or feasibility (Torres principle, carried), applying mechanism diversification as a constraint.
 
 ## Steps
 
 1. **Resolve scope.** Follow `references/workspace-scope.md`. Discovery scope only.
 
 2. **Load context via parent walk-up:**
-   - `<scope>/../chosen-opportunity.md`
-   - `<scope>/../../../_product-context/product-outcome.md`
+   - `<scope>/decisions.json`
    - Same-round predecessor: `<scope>/solution-candidates.json` (with sibling-round fallback)
 
 3. **Read the knowledge anchors:**
@@ -29,25 +28,23 @@ The output is a **proposal** that assist 9 (assumption generator) consumes after
 
 4. **Locate inputs:**
    - Latest `solution-candidates.json` in `<scope>/` (with sibling-round fallback).
-   - `<scope>/../chosen-opportunity.md` (parent walk-up).
-   - `<scope>/../../../_product-context/product-outcome.md` (parent walk-up).
+   - `<scope>/decisions.json` (parent walk-up).
 
 5. **Hard-exit checks** (see Hard-exit format below). Do not write any output files when these fire:
    - Missing knowledge anchor `top-three-selection.md`, `solution-brainstorm.md`, or `opportunity-solution-tree-teresa-torres.md` (expected under `knowledge/discovery/`).
    - Zero files match `solution-candidates.json` in `<scope>/`.
-   - `<scope>/../chosen-opportunity.md` missing.
-   - `<scope>/../../../_product-context/product-outcome.md` missing.
+   - `<scope>/decisions.json` missing.
+   - `decisions.json` has no `decided.opportunity` key.
    - Source JSON does not parse.
    - Source JSON `schema_version` is not `"0.1"`.
    - Source `solutions[]` does not contain exactly 18 entries.
-   - `product-outcome.md` has no extractable `## Outcome` section.
-   - Chosen-opp id in source JSON does not match the bold-id row in `<scope>/../chosen-opportunity.md`.
+   - Chosen-opp id in source JSON does not match `decided.opportunity.id` in `decisions.json`.
 
 6. **Parse inputs.**
    - Parse the source brainstormer JSON. Carry `team`, `product_outcome`, `chosen_opportunity` (full sub-object) verbatim. Index `solutions[]` by `id`. Confirm count == 18.
-   - Parse `<scope>/../chosen-opportunity.md`. Find the bold-id row: a line starting with `**` followed by an opp-id (e.g., `**opp-5-1** (Phase: ...)`). Extract the opp-id.
-   - Cross-check: source-JSON `chosen_opportunity.id` must equal context-md bold-id. Mismatch → hard-exit.
-   - Parse `<scope>/../../../_product-context/product-outcome.md`. Extract the outcome formulation under `## Outcome` (a blockquote). The `product_outcome` field in output is carried verbatim from source-JSON (which is the authoritative copy at brainstorm-time); the product-outcome.md is used only as grounding context in the LLM prompt.
+   - Read `<scope>/decisions.json`. Extract `decided.opportunity.id` and `decided.opportunity.quote` for grounding context.
+   - Cross-check: source-JSON `chosen_opportunity.id` must equal `decided.opportunity.id` in `decisions.json`. Mismatch → hard-exit.
+   - The `product_outcome` field in output is carried verbatim from source-JSON (which is the authoritative copy at brainstorm-time); `decisions.json` is used only as grounding context in the LLM prompt.
 
 7. **Compose the picking prompt.** Build a single LLM prompt with these sections, in this order:
 
@@ -124,7 +121,25 @@ The output is a **proposal** that assist 9 (assumption generator) consumes after
 
 12. **Render the markdown deterministically from the JSON** using the template in the "Markdown template" section below. Write to `<scope>/top-three-solutions.md`.
 
-    Use today's date in `YYYY-MM-DD` format. The two files share the same root name. Upstream files (`solution-candidates.json`, `chosen-opportunity.md`, `product-outcome.md`) are not modified. Do NOT write to the parent scope directory directly - the trio ratifies separately via `<scope>/../ratifications.md`.
+    Use today's date in `YYYY-MM-DD` format. The two files share the same root name. Upstream files (`solution-candidates.json`, `decisions.json`) are not modified after this step.
+
+13. **Write to decisions.json:** Read `<scope>/decisions.json`. Set `decided.solutions`:
+
+    ```json
+    {
+      "ratified": "<today YYYY-MM-DD>",
+      "picks": [
+        {
+          "id": "<sol-id>",
+          "title": "<title>",
+          "description": "<description>",
+          "rationale": "<rationale>"
+        }
+      ]
+    }
+    ```
+
+    Exactly 3 picks. Do not include `generating_role` or `round_number`.
 
 ## Hard-exit format
 
@@ -143,13 +158,12 @@ The hard-exit triggers:
 |---|---|---|
 | Missing knowledge anchor (`top-three-selection.md`, `solution-brainstorm.md`, or `opportunity-solution-tree-teresa-torres.md`) | The anchor file at the expected path under `knowledge/discovery/` | Restore from git, or re-run Task 1 of the OST-select-top-three-solutions v2 build |
 | Zero `solution-candidates.json` in `<scope>/` | A source brainstormer file | Run `OST-brainstorm-solutions` |
-| `<scope>/../chosen-opportunity.md` missing | Trio-ratified chosen-opportunity file | Trio ratifies after assist 5 (`OST-select-opportunity`) |
-| `<scope>/../../../_product-context/product-outcome.md` missing | Trio's product outcome file | Restore from git or re-author using the template structure |
-| `product-outcome.md` has no extractable `## Outcome` section | A `## Outcome` heading followed by the outcome formulation | Re-author per template structure |
+| `<scope>/decisions.json` missing | Round-level `decisions.json` | Re-run `OST-init-workspace` to scaffold the file |
+| `decisions.json` has no `decided.opportunity` key | `decided.opportunity` object in `decisions.json` | Run `OST-select-opportunity` to ratify the chosen opportunity |
 | Source JSON does not parse | Schema-conformant v0.1 JSON | Re-run `OST-brainstorm-solutions` |
 | Source JSON `schema_version` is not `"0.1"` | `"schema_version": "0.1"` | Re-run `OST-brainstorm-solutions` |
 | Source `solutions[]` count is not 18 | Exactly 18 source candidates | Re-run `OST-brainstorm-solutions` (3 sub-agents × 3 rounds × 2 ideas = 18) |
-| Chosen-opp id mismatch (source-JSON vs. context-md bold-id) | Same opp-id in both files | Inspect `<scope>/../chosen-opportunity.md` and source brainstormer JSON; re-ratify or re-run the upstream |
+| Chosen-opp id mismatch (source-JSON vs. `decided.opportunity.id`) | Same opp-id in both files | Inspect `decisions.json` and source brainstormer JSON; re-ratify or re-run the upstream |
 | LLM output not valid JSON | A single JSON object | Re-run the skill; if persistent, inspect the prompt for ambiguity |
 | Invariant: `picks.length != 3` | Exactly 3 picks | Re-run the skill; if persistent, tighten the prompt's pick-count rule |
 | Invariant: pick id not in source `solutions[]` | All pick ids in source | Re-run the skill |
@@ -165,7 +179,7 @@ The markdown output is rendered deterministically from the composed JSON using t
 ---
 title: "Top solutions: <chosen_opportunity.id> - <first 5-10 words of chosen_opportunity.quote>"
 date: <YYYY-MM-DD>
-purpose: Selector proposal for OST step 6 (top solutions to explore in parallel). Paired with top-three-solutions-<date>.json. Trio reviews and ratifies via <scope>/../ratifications.md. Input to assist 9 (assumption generator).
+purpose: Selector proposal for OST step 6 (top solutions to explore in parallel). Paired with top-three-solutions-<date>.json. Trio reviews; decided.solutions in decisions.json is the ratified record. Input to assist 9 (assumption generator).
 tags: [top-three-selection, ost, schema-v0.2]
 
 ---
@@ -173,12 +187,11 @@ tags: [top-three-selection, ost, schema-v0.2]
 # Top solutions: <chosen_opportunity.id>
 
 Source solution candidates: `<source_solution_candidates>`
-Source chosen opportunity: `<scope>/../chosen-opportunity.md`
-Source product outcome: `<scope>/../../../_product-context/product-outcome.md`
+Source context: `<scope>/decisions.json`
 Schema version: 0.2
 Paired JSON: `top-three-solutions-<YYYY-MM-DD>.json`
 
-> **Trio HITL:** This is the AI's proposal. Review the rationales, override if you disagree, then write a one-line ratification entry into `<scope>/../ratifications.md` so assist 9 reads the approved version.
+> **Trio HITL:** This is the AI's proposal. Review the rationales, override if you disagree. When approved, `decided.solutions` in `decisions.json` is the ratified record. The trio may edit `decisions.json` directly to swap picks or adjust rationale.
 
 ## Chosen opportunity
 
@@ -235,8 +248,8 @@ Paired JSON: `top-three-solutions-<YYYY-MM-DD>.json`
 - **No `Cites:` line.** No alternatives section. No notes section.
 - **No silent degradation.** Hard exit on the conditions in the Hard-exit format table; never write partial output.
 - **No JSON self-validation pass after composition.** Trust the invariant check.
-- **Upstream files are immutable.** Never modify `solution-candidates.json`, `chosen-opportunity.md`, or `product-outcome.md`. The skill writes only the two `top-three-solutions.*` files under `<scope>/`.
-- **Never write to the parent scope directory directly.** Ratification is the trio's manual step via `<scope>/../ratifications.md`.
+- **Upstream files are immutable.** Never modify `solution-candidates.json`. The skill writes the two `top-three-solutions.*` files under `<scope>/` and updates `decided.solutions` in `<scope>/decisions.json`.
+- **Creating `ratifications.md` entries is no longer required.** `decided.solutions` in `decisions.json` is the ratified record.
 - **Single pass.** No retries, no iteration.
 
 ## What this skill does NOT do
@@ -249,8 +262,8 @@ Paired JSON: `top-three-solutions-<YYYY-MM-DD>.json`
 - **Pick the same identity twice.** Hard invariant.
 - **Filter, dedupe, or modify source solutions.** Read-only against input.
 - **Re-brainstorm.** Upstream skill (assist 6).
-- **Write to the parent scope directory directly.** Ratification is the trio's step via `<scope>/../ratifications.md`.
-- **Read interview transcripts, comparison matrix, validated opportunities, experience map.** Everything needed is in the brainstormer JSON + the two parent-walk-up context files.
+- **Append to `ratifications.md`.** That pattern is retired; `decided.solutions` in `decisions.json` is the ratified record.
+- **Read interview transcripts, comparison matrix, validated opportunities, experience map.** Everything needed is in the brainstormer JSON + `decisions.json`.
 - **Score, matrix, or rank numerically before picking.** Single-pass qualitative judgement; ranking is internal to the LLM call and surfaces only as `picks[]` order.
 - **Apply effort or feasibility weighing.** Torres principle, carried.
 - **Apply mechanism diversification as a constraint.** Picker ranks by outcome-impact probability; if top 3 share a mechanism family, that's a coherent comparative bet.
