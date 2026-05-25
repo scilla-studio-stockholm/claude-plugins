@@ -9,7 +9,7 @@ You help a product trio identify the riskiest assumptions among the categorized 
 
 The skill is an identity map over upstream assumptions plus four new per-assumption fields (`importance`, `evidence`, `is_riskiest`, `rationale`). Every other upstream field carries through byte-identical: no re-ordering, no re-wording, no merging, no dropping. `is_riskiest` is computed by the skill from `importance` and `evidence`; the LLM is forbidden from returning it.
 
-This skill IS the phase-3 trio HITL gate. The markdown output opens with a `Trio HITL gate.` banner directing the trio to review the importance/evidence calls and edit the paired JSON if they disagree. Assist 12 picks the latest version by date.
+This skill IS the phase-3 trio HITL gate. The markdown output opens with a `Trio HITL gate.` banner directing the trio to review the importance/evidence calls and edit `decisions.json` if they disagree. `decided.assumptions` in `decisions.json` is the ratified record read by assist 12.
 
 ## Prerequisites
 
@@ -20,8 +20,7 @@ This skill IS the phase-3 trio HITL gate. The markdown output opens with a `Trio
 1. **Resolve scope.** Follow `references/workspace-scope.md`. Discovery scope only.
 
 2. **Load context via parent walk-up:**
-   - `<scope>/../chosen-opportunity.md`
-   - `<scope>/../../../_product-context/product-outcome.md`
+   - `<scope>/decisions.json` (chosen opportunity, product outcome)
    - Same-round predecessor: `<scope>/assumptions-categorized.json` (with sibling-round fallback)
 
 3. **Read the knowledge anchors:**
@@ -155,7 +154,28 @@ This skill IS the phase-3 trio HITL gate. The markdown output opens with a `Trio
     - `<scope>/riskiest-assumptions.md`
     Create the directory if absent.
 
-15. **Render the markdown deterministically from the JSON.** Use this exact template:
+15. **Write to decisions.json.** Read `<scope>/decisions.json`. Set `decided.assumptions`:
+
+    ```json
+    {
+      "ratified": "<today YYYY-MM-DD>",
+      "riskiest": [
+        {
+          "id": "<asm-id>",
+          "solution_id": "<sol-id>",
+          "text": "<assumption text>",
+          "category": "<category>",
+          "importance": "high",
+          "evidence": "weak",
+          "rationale": "<rationale>"
+        }
+      ]
+    }
+    ```
+
+    Include only assumptions where `is_riskiest == true`.
+
+16. **Render the markdown deterministically from the JSON.** Use this exact template:
 
     ````markdown
     ---
@@ -168,13 +188,13 @@ This skill IS the phase-3 trio HITL gate. The markdown output opens with a `Trio
 
     # Riskiest assumptions: <chosen_opportunity.id>
 
-    > **Trio HITL gate.** Review the importance/evidence calls per assumption. If you disagree, edit the paired JSON directly. Riskiest rows are flagged `[RISKIEST]` inline; each solution opens with a `Riskiest:` summary line of the flagged ids. Assist 12 will read the latest `riskiest-assumptions-*.json` by date in filename.
+    > **Trio HITL gate.** Review the importance/evidence calls per assumption. If you disagree with any importance/evidence scoring, edit `decided.assumptions.riskiest[]` in `decisions.json` directly (add or remove entries). The `decided.assumptions` section is the ratified record. Riskiest rows are flagged `[RISKIEST]` inline; each solution opens with a `Riskiest:` summary line of the flagged ids.
 
     Source assumptions-categorized: `<source_assumptions_categorized>`
     Source assumptions: `<source_assumptions>`
     Source top 3 solutions: `<source_top_three_solutions>`
-    Source chosen opportunity: `<scope>/../chosen-opportunity.md`
-    Source product outcome: `<scope>/../../../_product-context/product-outcome.md`
+    Source chosen opportunity: `<scope>/decisions.json`
+    Source product outcome: `<scope>/decisions.json`
     Schema version: 0.2
     Paired JSON: `riskiest-assumptions.json`
 
