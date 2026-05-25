@@ -629,6 +629,355 @@
     border-left: 2px solid var(--sc-purple-mountains);
   }
 
+  /* === Journey Map === */
+  .journey-map {
+    --jm-bg: var(--sc-grey-50);
+    --jm-ink: var(--sc-grey-900);
+    --jm-ink-soft: var(--sc-grey-600);
+    --jm-ink-faint: var(--sc-grey-400);
+    --jm-rule: var(--sc-grey-200);
+    --jm-rule-strong: var(--sc-grey-300);
+    --jm-card-bg: var(--sc-grey-0);
+    --jm-accent: var(--sc-blue-monday);
+    --jm-accent-soft: var(--sc-blue-nile);
+    --jm-reject: var(--sc-red-right-hand);
+    --jm-reject-soft: rgba(255, 64, 64, 0.08);
+    --jm-branch-bg: var(--sc-grey-0);
+    --jm-phase-1: #F0EFEA;
+    --jm-phase-2: #ECEEF3;
+    --jm-phase-3: #EAEFEC;
+    --jm-phase-4: #EFECEA;
+    --jm-phase-5: #ECEEF3;
+    --jm-phase-6: #EFEAEC;
+    --jm-phase-7: #EAEFEC;
+
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 140px);
+    overflow: hidden;
+  }
+
+  .journey-map .jm-top {
+    flex: 0 0 auto;
+    padding: var(--sc-spacing-sm) var(--sc-spacing-md);
+    border-bottom: var(--sc-border-width-subtle) solid var(--jm-rule);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sc-spacing-md);
+    background: var(--jm-card-bg);
+    border-radius: var(--sc-radius-sm) var(--sc-radius-sm) 0 0;
+  }
+
+  .journey-map .jm-top .jm-title-block { min-width: 0; flex: 1 1 auto; }
+
+  .journey-map .jm-top h2 {
+    font-size: 17px;
+    font-weight: var(--sc-font-weight-semi);
+    letter-spacing: var(--sc-letter-spacing-tight);
+    color: var(--jm-ink);
+    margin: 0;
+    line-height: var(--sc-line-height-tight);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .journey-map .jm-top h2 .jm-dim {
+    color: var(--jm-ink-faint);
+    font-weight: var(--sc-font-weight-medium);
+  }
+
+  .journey-map .jm-top .jm-sub {
+    font-size: var(--sc-font-size-xs);
+    color: var(--jm-ink-soft);
+    margin-top: 4px;
+  }
+
+  .journey-map .jm-meta {
+    display: flex;
+    gap: 28px;
+    font-size: 11px;
+    color: var(--jm-ink-soft);
+    text-transform: uppercase;
+    letter-spacing: var(--sc-letter-spacing-wide);
+    font-weight: var(--sc-font-weight-medium);
+  }
+
+  .journey-map .jm-meta div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .journey-map .jm-meta b {
+    color: var(--jm-ink);
+    font-size: 14px;
+    font-weight: var(--sc-font-weight-semi);
+    letter-spacing: var(--sc-letter-spacing-tight);
+    text-transform: none;
+  }
+
+  .journey-map .jm-legend {
+    flex: 0 0 auto;
+    padding: 10px var(--sc-spacing-md);
+    background: var(--jm-card-bg);
+    border-bottom: var(--sc-border-width-subtle) solid var(--jm-rule);
+    display: flex;
+    gap: 28px;
+    font-size: 11px;
+    color: var(--jm-ink-soft);
+    text-transform: uppercase;
+    letter-spacing: var(--sc-letter-spacing-wide);
+    font-weight: var(--sc-font-weight-medium);
+    align-items: center;
+  }
+
+  .journey-map .jm-legend .jm-swatch {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .journey-map .jm-legend svg { display: block; }
+
+  .journey-map .jm-legend .jm-dec-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: var(--sc-radius-pill);
+    background: var(--jm-branch-bg);
+    border: var(--sc-border-width-subtle) solid var(--jm-accent);
+    color: var(--jm-accent);
+    font-size: 10px;
+    font-weight: var(--sc-font-weight-semi);
+    letter-spacing: 0.02em;
+    text-transform: none;
+  }
+
+  .journey-map .jm-map-wrap {
+    flex: 1 1 auto;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .journey-map .jm-map {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-rows: 1fr;
+  }
+
+  .journey-map .jm-phase {
+    position: relative;
+    padding: 18px 22px 20px 14px;
+    border-right: 1px dashed var(--jm-rule);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .journey-map .jm-phase:last-child { border-right: none; }
+  .journey-map .jm-phase[data-num="1"] { background: var(--jm-phase-1); }
+  .journey-map .jm-phase[data-num="2"] { background: var(--jm-phase-2); }
+  .journey-map .jm-phase[data-num="3"] { background: var(--jm-phase-3); }
+  .journey-map .jm-phase[data-num="4"] { background: var(--jm-phase-4); }
+  .journey-map .jm-phase[data-num="5"] { background: var(--jm-phase-5); }
+  .journey-map .jm-phase[data-num="6"] { background: var(--jm-phase-6); }
+  .journey-map .jm-phase[data-num="7"] { background: var(--jm-phase-7); }
+
+  .journey-map .jm-phase-head {
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: var(--sc-border-width-subtle) solid var(--jm-rule-strong);
+  }
+
+  .journey-map .jm-phase-num {
+    display: block;
+    font-size: 10px;
+    font-weight: var(--sc-font-weight-semi);
+    letter-spacing: 0.12em;
+    color: var(--jm-ink-faint);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .journey-map .jm-phase-title {
+    font-size: 13px;
+    font-weight: var(--sc-font-weight-semi);
+    color: var(--jm-ink);
+    line-height: 1.25;
+    letter-spacing: -0.005em;
+    text-wrap: balance;
+  }
+
+  .journey-map .jm-steps {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    position: relative;
+  }
+
+  .journey-map .jm-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    position: relative;
+  }
+
+  .journey-map .jm-row.jm-fork {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .journey-map .jm-step {
+    position: relative;
+    background: var(--jm-card-bg);
+    border: var(--sc-border-width-subtle) solid var(--jm-rule-strong);
+    border-radius: 6px;
+    padding: 10px 11px 11px;
+    min-height: 54px;
+    box-shadow: var(--sc-shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    cursor: default;
+    transition: border-color var(--sc-transition-fast), box-shadow var(--sc-transition-fast), transform var(--sc-transition-fast);
+  }
+
+  .journey-map .jm-step:hover {
+    border-color: var(--jm-accent);
+    box-shadow: 2px 2px 0 var(--jm-accent);
+    transform: translate(-1px, -1px);
+    z-index: 5;
+  }
+
+  .journey-map .jm-step .jm-id {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 10px;
+    font-weight: var(--sc-font-weight-medium);
+    color: var(--jm-ink-faint);
+    letter-spacing: 0.02em;
+  }
+
+  .journey-map .jm-step .jm-label {
+    font-size: 12.5px;
+    font-weight: var(--sc-font-weight-medium);
+    color: var(--jm-ink);
+    line-height: 1.3;
+    letter-spacing: -0.005em;
+    text-wrap: balance;
+  }
+
+  .journey-map .jm-step.jm-decision {
+    border-color: var(--jm-accent);
+    border-left-width: 3px;
+    padding-left: 9px;
+  }
+
+  .journey-map .jm-step.jm-decision .jm-dec-flag {
+    position: absolute;
+    top: -7px;
+    right: 8px;
+    background: var(--jm-accent);
+    color: var(--sc-grey-0);
+    font-size: 9px;
+    font-weight: var(--sc-font-weight-semi);
+    padding: 2px 6px;
+    border-radius: 3px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .journey-map .jm-row.jm-terminal {
+    margin-top: auto;
+    padding-top: 0;
+  }
+
+  .journey-map .jm-row.jm-terminal .jm-step.jm-reject {
+    width: 78%;
+    margin-left: auto;
+    padding: 9px 10px 10px;
+    min-height: 0;
+  }
+
+  .journey-map .jm-row.jm-terminal::before {
+    content: 'avslagspunkt';
+    display: block;
+    font-size: 9px;
+    font-weight: var(--sc-font-weight-semi);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--jm-reject);
+    opacity: 0.6;
+    margin: 4px 0 6px auto;
+    text-align: right;
+    width: 78%;
+  }
+
+  .journey-map .jm-step.jm-reject {
+    background: var(--jm-reject-soft);
+    border-color: var(--jm-reject);
+    border-style: dashed;
+  }
+
+  .journey-map .jm-step.jm-reject .jm-label { color: var(--jm-reject); }
+  .journey-map .jm-step.jm-reject .jm-id { color: var(--jm-reject); opacity: 0.7; }
+
+  .journey-map .jm-arrows {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: visible;
+  }
+
+  .journey-map .jm-arrows path {
+    fill: none;
+    stroke: var(--jm-accent);
+    stroke-width: 1.4;
+    stroke-linecap: round;
+  }
+
+  .journey-map .jm-arrows path.jm-reject {
+    stroke: var(--jm-reject);
+    stroke-dasharray: 5 4;
+    stroke-width: 1.5;
+  }
+
+  .journey-map .jm-arrow-label {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    background: var(--jm-branch-bg);
+    border: var(--sc-border-width-subtle) solid var(--jm-accent);
+    color: var(--jm-accent);
+    font-size: 10px;
+    font-weight: var(--sc-font-weight-semi);
+    padding: 2px 7px;
+    border-radius: var(--sc-radius-pill);
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+    line-height: 1.4;
+    pointer-events: auto;
+    z-index: 10;
+  }
+
+  .journey-map .jm-arrow-label.jm-reject {
+    border-color: var(--jm-reject);
+    color: var(--jm-reject);
+    background: var(--sc-grey-0);
+  }
+
+  .journey-map .jm-hint {
+    position: absolute;
+    bottom: 10px;
+    left: 12px;
+    font-size: 10px;
+    color: var(--jm-ink-faint);
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    letter-spacing: 0.04em;
+    pointer-events: none;
+  }
+
   /* === Print === */
   @media print {
     body { max-width: none; padding: 1cm; background: white; }
@@ -677,6 +1026,7 @@
     'riskiest-assumptions.json':   { label: 'Riskiest Assumptions', render: renderRiskiest },
     'validation-experiments.json': { label: 'Experiments',        render: renderExperiments },
     'solution-candidates.json':    { label: 'Solutions',          render: renderSolutions },
+    'experience-map-extracted.json': { label: 'Journey Map',      render: renderJourneyMap },
     'experience-map-clustered.json': { label: 'Experience Map',   render: renderExperienceMap },
   };
 
@@ -1098,6 +1448,478 @@
     }
     html += '</div>';
     container.innerHTML = html;
+  }
+
+  // === Journey Map (experience-map-extracted.json) ===
+
+  function transformV01ToInternal(json) {
+    var phases = (json.phases || []).slice().sort(function (a, b) { return (a.order || 0) - (b.order || 0); });
+    var allStepIds = [];
+    var stepPhaseMap = {};
+    var stepBranches = {};
+
+    phases.forEach(function (phase) {
+      (phase.steps || []).forEach(function (step) {
+        allStepIds.push(step.id);
+        stepPhaseMap[step.id] = phase.id;
+        if (step.decision_branches && step.decision_branches.length) {
+          stepBranches[step.id] = step.decision_branches;
+        }
+      });
+    });
+
+    var branchTargets = {};
+    Object.keys(stepBranches).forEach(function (sid) {
+      stepBranches[sid].forEach(function (br) {
+        branchTargets[br.leads_to] = true;
+      });
+    });
+
+    var totalSteps = 0;
+    var decisionCount = 0;
+
+    var resultPhases = phases.map(function (phase, pi) {
+      var steps = phase.steps || [];
+      var nextPhase = phases[pi + 1];
+      var nextPhaseFirstStep = nextPhase && nextPhase.steps && nextPhase.steps.length ? nextPhase.steps[0].id : null;
+
+      var rejectStepIds = {};
+      steps.forEach(function (step, sourceIdx) {
+        if (step.decision_branches) {
+          step.decision_branches.forEach(function (br) {
+            if (stepPhaseMap[br.leads_to] === phase.id) {
+              var targetStep = steps.find(function (s) { return s.id === br.leads_to; });
+              if (!targetStep) return;
+              var targetIdx = steps.indexOf(targetStep);
+              var isLastStep = targetIdx === steps.length - 1;
+              var hasInterveningSteps = targetIdx - sourceIdx > 1;
+              if (isLastStep && !stepBranches[br.leads_to] && hasInterveningSteps) {
+                rejectStepIds[br.leads_to] = true;
+              }
+            }
+          });
+        }
+      });
+
+      var forkTargetSets = {};
+      steps.forEach(function (step) {
+        if (step.decision_branches && step.decision_branches.length) {
+          var samePhaseTargets = step.decision_branches.filter(function (br) {
+            return stepPhaseMap[br.leads_to] === phase.id && !rejectStepIds[br.leads_to];
+          });
+          if (samePhaseTargets.length >= 2) {
+            samePhaseTargets.forEach(function (br) { forkTargetSets[br.leads_to] = step.id; });
+          }
+        }
+      });
+
+      var rows = [];
+      var consumed = {};
+
+      steps.forEach(function (step) {
+        if (consumed[step.id]) return;
+        totalSteps++;
+
+        var hasBranches = stepBranches[step.id] && stepBranches[step.id].length > 0;
+        if (hasBranches) decisionCount++;
+
+        var nextEdges = [];
+        if (hasBranches) {
+          stepBranches[step.id].forEach(function (br) {
+            var edge = { to: br.leads_to, label: br.label };
+            if (rejectStepIds[br.leads_to]) edge.style = 'reject';
+            nextEdges.push(edge);
+          });
+        }
+
+        if (rejectStepIds[step.id]) {
+          rows.push({
+            fork: false,
+            terminal: true,
+            cells: [{ id: step.id, label: step.description || step.id, terminal: 'reject' }]
+          });
+          return;
+        }
+
+        if (forkTargetSets[step.id]) {
+          var parentId = forkTargetSets[step.id];
+          var siblings = Object.keys(forkTargetSets).filter(function (k) { return forkTargetSets[k] === parentId; });
+          if (siblings[0] === step.id) {
+            var forkCells = siblings.map(function (sid) {
+              consumed[sid] = true;
+              var s = steps.find(function (st) { return st.id === sid; });
+              totalSteps++;
+              var sNext = [];
+              if (stepBranches[sid]) {
+                stepBranches[sid].forEach(function (br) {
+                  sNext.push({ to: br.leads_to, label: br.label });
+                });
+              }
+              return { id: sid, label: s ? (s.description || sid) : sid, next: sNext };
+            });
+            totalSteps -= siblings.length;
+            siblings.forEach(function (sid) { totalSteps++; });
+            totalSteps -= siblings.length;
+
+            var stepsAfterFork = steps.filter(function (s) {
+              return !consumed[s.id] && !forkTargetSets[s.id] && !rejectStepIds[s.id];
+            });
+            var nextAfterFork = null;
+            for (var fi = 0; fi < steps.length; fi++) {
+              if (steps[fi].id === step.id) {
+                for (var fj = fi + 1; fj < steps.length; fj++) {
+                  if (!forkTargetSets[steps[fj].id] && !rejectStepIds[steps[fj].id]) {
+                    nextAfterFork = steps[fj].id;
+                    break;
+                  }
+                }
+                break;
+              }
+            }
+
+            forkCells.forEach(function (cell) {
+              if (!cell.next || cell.next.length === 0) {
+                if (nextAfterFork) {
+                  cell.next = [{ to: nextAfterFork }];
+                } else if (nextPhaseFirstStep) {
+                  cell.next = [{ to: nextPhaseFirstStep }];
+                }
+              }
+            });
+
+            rows.push({ fork: true, terminal: false, cells: forkCells });
+            return;
+          } else {
+            return;
+          }
+        }
+
+        if (!hasBranches) {
+          var nextStepIdx = steps.indexOf(step);
+          var foundNext = null;
+          for (var ni = nextStepIdx + 1; ni < steps.length; ni++) {
+            if (!rejectStepIds[steps[ni].id] && !forkTargetSets[steps[ni].id]) {
+              foundNext = steps[ni].id;
+              break;
+            }
+            if (forkTargetSets[steps[ni].id]) {
+              foundNext = steps[ni].id;
+              break;
+            }
+          }
+          if (!foundNext && nextPhaseFirstStep) {
+            foundNext = nextPhaseFirstStep;
+          }
+          if (foundNext) {
+            nextEdges = [{ to: foundNext }];
+          }
+        }
+
+        rows.push({
+          fork: false,
+          terminal: false,
+          cells: [{
+            id: step.id,
+            label: step.description || step.id,
+            decision: hasBranches,
+            next: nextEdges
+          }]
+        });
+      });
+
+      return { num: phase.order || (pi + 1), title: phase.name || phase.id, rows: rows };
+    });
+
+    var title = json.title || '';
+    var subtitle = json.product_outcome || '';
+    if (json.narrativ) subtitle = json.narrativ;
+
+    totalSteps = 0;
+    decisionCount = 0;
+    phases.forEach(function (phase) {
+      (phase.steps || []).forEach(function (step) {
+        totalSteps++;
+        if (step.decision_branches && step.decision_branches.length) decisionCount++;
+      });
+    });
+
+    return {
+      title: title,
+      subtitle: subtitle,
+      meta: [
+        { label: 'Faser', value: String(phases.length) },
+        { label: 'Steg', value: String(totalSteps) },
+        { label: 'Beslutspunkter', value: String(decisionCount) }
+      ],
+      phases: resultPhases
+    };
+  }
+
+  function renderJourneyMap(json, container) {
+    var data = transformV01ToInternal(json);
+    var phaseCount = data.phases.length;
+
+    var html = '<div class="journey-map">';
+
+    html += '<div class="jm-top">';
+    html += '<div class="jm-title-block">';
+    var titleParts = data.title.split(/\s+—\s+/);
+    if (titleParts.length === 2) {
+      html += '<h2>' + esc(titleParts[0]) + ' <span class="jm-dim">— ' + esc(titleParts[1]) + '</span></h2>';
+    } else {
+      html += '<h2>' + esc(data.title) + '</h2>';
+    }
+    html += '<div class="jm-sub">' + esc(data.subtitle) + '</div>';
+    html += '</div>';
+    html += '<div class="jm-meta">';
+    data.meta.forEach(function (m) {
+      html += '<div><span>' + esc(m.label) + '</span><b>' + esc(m.value) + '</b></div>';
+    });
+    html += '</div></div>';
+
+    html += '<div class="jm-legend">';
+    html += '<span class="jm-swatch"><svg width="32" height="10" viewBox="0 0 32 10"><path d="M2 5 L28 5" stroke="var(--jm-accent)" stroke-width="1.4" fill="none" stroke-linecap="round"/><path d="M24 1.5 L29 5 L24 8.5" stroke="var(--jm-accent)" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg> Steg-flöde</span>';
+    html += '<span class="jm-swatch"><span class="jm-dec-pill">Ja / Nej</span> Beslutsgren</span>';
+    html += '<span class="jm-swatch"><svg width="32" height="10" viewBox="0 0 32 10"><path d="M2 5 L28 5" stroke="var(--jm-reject)" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-dasharray="4 3"/></svg> Avslagsväg</span>';
+    html += '</div>';
+
+    html += '<div class="jm-map-wrap" id="jm-map-wrap">';
+    html += '<div class="jm-map" id="jm-map" style="grid-template-columns: repeat(' + phaseCount + ', 1fr);">';
+
+    data.phases.forEach(function (phase) {
+      html += '<div class="jm-phase" data-num="' + phase.num + '">';
+      html += '<div class="jm-phase-head">';
+      html += '<span class="jm-phase-num">Fas ' + phase.num + '</span>';
+      html += '<span class="jm-phase-title">' + esc(phase.title) + '</span>';
+      html += '</div>';
+      html += '<div class="jm-steps">';
+
+      phase.rows.forEach(function (row) {
+        var rowClasses = 'jm-row';
+        if (row.fork) rowClasses += ' jm-fork';
+        if (row.terminal) rowClasses += ' jm-terminal';
+        html += '<div class="' + rowClasses + '">';
+
+        row.cells.forEach(function (cell) {
+          var stepClasses = 'jm-step';
+          if (cell.decision) stepClasses += ' jm-decision';
+          if (cell.terminal === 'reject') stepClasses += ' jm-reject';
+          html += '<div class="' + stepClasses + '" data-id="' + esc(cell.id) + '">';
+          if (cell.decision) html += '<span class="jm-dec-flag">Beslut</span>';
+          html += '<span class="jm-id">' + esc(cell.id) + '</span>';
+          html += '<span class="jm-label">' + esc(cell.label) + '</span>';
+          html += '</div>';
+        });
+
+        html += '</div>';
+      });
+
+      html += '</div></div>';
+    });
+
+    html += '</div>';
+    html += '<svg class="jm-arrows" id="jm-arrows" xmlns="http://www.w3.org/2000/svg"></svg>';
+    html += '<div class="jm-hint">hover any step to highlight</div>';
+    html += '</div>';
+    html += '</div>';
+
+    container.innerHTML = html;
+
+    var mapWrap = document.getElementById('jm-map-wrap');
+    var svgEl = document.getElementById('jm-arrows');
+    var arrowLabels = [];
+    var stepIndex = new Map();
+
+    var allStepEls = container.querySelectorAll('.jm-step');
+    allStepEls.forEach(function (el) {
+      stepIndex.set(el.dataset.id, el);
+    });
+
+    function rectIn(el, base) {
+      var r = el.getBoundingClientRect();
+      var b = base.getBoundingClientRect();
+      return {
+        left: r.left - b.left,
+        right: r.right - b.left,
+        top: r.top - b.top,
+        bottom: r.bottom - b.top,
+        cx: (r.left + r.right) / 2 - b.left,
+        cy: (r.top + r.bottom) / 2 - b.top,
+        w: r.width,
+        h: r.height
+      };
+    }
+
+    function makeArrow(d, style) {
+      var p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      p.setAttribute('d', d);
+      p.setAttribute('marker-end', style === 'reject' ? 'url(#jm-head-r)' : 'url(#jm-head)');
+      if (style === 'reject') p.classList.add('jm-reject');
+      svgEl.appendChild(p);
+    }
+
+    function makeLabel(x, y, text, style) {
+      var el = document.createElement('div');
+      el.className = 'jm-arrow-label' + (style === 'reject' ? ' jm-reject' : '');
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      el.textContent = text;
+      mapWrap.appendChild(el);
+      arrowLabels.push(el);
+    }
+
+    function drawArrows() {
+      svgEl.innerHTML = '<defs>'
+        + '<marker id="jm-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">'
+        + '<path d="M1,1 L9,5 L1,9" fill="none" stroke="var(--jm-accent)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>'
+        + '</marker>'
+        + '<marker id="jm-head-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">'
+        + '<path d="M1,1 L9,5 L1,9" fill="none" stroke="var(--jm-reject)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>'
+        + '</marker>'
+        + '</defs>';
+      arrowLabels.forEach(function (l) { l.remove(); });
+      arrowLabels.length = 0;
+
+      var firstStepEl = mapWrap.querySelector('.jm-steps .jm-row:first-child .jm-step');
+      var firstR = firstStepEl ? rectIn(firstStepEl, mapWrap) : null;
+      var channelY = firstR ? firstR.top - 12 : 90;
+
+      data.phases.forEach(function (phase) {
+        phase.rows.forEach(function (row) {
+          row.cells.forEach(function (cell) {
+            var edges = cell.next;
+            if (!edges || !edges.length) return;
+            var fromEl = stepIndex.get(cell.id);
+            if (!fromEl) return;
+            var fr = rectIn(fromEl, mapWrap);
+            var fromPhaseEl = fromEl.closest('.jm-phase');
+            var fromPhaseNum = +fromPhaseEl.dataset.num;
+
+            edges.forEach(function (edge) {
+              var toEl = stepIndex.get(edge.to);
+              if (!toEl) return;
+              var tr = rectIn(toEl, mapWrap);
+              var toPhaseNum = +toEl.closest('.jm-phase').dataset.num;
+
+              var sameCol = fromPhaseNum === toPhaseNum;
+              var sameRow = Math.abs(fr.cy - tr.cy) < 6;
+              var phaseGap = Math.abs(toPhaseNum - fromPhaseNum);
+
+              var d, lx, ly;
+
+              if (sameCol && sameRow) {
+                var x1 = fr.right + 2, x2 = tr.left - 4;
+                d = 'M' + x1 + ',' + fr.cy + ' L' + x2 + ',' + tr.cy;
+                lx = (x1 + x2) / 2;
+                ly = fr.cy - 14;
+              } else if (sameCol && edge.style === 'reject') {
+                var phaseR = rectIn(fromPhaseEl, mapWrap);
+                var lane = phaseR.right - 10;
+                var sx = fr.right + 1;
+                var sy = fr.cy + 6;
+                var ex = tr.right + 1;
+                var ey = tr.cy;
+                var rr = 5;
+                d = 'M' + sx + ',' + sy
+                  + ' L' + (lane - rr) + ',' + sy
+                  + ' Q' + lane + ',' + sy + ' ' + lane + ',' + (sy + rr)
+                  + ' L' + lane + ',' + (ey - rr)
+                  + ' Q' + lane + ',' + ey + ' ' + (lane - rr) + ',' + ey
+                  + ' L' + ex + ',' + ey;
+                lx = lane - 14;
+                ly = fr.bottom + 14;
+              } else if (sameCol) {
+                var xc = fr.cx;
+                var y1s = fr.bottom + 1;
+                var y2s = tr.top - 3;
+                d = 'M' + xc + ',' + y1s + ' L' + xc + ',' + y2s;
+                if (cell.decision) {
+                  lx = xc;
+                  ly = y1s + 12;
+                } else {
+                  lx = xc;
+                  ly = (y1s + y2s) / 2;
+                }
+              } else if (phaseGap > 1) {
+                var x1c = fr.right + 2, y1c = fr.cy;
+                var x2c = tr.left - 4, y2c = tr.cy;
+                var rc = 6;
+                var upX = x1c + 10;
+                var dnX = x2c - 10;
+                d = 'M' + x1c + ',' + y1c
+                  + ' L' + (upX - rc) + ',' + y1c
+                  + ' Q' + upX + ',' + y1c + ' ' + upX + ',' + (y1c - rc)
+                  + ' L' + upX + ',' + (channelY + rc)
+                  + ' Q' + upX + ',' + channelY + ' ' + (upX + rc) + ',' + channelY
+                  + ' L' + (dnX - rc) + ',' + channelY
+                  + ' Q' + dnX + ',' + channelY + ' ' + dnX + ',' + (channelY + rc)
+                  + ' L' + dnX + ',' + (y2c - rc)
+                  + ' Q' + dnX + ',' + y2c + ' ' + (dnX + rc) + ',' + y2c
+                  + ' L' + x2c + ',' + y2c;
+                lx = upX;
+                ly = (y1c + channelY) / 2 + 4;
+              } else {
+                var x1a = fr.right + 2, y1a = fr.cy;
+                var x2a = tr.left - 4, y2a = tr.cy;
+                var mid = (x1a + x2a) / 2;
+                if (Math.abs(y1a - y2a) < 6) {
+                  d = 'M' + x1a + ',' + y1a + ' L' + x2a + ',' + y2a;
+                } else {
+                  d = 'M' + x1a + ',' + y1a + ' C' + mid + ',' + y1a + ' ' + mid + ',' + y2a + ' ' + x2a + ',' + y2a;
+                }
+                var t = cell.decision ? 0.28 : 0.5;
+                if (Math.abs(y1a - y2a) < 6) {
+                  lx = x1a + (x2a - x1a) * t;
+                  ly = y1a - 12;
+                } else {
+                  var omt = 1 - t;
+                  lx = omt * omt * omt * x1a + 3 * omt * omt * t * mid + 3 * omt * t * t * mid + t * t * t * x2a;
+                  ly = omt * omt * omt * y1a + 3 * omt * omt * t * y1a + 3 * omt * t * t * y2a + t * t * t * y2a;
+                }
+              }
+
+              makeArrow(d, edge.style);
+              if (edge.label) makeLabel(lx, ly, edge.label, edge.style);
+            });
+          });
+        });
+      });
+    }
+
+    requestAnimationFrame(drawArrows);
+    var ro = new ResizeObserver(function () { requestAnimationFrame(drawArrows); });
+    ro.observe(mapWrap);
+
+    var allSteps = Array.prototype.slice.call(allStepEls);
+    container.addEventListener('mouseover', function (e) {
+      var s = e.target.closest('.jm-step');
+      if (!s) return;
+      var id = s.dataset.id;
+      var connected = {};
+      connected[id] = true;
+      data.phases.forEach(function (p) {
+        p.rows.forEach(function (r) {
+          r.cells.forEach(function (cell) {
+            if (cell.id === id && cell.next) {
+              cell.next.forEach(function (n) { connected[n.to] = true; });
+            }
+            if (cell.next) {
+              cell.next.forEach(function (n) {
+                if (n.to === id) connected[cell.id] = true;
+              });
+            }
+          });
+        });
+      });
+      allSteps.forEach(function (el) {
+        el.style.opacity = connected[el.dataset.id] ? '1' : '0.35';
+      });
+    });
+    container.addEventListener('mouseout', function (e) {
+      if (e.target.closest('.jm-step')) {
+        allSteps.forEach(function (el) { el.style.opacity = ''; });
+      }
+    });
   }
 
   function renderExperienceMap(json, container) {
