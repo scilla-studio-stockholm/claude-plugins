@@ -71,6 +71,8 @@ This skill is assist 3b in the OST discovery workflow.
 
    The two files share the same root name. Upstream `experience-map-extracted.*` files are not modified.
 
+12. **Launch the viewer.** Follow `knowledge/discovery/viewer-launch.md` to resolve the viewer path, start the server, and open the browser.
+
 ## Hard-exit format
 
 When a hard-exit condition fires, respond with this exact pattern (substitute actual values) and stop. Do not write any output files.

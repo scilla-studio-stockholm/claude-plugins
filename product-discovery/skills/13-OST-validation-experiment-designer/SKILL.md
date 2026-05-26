@@ -285,6 +285,8 @@ This skill is terminal. There is no downstream skill. The markdown output opens 
     - Row ordering within each solution preserves upstream order (among retained).
     - Output language: Test Card prose follows upstream language (typically Swedish). Schema field names, test_type names, enums, abbreviations stay English.
 
+16. **Launch the viewer.** Follow `knowledge/discovery/viewer-launch.md` to resolve the viewer path, start the server, and open the browser.
+
 ## Output principles
 
 - The output is the terminal artifact for the discovery critical path. Markdown opens with a run-list handoff banner; the trio reads, picks execution order, runs the cheapest viable first.
