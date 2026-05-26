@@ -84,7 +84,9 @@ After this skill completes, the discovery workspace is **ready to run**: every d
    - Also compose the `## Product outcome` blockquote by copying the confirmed outcome from `product-outcome.md`.
    - Write both sections into `chosen-opportunity.md`, replacing the TBD placeholders. Write the rationale into the `### Rationale` subsection.
 
-8. **Final summary.** After all interviews, print:
+8. **Launch the viewer** (if any JSON was written). If `experience-map-extracted.json` was written in step 6, follow `knowledge/discovery/viewer-launch.md` to resolve the viewer path, start the server, and open the browser. If step 6 was deferred or delegated to `OST-extract-experience-map`, skip this step.
+
+9. **Final summary.** After all interviews, print:
    - Files written (full paths)
    - Files still TBD with the remedy for each (e.g., "experience-map.md deferred — run `OST-extract-experience-map` after saving a screenshot")
    - Active scope: read `discovery/.current-scope` and print the path. If `.current-scope` does NOT point at the round folder just created (e.g. because it already existed from a previous product), print a warning: "Note: `.current-scope` still points at `<old path>`, not the round you just set up. To switch, run: `echo '<new round path>' > discovery/.current-scope`"

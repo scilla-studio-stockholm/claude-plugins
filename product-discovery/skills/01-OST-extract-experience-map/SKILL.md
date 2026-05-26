@@ -71,22 +71,7 @@ This skill is assist 2 in the OST discovery workflow.
    - `<scope>/../../_product-context/experience-map-extracted.json`
    - `<scope>/../../_product-context/experience-map-extracted.md`
 
-13. **Launch the viewer.**
-   - Locate the viewer assets at `~/.claude/plugins/marketplaces/scilla-studio/product-discovery/templates/`.
-   - If the directory does not exist, skip this step with a note: "Viewer not available — install the scilla-studio marketplace to enable auto-open."
-   - Compute the discovery root: walk up from `<scope>` until you find the directory that contains `.current-scope` or is named `discovery/`. This becomes the `--data` argument.
-   - Compute the round path: the relative path from the discovery root to `<scope>` (e.g. `metria/opp-1/2026-05-25`). This becomes the `?round=` query parameter.
-   - Check if port 3000 is already in use (`lsof -ti:3000`). If it is, verify the running server points at the correct discovery root by inspecting its command line (`ps -p <pid> -o args=`). If the `--data` argument does not match `<discovery-root>`, kill the process and start a fresh server. If the port is free, start the server:
-     ```
-     python3 ~/.claude/plugins/marketplaces/scilla-studio/product-discovery/templates/serve.py \
-       --templates ~/.claude/plugins/marketplaces/scilla-studio/product-discovery/templates/viewer \
-       --data <discovery-root> \
-       --port 3000
-     ```
-   - Open the viewer in the default browser:
-     ```
-     open "http://localhost:3000/_viewer/?round=<round-path>"
-     ```
+13. **Launch the viewer.** Follow `knowledge/discovery/viewer-launch.md` to resolve the viewer path, start the server, and open the browser.
 
 ## Hard-exit format
 

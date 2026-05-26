@@ -255,6 +255,8 @@ This skill IS the phase-3 trio HITL gate. The markdown output opens with a `Trio
     - Row ordering within each solution preserves the upstream `assumptions[]` order. No re-sort by score or risk.
     - Output language for assumption text and rationale matches the upstream (typically Swedish for this trio).
 
+17. **Launch the viewer.** Follow `knowledge/discovery/viewer-launch.md` to resolve the viewer path, start the server, and open the browser.
+
 ## Output principles
 
 - The output is the phase-3 trio HITL gate. Markdown opens with a `Trio HITL gate.` banner; the trio reviews the calls and edits the paired JSON to override; assist 12 picks up the latest by date.

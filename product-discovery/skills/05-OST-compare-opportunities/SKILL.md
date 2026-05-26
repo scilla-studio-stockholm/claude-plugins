@@ -103,6 +103,8 @@ The comparator filters by verdict before scoring: only `verdict == "approved"` o
 
     Both artifacts are written from the same composed JSON in a single pass. Upstream `experience-map-clustered.json` and `product-outcome.md` are not modified. Create `<scope>/` if it doesn't exist.
 
+14. **Launch the viewer.** Follow `knowledge/discovery/viewer-launch.md` to resolve the viewer path, start the server, and open the browser.
+
 ## Hard-exit format
 
 When a hard-exit condition fires, respond with this exact pattern (substitute actual values) and stop. Do not write any output files.
