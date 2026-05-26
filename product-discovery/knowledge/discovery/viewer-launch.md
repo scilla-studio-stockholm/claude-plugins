@@ -7,9 +7,8 @@ Shared reference for all skills that produce viewer-compatible JSON. Include as 
 Try these locations in order. Use the first that exists:
 
 1. `~/.claude/plugins/marketplaces/scilla-studio/product-discovery/templates/` — marketplace clone (full git checkout, includes `templates/`)
-2. `~/.claude/plugins/cache/scilla-studio/product-discovery/*/templates/` — plugin cache (glob the version folder)
 
-If neither exists, skip with a note:
+If not found, skip with a note:
 > "Viewer not available — install the scilla-studio marketplace (`/plugin marketplace add scilla-studio-stockholm/claude-plugins && /plugin install product-discovery@scilla-studio`) to enable auto-open."
 
 Let `VIEWER_ROOT` be the resolved path (the directory containing `serve.py` and `viewer/`).
@@ -19,6 +18,8 @@ Let `VIEWER_ROOT` be the resolved path (the directory containing `serve.py` and 
 Walk up from `<scope>` until you find a directory that:
 - contains `.current-scope`, OR
 - is named `discovery/`
+
+If neither is found after reaching the filesystem root, skip the viewer launch with a warning: "Could not resolve discovery root from `<scope>` — viewer launch skipped."
 
 This becomes `DISCOVERY_ROOT` (the `--data` argument to `serve.py`).
 
@@ -43,10 +44,15 @@ The relative path from `DISCOVERY_ROOT` to `<scope>` (e.g. `metria/opp-1/2026-05
 
 ## Open in browser
 
-```
+```bash
+# macOS
 open "http://localhost:3000/_viewer/?round=<round-path>"
+# Linux
+xdg-open "http://localhost:3000/_viewer/?round=<round-path>"
 ```
+
+Use `open` on macOS, `xdg-open` on Linux. Check `uname -s` if unsure.
 
 ## Refresh-only shortcut
 
-If the server is already running and pointing at the correct discovery root, skip the server management steps. Just open the browser URL — the viewer fetches JSON with `Cache-Control: no-cache`, so a page refresh picks up new data automatically.
+If the server is already running and pointing at the correct discovery root, skip the server management steps. The viewer fetches JSON with `Cache-Control: no-cache`, so refreshing the existing browser tab picks up new data — no need to open a new tab.
