@@ -33,6 +33,8 @@ git log --oneline HEAD..@{u}
 gh pr list --author @me --state all --json number,title,state,reviewDecision,mergedAt,updatedAt --limit 10
 ```
 
+If the current branch has no upstream configured, the two `@{u}` commands will fail with `fatal: no upstream configured for branch 'X'`. Detect this (e.g., `git rev-parse --abbrev-ref --symbolic-full-name @{u}` returns non-zero) and skip them — report "no upstream configured" in the digest instead.
+
 **Enrich with Linear MCP if available.** If a Linear MCP server is configured (any tool matching `mcp__linear*` or `mcp__claude_ai_Linear*` — the official remote server registers as `mcp__linear-server__*`), fetch current title + status for each `SCI-\d+` mentioned in the state files. This lets the digest reflect what's *now* true in Linear, not just what was true at last wrapup.
 
 If `gh` isn't installed or authenticated, skip PR detection and note "(gh not available)" in the digest.
@@ -100,6 +102,7 @@ Do not act on the suggested next step without explicit user confirmation. If the
 | Linear MCP not configured | Skip status enrichment; use IDs as-is from state file. |
 | Multiple worktrees, ambiguous which to pick up | List them and ask which one. |
 | Stale STATE.md mentions a deleted branch | Note "(branch deleted)" next to the entry; don't crash. |
+| Current branch has no upstream | Skip the `@{u}` commands; note "no upstream configured" in the digest. |
 
 ## Rules
 
@@ -107,4 +110,4 @@ Do not act on the suggested next step without explicit user confirmation. If the
 - Lead with what changed since last session. That's the most useful piece.
 - If state is missing, say so plainly. Don't invent a "where you were" from git log alone — that's a fallback, not a substitute.
 - Keep the digest scannable. The user should know in 30 seconds what's open and what to do next.
-- The skill is read-only by default. It can run `git fetch` and `gh pr list` (both safe reads) but does not pull, push, checkout, or modify state.
+- The skill is non-destructive — it doesn't pull, push, checkout, or modify your working tree. It may run `git fetch` (which updates remote-tracking refs) and `gh pr list` (read-only).
