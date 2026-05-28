@@ -41,6 +41,15 @@
         "name": "Joni Lindgren"
       },
       "source": "./product-discovery"
+    },
+    {
+      "name": "scilla-claude-toolkit",
+      "description": "Scilla team's curated meta-skills for managing the way of working with Claude: session wrapup, Anthropic update digest",
+      "version": "1.0.0",
+      "author": {
+        "name": "Scilla Studio"
+      },
+      "source": "./scilla-claude-toolkit"
     }
   ]
 }
