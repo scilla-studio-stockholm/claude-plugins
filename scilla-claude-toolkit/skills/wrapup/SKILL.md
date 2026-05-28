@@ -15,7 +15,7 @@ Capture session context into project files so the next session can pick up seaml
 
 Run `git status` and, if relevant, `git worktree list` to confirm which branch/worktree you're in. If there are unversioned changes from the work itself (separate from the wrapup updates you're about to write), ask if the user wants to commit and push first.
 
-Joni follows a Linear → GitHub PR workflow (see global CLAUDE.md). If the branch is `joni/sci-XX-…`, commits and PRs should include the ticket ID.
+The Scilla team uses a Linear → GitHub PR workflow. If the branch matches `<name>/sci-XX-…`, commits and PRs should include the ticket ID.
 
 ### 2. Review what happened
 
