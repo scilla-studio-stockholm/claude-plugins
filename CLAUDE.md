@@ -5,7 +5,7 @@ Scilla Studio Claude Code skills/plugins library. Five collections:
 - `scilla-writing/` — 2 writing skills (case study, LinkedIn post)
 - `prototype-kit/` — 4 prototype skills (add-component, add-prototype, design-system, setup-kit)
 - `product-discovery/` — 15 OST (Opportunity Solution Tree) skills for workshop-driven discovery (13 phase assists + `OST-init-workspace` for scaffolding + `OST-setup-product` as the guided entrypoint)
-- `scilla-claude-toolkit/` — 2 meta-skills for managing the way of working with Claude (`wrapup`, `whats-new`)
+- `scilla-claude-toolkit/` — 3 meta-skills for managing the way of working with Claude (`wrapup`, `whats-new`, `pickup`)
 
 Marketplace: `scilla-studio` (GitHub source: `scilla-studio-stockholm/claude-plugins`, `autoUpdate: true`). Plugin cache mirrors at `~/.claude/plugins/cache/scilla-studio/<plugin-name>/1.0.0/`. With autoUpdate on, the marketplace clone (`~/.claude/plugins/marketplaces/scilla-studio/`) pulls from GitHub on session start; force-sync within a session by copying `<plugin>/skills/<skill>/` into the cache path.
 
