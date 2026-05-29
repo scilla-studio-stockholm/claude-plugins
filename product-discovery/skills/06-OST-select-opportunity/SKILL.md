@@ -5,7 +5,7 @@ description: For product trios and researchers, when selecting one opportunity f
 
 # Select opportunity
 
-You help a product trio select one opportunity from an approved set already compared against a product outcome and Torres criteria, producing paired JSON (per the opportunity-selection schema v0.1) plus a markdown rendering. The output is a proposal: the chosen opportunity with rationale, every other approved opportunity as an alternative-considered with a reason not picked, the chosen opp's score profile, and an AI-judged subset of the chosen opportunity's evidence gaps to carry into phase 2.
+You help a product trio select one opportunity from an approved set already compared against a product outcome and Torres criteria, producing a machine JSON (per the opportunity-selection schema v0.1, hidden in `_working/`) plus a self-contained milestone markdown doc, `1-opportunity.md`, at the scope root. The output is a proposal: the chosen opportunity with rationale, every other approved opportunity as an alternative-considered with a reason not picked, the decision-relevant slice of the comparison matrix, and an AI-judged subset of the chosen opportunity's evidence gaps to carry into phase 2. `1-opportunity.md` must stand alone — the reader (the trio) should be able to understand and challenge the decision without opening `_working/`.
 
 This skill is assist 5 in the OST discovery workflow.
 
@@ -25,7 +25,7 @@ The output is a **proposal**, not a decision-of-record. The trio reviews the pro
 
 2. **Load context via parent walk-up:**
    - `<scope>/../../_product-context/product-outcome.md`
-   - Same-round predecessor: `<scope>/comparison-matrix.json`
+   - Same-round predecessor: `<scope>/_working/comparison-matrix.json`
 
 3. **Read the knowledge anchors:**
    - `references/opportunity-selection.md` - the chosen-opportunity schema (v0.1), the three-step decision rule, the tie-handling convention, the evidence-gap-filter convention, the no-effort reminder.
@@ -33,11 +33,14 @@ The output is a **proposal**, not a decision-of-record. The trio reviews the pro
    - `references/opportunity-solution-tree-teresa-torres.md` - Torres principles, especially "Don't assess effort during opportunity selection".
 
 4. **Locate inputs:**
-   - `<scope>/comparison-matrix.json` (same-round predecessor).
+   - `<scope>/_working/comparison-matrix.json` (same-round predecessor). Read this to populate the decision rule, the chosen opp's score profile, the alternatives-considered table (section 2 of the milestone doc), and the "How it compared" matrix slice (section 3).
+   - `<scope>/_working/opportunities-validated.md` (if present). Read this for the verbatim approved-opportunity quotes and verdicts used to flesh out sections 2-3 of the milestone doc.
    - `<scope>/../../_product-context/product-outcome.md`.
 
+   **Note:** `1-opportunity.md` must stand alone - the reader should not need to open `_working/`. Pull everything sections 1-4 need (quotes, sources, scores, comparison cells, gaps) into the milestone doc itself.
+
 5. **Hard-exit checks** (see Hard-exit format below). Do not write any output files when these fire:
-   - `<scope>/comparison-matrix.json` not found.
+   - `<scope>/_working/comparison-matrix.json` not found.
    - `<scope>/../../_product-context/product-outcome.md` missing.
    - Matrix JSON does not parse.
    - Matrix JSON `schema_version` is not `"0.1"`.
@@ -87,15 +90,20 @@ The output is a **proposal**, not a decision-of-record. The trio reviews the pro
 
     Per the missing-optional convention, omit any optional key whose value isn't set; never write `null`. `decision_signals.tie_with[]`, `evidence_gaps_carried[]`, and `evidence_gaps_excluded[]` are written as empty arrays when applicable, never as `null` and never omitted.
 
-15. **Render the markdown deterministically from the JSON** using the template in the "Markdown template" section below.
+15. **Render the milestone markdown deterministically** using the template in the "Markdown template" section below. The milestone doc (`1-opportunity.md`) is self-contained, so the reader never needs to open `_working/`:
+    - **Section 1 (Proposed opportunity)** and **Section 4 (Evidence gaps carried forward)** render from the composed JSON (chosen opp, rationale, profile summary, carried/excluded gaps).
+    - **Section 2 (Alternatives considered)** renders one row per `alternatives_considered[]` entry (every approved opp except the chosen) with its `reason_not_picked`.
+    - **Section 3 (How it compared)** is the decision-relevant slice of the comparison matrix. Read `_working/comparison-matrix.json` and render a table of the five Torres criteria (rows) × the chosen opportunity plus the top 2-3 alternatives (columns). Pick the top alternatives by their step-2 profile strength; if there are 3 or fewer alternatives in total, show all of them. Cells are the verbatim qualitative scores from the matrix — do not aggregate.
 
-16. **Write paired output** to:
-    - `<scope>/chosen-opportunity-proposal.json`
-    - `<scope>/chosen-opportunity-proposal.md`
+16. **Write output** to:
+    - `<scope>/_working/chosen-opportunity-proposal.json` (machine JSON, hidden in `_working/`)
+    - `<scope>/1-opportunity.md` (the self-contained milestone doc at the scope root)
 
-    Upstream `comparison-matrix.json` and `product-outcome.md` are not modified. Create `<scope>/` if it doesn't exist. Do NOT write to any `chosen-opportunity.md` under `opportunities/` - that is the trio's ratification step.
+    Upstream `comparison-matrix.json` and `product-outcome.md` are not modified. Create `<scope>/` and `<scope>/_working/` if they don't exist. Do NOT write to any `chosen-opportunity.md` under `opportunities/` - that is the trio's ratification step.
 
-17. **Write to decisions.json:** Read the round's `decisions.json`. Set `decided.opportunity` with these fields extracted from the proposal:
+    **`1-opportunity.md` must stand alone** - the reader (the trio) must be able to understand and challenge the decision without opening `_working/`.
+
+17. **Write to decisions.json:** Read `<scope>/decisions.json` (scope ROOT, not `_working/`). Set `decided.opportunity` with these fields extracted from the proposal:
 
     ```json
     {
@@ -133,7 +141,7 @@ The six hard-exit triggers:
 
 | Trigger | Looked for | Remedy |
 |---|---|---|
-| `<scope>/comparison-matrix.json` not found | A comparison matrix at the resolved scope path | Run `OST-compare-opportunities` for this scope round |
+| `<scope>/_working/comparison-matrix.json` not found | A comparison matrix at the resolved scope path | Run `OST-compare-opportunities` for this scope round |
 | `<scope>/../../_product-context/product-outcome.md` missing | Trio's product outcome file via parent walk-up | Restore from git or re-author using the template structure in `_product-context/` |
 | Matrix JSON does not parse | Schema-conformant v0.1 JSON | Re-run `OST-compare-opportunities` |
 | Matrix JSON `schema_version` is not `"0.1"` | `"schema_version": "0.1"` | Re-run `OST-compare-opportunities` against the latest clustered map |
@@ -144,71 +152,78 @@ The six hard-exit triggers:
 
 The markdown output is rendered deterministically from the composed JSON using this template:
 
+`1-opportunity.md` is the milestone doc the trio reads at the scope root. It must be self-contained: every quote, score, comparison cell, and gap the reader needs to challenge the decision is rendered here, so the reader never needs to open `_working/`. Sections appear in this fixed order: (1) Proposed opportunity, (2) Alternatives considered, (3) How it compared, (4) Evidence gaps carried forward.
+
 ```markdown
 ---
 title: Chosen opportunity - <title> (<team>)
 date: <YYYY-MM-DD>
-purpose: Selector proposal for OST opportunity selection, paired with chosen-opportunity-proposal.json. Trio reviews and ratifies into OST-discovery/<team>/<product>/opportunities/<opp-slug>/chosen-opportunity.md.
-tags: [opportunity-selection, ost, schema-v0.1]
+purpose: Milestone doc for OST opportunity selection (phase 06). Self-contained proposal the trio reviews and ratifies. Machine JSON paired at _working/chosen-opportunity-proposal.json; ratified record at decisions.json (decided.opportunity).
+tags: [opportunity-selection, ost, schema-v0.1, milestone]
 
 ---
 
 # Chosen opportunity: <title> (<team>)
 
-Source comparison matrix: `comparison-matrix.json`
-Source product outcome: `<scope>/../../_product-context/product-outcome.md`
 Schema version: 0.1
-Paired JSON: `chosen-opportunity-proposal.json`
+Paired JSON: `_working/chosen-opportunity-proposal.json`
+Ratified record: `decisions.json` (`decided.opportunity`)
 
 > **Trio HITL:** This is the AI's proposal. Review the rationale and override if you disagree. If approved, `decided.opportunity` in `decisions.json` is the ratified record — you may edit it directly to adjust scores or rationale before approving. Creating `chosen-opportunity.md` in an opportunity folder is optional (human reference only — downstream skills read from `decisions.json`).
 
-## Product outcome
+**Product outcome:** <full outcome formulation>
 
-> <full outcome formulation>
+## 1. Proposed opportunity
 
-## Chosen opportunity
+**<chosen.id>** (Journey phase: <phase name>)
 
-**<chosen.id>** (Phase: <phase name>) - "<chosen.quote>" - *<chosen.source>*
+> "<chosen.quote>"
+> — *<chosen.source>*
 
-### Score profile
+### Why this opportunity
 
-| Criterion               | Score   |
-|-------------------------|---------|
-| Outcome alignment       | <score> |
-| Customer importance     | <score> |
-| Market size / frequency | <score> |
-| Strategic fit           | <score> |
-| Competitive landscape   | <score> |
+<rationale prose, 2-4 sentences using the locked decision rule. Mentions opp-ids and criterion names by their canonical English form; on tied picks, names the tied opp(s) explicitly so the trio sees the closeness; on the empty-candidate-set fallback, names the fallback explicitly. No effort vocabulary.>
 
 Profile summary: <decision_signals.profile_summary>.
 
-### Rationale
+## 2. Alternatives considered (<N>)
 
-<rationale prose, 2-4 sentences. Mentions opp-ids and criterion names; on tied picks, names the tied opp(s) explicitly so the trio sees the closeness.>
+Every other approved opportunity from the comparison, with a one-line reason it was not chosen.
 
-## Alternatives considered (<N>)
+| Opportunity | Journey phase | Why not chosen |
+|-------------|---------------|----------------|
+| **<opp-id>** | <phase> | <one-line reason_not_picked anchored in matrix scores or the decision-rule step that filtered it> |
 
-- **opp-X-Y** (Phase: <phase>) - "<quote>" - *<source>*
-  Reason not picked: <1-2 sentences anchored in matrix scores>
-- **opp-A-B** (Phase: <phase>) - "<quote>" - *<source>*
-  Reason not picked: <...>
+(one row per opp in alternatives_considered[] — i.e. every approved opportunity except the chosen one)
 
-(repeat one entry per opp in alternatives_considered[])
+## 3. How it compared
 
-## Evidence gaps carried into phase 2 (<N>)
+The decision-relevant slice of the comparison matrix: the five Torres criteria for the chosen opportunity and the top alternatives, so the reader sees what lost and on which criteria. Built from `_working/comparison-matrix.json` (chosen column + the next strongest 2-3 alternatives by their step-2 profile; if there are 3 or fewer alternatives total, show them all).
 
-(only if non-empty; otherwise omit this whole section)
+| Criterion               | **<chosen.id>** (chosen) | <alt-1 id> | <alt-2 id> | <alt-3 id> |
+|-------------------------|--------------------------|------------|------------|------------|
+| Outcome alignment       | <score>                  | <score>    | <score>    | <score>    |
+| Customer importance     | <score>                  | <score>    | <score>    | <score>    |
+| Market size / frequency | <score>                  | <score>    | <score>    | <score>    |
+| Strategic fit           | <score>                  | <score>    | <score>    | <score>    |
+| Competitive landscape   | <score>                  | <score>    | <score>    | <score>    |
 
-These gaps from the chosen opportunity affect how phase-2 solutions are evaluated.
+Scores are the qualitative cells from the comparison matrix (`strong` / `medium` / `weak` / `unknown` / `n/a`), not aggregated.
+
+## 4. Evidence gaps carried forward (<N>)
+
+(only if `evidence_gaps_carried[]` is non-empty; otherwise omit this whole section)
+
+The AI-judged subset of the chosen opportunity's evidence gaps to carry into phase 2. These affect how phase-2 solutions are evaluated.
 
 - **<criterion display name>**: <what_is_missing>
   *Why relevant: <why_relevant_to_phase_2>*
 
 (repeat one entry per evidence_gaps_carried[])
 
-## Evidence gaps not carried (<N>)
+### Gaps not carried (<N>)
 
-(only if non-empty; otherwise omit this whole section)
+(only if `evidence_gaps_excluded[]` is non-empty; otherwise omit this subsection)
 
 These gaps from the chosen opportunity were judged not to affect phase-2 solution work. Listed for transparency; trio may decide to investigate them anyway.
 
@@ -226,21 +241,21 @@ These gaps from the chosen opportunity were judged not to affect phase-2 solutio
 - **Criterion display names stay in English** even when quotes and rationales are Swedish.
 - **Output language for prose** (`rationale`, `reason_not_picked`, `why_relevant_to_phase_2`, `why_excluded`) matches the source language detected in the matrix's `quote` text and `phase` placement. Schema field names, JSON keys, criterion IDs, criterion display names, and score vocabulary stay as defined.
 - **Frontmatter on the markdown output** complies with the project convention that every `.md` file has YAML frontmatter, with a blank line before the closing `---`.
-- **Empty optional sections are omitted entirely.** "Evidence gaps carried into phase 2" and "Evidence gaps not carried" each omit when their underlying list is empty.
+- **Empty optional sections are omitted entirely.** "Evidence gaps carried forward" omits when `evidence_gaps_carried[]` is empty, and its "Gaps not carried" subsection omits when `evidence_gaps_excluded[]` is empty.
 - **Tie callouts live inline in the rationale prose.** No separate "tie note" or "coin-flip" section.
 - **No `Cites:` line** anywhere. The selector's rationale references opp-ids inline; there is no per-cell trace-back invariant.
 - **Section order is fixed** and the AI does not insert ad-hoc sections.
 - **The HITL banner** (`> **Trio HITL:** ...`) is rendered verbatim every run.
 - **No silent degradation.** Hard exit on the conditions in the Hard-exit format table; never write partial output.
 - **No JSON self-validation pass.** Trust the prompt; downstream skills surface any malformed JSON.
-- **Upstream files are immutable.** Never modify `comparison-matrix-*.json` or `product-outcome.md`. The skill writes the two `chosen-opportunity-proposal.*` files and `decisions.json`.
-- **Never write to any `chosen-opportunity.md` under `opportunities/`.** The skill writes only `chosen-opportunity-proposal.*` into `<scope>/` and updates `decided.opportunity` in `decisions.json`. Creating `chosen-opportunity.md` in an opportunity folder is the trio's optional manual step.
+- **Upstream files are immutable.** Never modify `comparison-matrix-*.json` or `product-outcome.md`. The skill writes `_working/chosen-opportunity-proposal.json`, the milestone `<scope>/1-opportunity.md`, and updates `decisions.json`.
+- **Never write to any `chosen-opportunity.md` under `opportunities/`.** The skill writes `_working/chosen-opportunity-proposal.json` and the milestone `<scope>/1-opportunity.md`, and updates `decided.opportunity` in `decisions.json`. Creating `chosen-opportunity.md` in an opportunity folder is the trio's optional manual step.
 - **Single pass.** No retries, no iteration over the inputs.
 
 ## What this skill does NOT do
 
 - **Read interview transcripts.** Quotes come from the comparison matrix.
-- **Read the clustered experience-map JSON, validated table, or extracted opportunities.** All quotes, sources, scores, and rationales the selector needs are already in the matrix.
+- **Read the clustered experience-map JSON or extracted opportunities.** All quotes, sources, scores, and rationales the selector needs are already in the matrix. (`_working/opportunities-validated.md` may be consulted to flesh out the milestone doc's alternatives table, but the decision rule runs off the matrix alone.)
 - **Re-validate, re-cluster, or re-compare.** Those are upstream skills.
 - **Modify upstream files.** `comparison-matrix-*.json` and `product-outcome.md` stay immutable.
 - **Write to `OST-discovery/<team>/<product>/opportunities/<opp-slug>/chosen-opportunity.md`.** That is the trio's optional manual step; downstream skills read from `decisions.json`.
@@ -251,7 +266,7 @@ These gaps from the chosen opportunity were judged not to affect phase-2 solutio
 - **Weigh effort, feasibility, integration cost, or implementation complexity.** Per Torres.
 - **Generate solutions for the chosen opportunity.** Downstream (assist 6).
 - **Re-introduce excluded opportunities** (verdict `needs_tweak` or `solution_in_disguise`) into the candidate set. The matrix already filtered them.
-- **Iterate, retry, or run multiple passes.** One pass over the inputs, one pair of output files.
+- **Iterate, retry, or run multiple passes.** One pass over the inputs; writes `_working/chosen-opportunity-proposal.json`, the milestone `1-opportunity.md`, and `decisions.json`.
 - **Run a JSON self-validation pass after composition.**
 - **Write to Miro or any external surface.** JSON + markdown only.
 - **Audit the matrix JSON for invariant violations** beyond what's needed to apply the decision rule. The selector trusts the comparator's output.
