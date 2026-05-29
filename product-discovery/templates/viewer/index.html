@@ -1013,8 +1013,13 @@
   async function loadRound(roundPath) {
     var base = '/' + roundPath.replace(/^\/+/, '').replace(/\/+$/, '');
     var decisions = await loadJSON(base + '/decisions.json');
-    var listing = await loadJSON(base + '/');
+    var listing = await loadJSON(base + '/_working/');
     var files = Array.isArray(listing) ? listing : [];
+    // decisions.json lives at the scope root, not in _working/, so the
+    // _working/ listing won't include it — add it back for tab discovery.
+    if (decisions && files.indexOf('decisions.json') === -1) {
+      files.push('decisions.json');
+    }
     return { decisions: decisions, files: files, basePath: base };
   }
 
@@ -1077,7 +1082,7 @@
       return;
     }
 
-    var json = await loadJSON(roundData.basePath + '/' + filename);
+    var json = await loadJSON(roundData.basePath + '/_working/' + filename);
     if (!json) {
       container.innerHTML = '<div class="viewer-error"><h2>Could not load</h2><p>Failed to fetch <code>' + filename + '</code></p></div>';
       return;
