@@ -24,7 +24,7 @@ If a transcript is long enough that you would be tempted to skim or sample, disp
 1. **Resolve scope.** Follow `references/workspace-scope.md`. Opportunity-selection scope only — the resolved path must contain `/opportunity-selection/`. If no opportunity-selection round exists for the target product yet, create a new round folder dated today: `OST-discovery/<team>/<product>/opportunity-selection/<YYYY-MM-DD>/`.
 
 2. **Load context via parent walk-up (optional):**
-   - `<scope>/../../_product-context/product-outcome.md` (if it exists; the extractor can run without it)
+   - `<scope>/product-context/product-outcome.md` (if it exists; the extractor can run without it)
 
 3. **Read the format anchor:** `references/opportunity-citation-format.md` — for citat-stickie format, tweak rules, and when to tweak.
 
@@ -77,7 +77,7 @@ If a transcript is long enough that you would be tempted to skim or sample, disp
    - Number of opportunity candidates extracted, by bucket, per file and total
    - Any transcripts where extraction yielded few candidates — flag for the trio
 
-12. **Save the result** as `<scope>/opportunities-extracted.md` with YAML frontmatter (title, date, team, purpose: "Extracted opportunity candidates from interview transcripts for this opportunity-selection round", source_transcripts, based_on_outcome if known, tags).
+12. **Save the result** as `<scope>/_working/opportunities-extracted.md` with YAML frontmatter (title, date, team, purpose: "Extracted opportunity candidates from interview transcripts for this opportunity-selection round", source_transcripts, based_on_outcome if known, tags).
 
 ## Output principles
 

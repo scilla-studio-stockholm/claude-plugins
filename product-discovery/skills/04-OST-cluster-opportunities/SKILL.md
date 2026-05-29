@@ -15,26 +15,26 @@ This skill is assist 3b in the OST discovery workflow.
 
 1. **Resolve scope.** Follow `references/workspace-scope.md`. Portfolio scope only.
 
-2. **Load context via parent walk-up:**
-   - `<scope>/../../_product-context/product-outcome.md`
-   - Same-round predecessor: `<scope>/experience-map-extracted.{md,json}` and `<scope>/opportunities-extracted.md`
+2. **Load context:**
+   - `<scope>/product-context/product-outcome.md`
+   - Same-round predecessor: `<scope>/_working/experience-map-extracted.{md,json}` and `<scope>/_working/opportunities-extracted.md`
 
 3. **Read the knowledge anchors:**
    - `references/experience-mapping.md` — schema v0.2 and the structural pattern.
    - `references/opportunity-citation-format.md` — citation conventions, used to read the source/quote structure.
    - `references/opportunity-solution-tree-teresa-torres.md` — opportunity-space principles, used as the lens for parent-child grouping.
 
-4. **Locate the three input files** in `<scope>/`:
-   - `<scope>/experience-map-extracted.json` — the extracted experience map (v0.1 from `OST-extract-experience-map`).
-   - `<scope>/opportunities-validated.md` — the per-opportunity verdict table from `OST-validate-opportunities`.
-   - `<scope>/opportunities-extracted.md` — the full-quote source the validation table was built from (the validation table truncates excerpts to ~50 chars; the full quote is needed for the output).
+4. **Locate the three input files** in `<scope>/_working/`:
+   - `<scope>/_working/experience-map-extracted.json` — the extracted experience map (v0.1 from `OST-extract-experience-map`).
+   - `<scope>/_working/opportunities-validated.md` — the per-opportunity verdict table from `OST-validate-opportunities`.
+   - `<scope>/_working/opportunities-extracted.md` — the full-quote source the validation table was built from (the validation table truncates excerpts to ~50 chars; the full quote is needed for the output).
 
    If any file is absent, hard-exit before writing any output.
 
 5. **Hard-exit checks** (see Hard-exit format below). Do not write any output files when these fire:
-   - `<scope>/experience-map-extracted.json` not found.
-   - `<scope>/opportunities-validated.md` not found.
-   - `<scope>/opportunities-extracted.md` not found.
+   - `<scope>/_working/experience-map-extracted.json` not found.
+   - `<scope>/_working/opportunities-validated.md` not found.
+   - `<scope>/_working/opportunities-extracted.md` not found.
    - Experience-map JSON does not parse, or required v0.1 fields missing/empty (`product_outcome`, `title`, `team`, non-empty `phases[]` with `name`/`order`/non-empty `steps[]` per phase).
 
 6. **Parse and join.**
@@ -66,8 +66,8 @@ This skill is assist 3b in the OST discovery workflow.
 10. **Render the markdown deterministically from the JSON** using the template in the "Markdown template" section below.
 
 11. **Write paired output** to:
-   - `<scope>/experience-map-clustered.json`
-   - `<scope>/experience-map-clustered.md`
+   - `<scope>/_working/experience-map-clustered.json`
+   - `<scope>/_working/experience-map-clustered.md`
 
    The two files share the same root name. Upstream `experience-map-extracted.*` files are not modified.
 
@@ -88,11 +88,11 @@ The five hard-exit triggers:
 
 | Trigger | Looked for | Remedy |
 |---|---|---|
-| `<scope>/experience-map-extracted.json` not found | The extracted experience map at the resolved scope path | Run `OST-extract-experience-map` and confirm scope resolution via `references/workspace-scope.md` |
-| `<scope>/opportunities-validated.md` not found | The validated opportunity table at the resolved scope path | Run `OST-validate-opportunities` |
-| `<scope>/opportunities-extracted.md` not found | The extracted opportunities (full quotes) at the resolved scope path | Run `OST-opportunity-extractor` or capture opportunities manually in citat-stickie format |
+| `<scope>/_working/experience-map-extracted.json` not found | The extracted experience map at the resolved scope path | Run `OST-extract-experience-map` and confirm scope resolution via `references/workspace-scope.md` |
+| `<scope>/_working/opportunities-validated.md` not found | The validated opportunity table at the resolved scope path | Run `OST-validate-opportunities` |
+| `<scope>/_working/opportunities-extracted.md` not found | The extracted opportunities (full quotes) at the resolved scope path | Run `OST-opportunity-extractor` or capture opportunities manually in citat-stickie format |
 | Experience-map JSON does not parse, or required v0.1 fields missing/empty | Schema-conformant `product_outcome`, `title`, `team`, non-empty `phases[]` with `name`/`order`/non-empty `steps[]` per phase | Re-run `OST-extract-experience-map` against the source screenshot |
-| Row-order join prefix mismatch | Validated row N's excerpt is a prefix of extracted opportunity N's full quote | Re-run `OST-validate-opportunities` against the current `<scope>/opportunities-extracted.md`; do not hand-edit either file out of sync |
+| Row-order join prefix mismatch | Validated row N's excerpt is a prefix of extracted opportunity N's full quote | Re-run `OST-validate-opportunities` against the current `<scope>/_working/opportunities-extracted.md`; do not hand-edit either file out of sync |
 
 ## Markdown template
 
