@@ -113,7 +113,7 @@ The markdown output is rendered deterministically from the composed JSON using t
 ---
 title: Solution candidates - <title> (<team>)
 date: <YYYY-MM-DD>
-purpose: Divergent solution-candidate set for the chosen opportunity, paired with solution-candidates-<date>.json. Consumed by assist 7 (OST-cluster-solutions). Trio review at assist 8 (top-3 selector).
+purpose: Divergent solution-candidate set for the chosen opportunity, paired with solution-candidates.json. Consumed by assist 7 (OST-cluster-solutions). Trio review at assist 8 (top-3 selector).
 tags: [solution-brainstorm, ost, schema-v0.1]
 
 ---

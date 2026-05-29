@@ -161,7 +161,7 @@ You help a product trio decompose their 3 chosen solutions into the assumptions 
     ---
     title: "Assumptions: <chosen_opportunity.id> - <first 5-10 words of quote>"
     date: <YYYY-MM-DD>
-    purpose: Per-solution deduped assumption lists with source-method attribution. Paired with assumptions-<date>.json. Input to assist 10 (OST-assumption-categorizer); trio gate downstream at assist 11 (OST-riskiest-assumptions).
+    purpose: Per-solution deduped assumption lists with source-method attribution. Paired with assumptions.json. Input to assist 10 (OST-assumption-categorizer); trio gate downstream at assist 11 (OST-riskiest-assumptions).
     tags: [assumption-generation, ost, schema-v0.1]
 
     ---

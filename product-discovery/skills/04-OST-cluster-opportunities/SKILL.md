@@ -102,16 +102,16 @@ The markdown output is rendered deterministically from the composed JSON using t
 ---
 title: Experience map (clustered) - <title> (<team>)
 date: <YYYY-MM-DD>
-purpose: Clustered experience map for OST opportunity work, paired with experience-map-clustered-<date>.json
+purpose: Clustered experience map for OST opportunity work, paired with experience-map-clustered.json
 tags: [experience-mapping, ost, opportunity-clustering, schema-v0.2]
 
 ---
 
 # Experience map (clustered): <title> (<team>)
 
-Source experience map: `experience-map-extracted-<date>.json`
-Source validated opportunities: `opportunities-validated-<date>.md`
-Source extracted opportunities: `opportunities-extracted-<date>.md`
+Source experience map: `experience-map-extracted.json`
+Source validated opportunities: `opportunities-validated.md`
+Source extracted opportunities: `opportunities-extracted.md`
 Schema version: 0.2
 Paired JSON: `experience-map-clustered-<YYYY-MM-DD>.json`
 
@@ -219,7 +219,7 @@ from the extracted JSON)
 - **Frontmatter on the markdown output** complies with the project convention that every `.md` file has YAML frontmatter, with a blank line before the closing `---`.
 - **No silent degradation.** Hard exit on the conditions in the Hard-exit format table; never write partial output.
 - **No JSON self-validation pass.** Trust the prompt; downstream skills surface any malformed JSON.
-- **Upstream files are immutable.** Never modify `experience-map-extracted-*`, `opportunities-validated-*`, or `opportunities-extracted-*`. The skill only writes the two `experience-map-clustered-<date>.*` files.
+- **Upstream files are immutable.** Never modify `experience-map-extracted-*`, `opportunities-validated-*`, or `opportunities-extracted-*`. The skill only writes the two `experience-map-clustered.*` files.
 - **Single pass.** No retries, no iteration over the inputs.
 
 ## What this skill does NOT do

@@ -137,7 +137,7 @@ The markdown output is rendered deterministically from the composed JSON using t
 ---
 title: Comparison matrix - <title> (<team>)
 date: <YYYY-MM-DD>
-purpose: Opportunity comparison matrix for OST opportunity selection, paired with comparison-matrix-<date>.json
+purpose: Opportunity comparison matrix for OST opportunity selection, paired with comparison-matrix.json
 tags: [opportunity-comparison, ost, schema-v0.1]
 
 ---
