@@ -122,7 +122,7 @@ tags: [solution-brainstorm, ost, schema-v0.1]
 
 Source: `<scope>/decisions.json`
 Schema version: 0.1
-Paired JSON: `_working/solution-candidates-<YYYY-MM-DD>.json`
+Paired JSON: `_working/solution-candidates.json`
 
 Generation summary: 3 rounds × 3 roles × 2 ideas = 18 total. Roles: Product Manager (PM), UX Designer (UX), Tech Lead (TL).
 

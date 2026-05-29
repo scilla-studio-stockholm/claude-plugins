@@ -172,7 +172,7 @@ You help a product trio decompose their 3 chosen solutions into the assumptions 
     Source top 3 solutions: `<source_top_three_solutions>`
     Source experience map: `<source_experience_map>`
     Schema version: 0.1
-    Paired JSON: `assumptions-<YYYY-MM-DD>.json`
+    Paired JSON: `_working/assumptions.json`
 
     Generation summary: 3 methods (storymap, pre-mortem, outcome-impact) x 3 solutions x 6 assumptions = 54 raw, then per-solution dedup with source-method attribution.
 

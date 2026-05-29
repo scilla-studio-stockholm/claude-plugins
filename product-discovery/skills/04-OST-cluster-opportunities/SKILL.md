@@ -113,7 +113,7 @@ Source experience map: `experience-map-extracted.json`
 Source validated opportunities: `opportunities-validated.md`
 Source extracted opportunities: `opportunities-extracted.md`
 Schema version: 0.2
-Paired JSON: `experience-map-clustered-<YYYY-MM-DD>.json`
+Paired JSON: `_working/experience-map-clustered.json`
 
 ## Product outcome
 
