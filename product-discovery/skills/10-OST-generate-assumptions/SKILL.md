@@ -12,8 +12,8 @@ You help a product trio decompose their 3 chosen solutions into the assumptions 
 - The trio has ratified the top-three solutions into `decided.solutions` in `<scope>/decisions.json`.
 - `decided.opportunity` exists in `<scope>/decisions.json` with `id`, `phase_id`, `quote`, `source`.
 - `decided.solutions` exists in `<scope>/decisions.json` with a `picks[]` array of 3 objects.
-- `<scope>/../../../_product-context/experience-map.json` (or `.md`) exists.
-- `<scope>/top-three-solutions.json` exists in the current scope (for full per-pick fields including `generating_role` and `round_number`).
+- `<scope>/../../../product-context/experience-map.json` (or `.md`) exists.
+- `<scope>/_working/top-three-solutions.json` exists in the current scope (for full per-pick fields including `generating_role` and `round_number`).
 
 ## Steps
 
@@ -21,8 +21,8 @@ You help a product trio decompose their 3 chosen solutions into the assumptions 
 
 2. **Load context:**
    - `<scope>/decisions.json` (required — authority for ratification status and opportunity/outcome data)
-   - `<scope>/top-three-solutions.json` (required — full per-pick data including `generating_role` and `round_number`)
-   - `<scope>/../../../_product-context/experience-map.json` (or `.md`) — the experience map for context
+   - `<scope>/_working/top-three-solutions.json` (required — full per-pick data including `generating_role` and `round_number`)
+   - `<scope>/../../../product-context/experience-map.json` (or `.md`) — the experience map for context
 
 3. **Read the knowledge anchors:**
    - `references/assumption-generation.md` (the schema and the three-method definitions; this is the canonical source for everything below).
@@ -33,8 +33,8 @@ You help a product trio decompose their 3 chosen solutions into the assumptions 
 4. **Locate inputs:**
 
    - Read `<scope>/decisions.json`. Hard-exit if missing. Check for `decided.solutions` key — hard-exit if absent. Check for `decided.opportunity` key — hard-exit if absent. Use `decided.solutions.picks[]` (array of 3) to confirm ratification. Use `decided.opportunity` for chosen-opportunity fields. Use top-level `product_outcome` for the outcome formulation.
-   - Read `<scope>/top-three-solutions.json`. Hard-exit if missing. This provides the full per-pick data (`generating_role`, `round_number`) not stored in decisions.json. No sibling-round fallback needed.
-   - Read `<scope>/../../../_product-context/experience-map.json` (fall back to `.md` if JSON is absent). Hard-exit if neither exists.
+   - Read `<scope>/_working/top-three-solutions.json`. Hard-exit if missing. This provides the full per-pick data (`generating_role`, `round_number`) not stored in decisions.json. No sibling-round fallback needed.
+   - Read `<scope>/../../../product-context/experience-map.json` (fall back to `.md` if JSON is absent). Hard-exit if neither exists.
 
 5. **Hard-exit checks.** Apply the triggers below. If any fire, write no output files. Emit a three-line error in this exact shape:
 
@@ -50,11 +50,11 @@ You help a product trio decompose their 3 chosen solutions into the assumptions 
    - `<scope>/decisions.json` missing.
    - `decided.solutions` key absent from `<scope>/decisions.json`.
    - `decided.opportunity` key absent from `<scope>/decisions.json`.
-   - `<scope>/top-three-solutions.json` missing.
+   - `<scope>/_working/top-three-solutions.json` missing.
    - `top-three-solutions.json` does not parse.
    - `top-three-solutions.json` `schema_version` is not `"0.2"`.
    - `top-three-solutions.json` `picks[]` length != 3.
-   - Neither `<scope>/../../../_product-context/experience-map.json` nor `experience-map.md` exists.
+   - Neither `<scope>/../../../product-context/experience-map.json` nor `experience-map.md` exists.
    - Any of the four knowledge anchors missing.
 
 7. **Parse inputs.**
@@ -120,7 +120,7 @@ You help a product trio decompose their 3 chosen solutions into the assumptions 
    - `product_outcome`: the verbatim outcome formulation.
    - `chosen_opportunity`: the object with `id`, `phase_id`, `quote`, `source` (carried from upstream).
    - `source_decisions`: relative path to `decisions.json` from the repo root (e.g., `"OST-discovery/fast/fsok/opportunities/sok-pa-karta/2026-05-11/decisions.json"`).
-   - `source_top_three_solutions`: relative path to the source top-three JSON from the repo root (e.g., `"OST-discovery/fast/fsok/opportunities/sok-pa-karta/2026-05-11/top-three-solutions.json"`).
+   - `source_top_three_solutions`: relative path to the source top-three JSON from the repo root (e.g., `"OST-discovery/fast/fsok/opportunities/sok-pa-karta/2026-05-11/_working/top-three-solutions.json"`).
    - `source_experience_map`: basename of the source experience-map JSON.
    - `generation_summary`: the fixed v0.1 block:
      ```json
@@ -150,10 +150,10 @@ You help a product trio decompose their 3 chosen solutions into the assumptions 
 
 14. **Write paired output.**
 
-    - `<scope>/assumptions.json`
-    - `<scope>/assumptions.md`
+    - `<scope>/_working/assumptions.json`
+    - `<scope>/_working/assumptions.md`
 
-    Create `<scope>/` if it does not exist. Same root name on both files.
+    Create `<scope>/_working/` if it does not exist. Same root name on both files.
 
 15. **Render the markdown deterministically from the JSON.** Use this exact template:
 
@@ -237,7 +237,7 @@ You help a product trio decompose their 3 chosen solutions into the assumptions 
 - Generates test cards, validation plans, or experiment designs. (Future phase 4.)
 - Applies cross-solution dedup or marks shared assumptions across solutions.
 - Modifies upstream files (decisions.json, top-three JSON, experience map).
-- Writes outside the resolved scope. Output lives in `<scope>/`.
+- Writes outside the resolved scope. Output lives in `<scope>/_working/`.
 - Appends to `decisions.json`. Ratification writes are the responsibility of the ratifying skill upstream.
 - Adds an in-skill HITL banner. Trio gate is at assist 11.
 - Runs a JSON self-validation pass. Trust the invariant check.
