@@ -80,7 +80,7 @@ The ratified file mirrors the selector's proposal markdown structure, minus the 
 
 The trio's ratification action is concrete:
 
-1. Create a new opportunity folder at `discovery/<team>/<product>/opportunities/<opp-slug>/` (slug from the chosen opportunity's title per `knowledge/discovery/workspace-scope.md`) and copy `<scope>/chosen-opportunity-proposal.md` into it as `chosen-opportunity.md`.
+1. Create a new opportunity folder at `OST-discovery/<team>/<product>/opportunities/<opp-slug>/` (slug from the chosen opportunity's title per `knowledge/discovery/workspace-scope.md`) and copy `<scope>/chosen-opportunity-proposal.md` into it as `chosen-opportunity.md`.
 2. Delete the `> **Trio HITL:** ...` blockquote.
 3. Delete the entire `## Alternatives considered` section and its bullet entries.
 4. Edit the chosen opportunity / rationale / score profile if overriding the selector's pick (otherwise leave as-is).

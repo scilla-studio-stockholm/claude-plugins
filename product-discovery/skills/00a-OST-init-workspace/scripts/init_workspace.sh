@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# OST-init-workspace: scaffold the discovery/ tree and context templates
+# OST-init-workspace: scaffold the OST-discovery/ tree and context templates
 # that all OST-* skills depend on.
 #
 # Two layout modes:
-#   - Multi-product (default): discovery/<team>/<product>/...
-#   - Single-product (--single-product): discovery/...   (no team/product nesting)
+#   - Multi-product (default): OST-discovery/<team>/<product>/...
+#   - Single-product (--single-product): OST-discovery/...   (no team/product nesting)
 #
 # Idempotent: existing files are never overwritten. Each action prints
 # CREATED, SKIPPED (exists), or ERROR. Summary at the end.
@@ -37,7 +37,7 @@ Optional:
                         .current-scope there. Mutually exclusive with --opportunity.
   --date YYYY-MM-DD     Override today's date for the round folder name.
 
-Run from the repo root where discovery/ should live.
+Run from the repo root where OST-discovery/ should live.
 EOF
 }
 
@@ -110,7 +110,7 @@ if ! [[ "$DATE" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
   exit 2
 fi
 
-DISCOVERY_DIR="discovery"
+DISCOVERY_DIR="OST-discovery"
 if [[ "$SINGLE_PRODUCT" -eq 1 ]]; then
   PRODUCT_ROOT="$DISCOVERY_DIR"
   MODE="single-product"
@@ -348,7 +348,7 @@ phase skills do not care which mode the repo uses.
 For organisations with multiple teams or products in one repo:
 
 ```text
-discovery/
+OST-discovery/
 ├── .current-scope                                # one-line file: relative path to the active round folder
 ├── <team>/                                       # e.g. fast, norrsken
 │   ├── _team-context/                            # team-level docs (optional)
@@ -366,7 +366,7 @@ discovery/
 For small repos with exactly one product (no team/product nesting):
 
 ```text
-discovery/
+OST-discovery/
 ├── .current-scope
 ├── _product-context/                             # product-outcome.md, experience-map.{md,json}
 ├── opportunity-selection/<YYYY-MM-DD>/           # phase A round
@@ -382,7 +382,7 @@ Every OST-* skill resolves its scope (the round folder it reads/writes
 inside) in this order, taking the first that exists:
 
 1. Explicit `scope=` argument passed by the user when invoking the skill.
-2. `discovery/.current-scope` — one-line file with a relative path from
+2. `OST-discovery/.current-scope` — one-line file with a relative path from
    the repo root to the active round folder.
 3. Prompt the user, defaulting to the latest dated round under the most
    recently touched opportunity.
