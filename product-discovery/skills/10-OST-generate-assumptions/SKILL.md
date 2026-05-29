@@ -12,17 +12,17 @@ You help a product trio decompose their 3 chosen solutions into the assumptions 
 - The trio has ratified the top-three solutions into `decided.solutions` in `<scope>/decisions.json`.
 - `decided.opportunity` exists in `<scope>/decisions.json` with `id`, `phase_id`, `quote`, `source`.
 - `decided.solutions` exists in `<scope>/decisions.json` with a `picks[]` array of 3 objects.
-- `<scope>/../../../product-context/experience-map.json` (or `.md`) exists.
+- `<scope>/product-context/experience-map.json` (or `.md`) exists.
 - `<scope>/_working/top-three-solutions.json` exists in the current scope (for full per-pick fields including `generating_role` and `round_number`).
 
 ## Steps
 
-1. **Resolve scope.** Follow `references/workspace-scope.md`. Discovery scope only.
+1. **Resolve scope.** Follow `references/workspace-scope.md`. The scope is `OST-discovery/` itself in the default flat layout; multi-product / multi-round layouts are opt-in and resolved per that reference.
 
 2. **Load context:**
    - `<scope>/decisions.json` (required — authority for ratification status and opportunity/outcome data)
    - `<scope>/_working/top-three-solutions.json` (required — full per-pick data including `generating_role` and `round_number`)
-   - `<scope>/../../../product-context/experience-map.json` (or `.md`) — the experience map for context
+   - `<scope>/product-context/experience-map.json` (or `.md`) — the experience map for context
 
 3. **Read the knowledge anchors:**
    - `references/assumption-generation.md` (the schema and the three-method definitions; this is the canonical source for everything below).
@@ -34,7 +34,7 @@ You help a product trio decompose their 3 chosen solutions into the assumptions 
 
    - Read `<scope>/decisions.json`. Hard-exit if missing. Check for `decided.solutions` key — hard-exit if absent. Check for `decided.opportunity` key — hard-exit if absent. Use `decided.solutions.picks[]` (array of 3) to confirm ratification. Use `decided.opportunity` for chosen-opportunity fields. Use top-level `product_outcome` for the outcome formulation.
    - Read `<scope>/_working/top-three-solutions.json`. Hard-exit if missing. This provides the full per-pick data (`generating_role`, `round_number`) not stored in decisions.json. No sibling-round fallback needed.
-   - Read `<scope>/../../../product-context/experience-map.json` (fall back to `.md` if JSON is absent). Hard-exit if neither exists.
+   - Read `<scope>/product-context/experience-map.json` (fall back to `.md` if JSON is absent). Hard-exit if neither exists.
 
 5. **Hard-exit checks.** Apply the triggers below. If any fire, write no output files. Emit a three-line error in this exact shape:
 
@@ -54,7 +54,7 @@ You help a product trio decompose their 3 chosen solutions into the assumptions 
    - `top-three-solutions.json` does not parse.
    - `top-three-solutions.json` `schema_version` is not `"0.2"`.
    - `top-three-solutions.json` `picks[]` length != 3.
-   - Neither `<scope>/../../../product-context/experience-map.json` nor `experience-map.md` exists.
+   - Neither `<scope>/product-context/experience-map.json` nor `experience-map.md` exists.
    - Any of the four knowledge anchors missing.
 
 7. **Parse inputs.**

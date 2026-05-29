@@ -77,7 +77,7 @@ After this skill completes, the discovery workspace is **ready to run**: every d
 
 - **One question at a time.** Wait for the answer before asking the next. This is a guided interview, not a form.
 - **Knowledge-anchor before drafting.** Read the relevant reference file before composing a draft. Apply the framework; do not invent your own version.
-- **Show, confirm, write.** Never write a context file without showing the draft and getting explicit confirmation. The user is the source of truth for their product outcome and opportunity citation.
+- **Show, confirm, write.** Never write a context file without showing the draft and getting explicit confirmation. The user is the source of truth for their product outcome.
 - **Challenge drift.** If the user's product outcome reads like a business outcome, push back with the reasoning from `product-outcomes-vs-business-outcomes.md`. Do not silently rewrite the user's outcome.
 - **Defer gracefully.** Users can skip the experience map and come back later via `OST-extract-experience-map` or by re-invoking this skill. Print the deferred-file remedy in the final summary so the user does not need to remember.
 - **Re-runnable.** Re-invoking on an already-filled workspace must short-circuit without re-interviewing. The init script is already idempotent; this skill's content-detection step in step 4 handles the rest.

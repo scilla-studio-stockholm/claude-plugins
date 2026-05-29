@@ -11,15 +11,15 @@ This skill is assist 8 in the OST discovery workflow.
 
 The output is a **proposal** that assist 9 (assumption generator) consumes after trio ratification. The trio reviews the markdown output. If approved, `decided.solutions` in `decisions.json` is the ratified record. The trio may edit `decisions.json` to swap picks or adjust rationale. This skill does NOT write outside `<scope>/`.
 
-**Out of scope:** clustering or grouping solutions (`OST-cluster-solutions` is a separate optional skill, not consumed here), generating assumptions per pick (assist 9), re-brainstorming (assist 6), reading interview transcripts or the comparison matrix (everything needed is in the brainstormer JSON + `decisions.json`), surfacing alternatives or runners-up as a structured field (trio reads brainstormer markdown directly), scoring or ranking numerically, weighing effort or feasibility (Torres principle, carried), applying mechanism diversification as a constraint.
+**Out of scope:** clustering or grouping solutions (`OST-cluster-solutions` is a separate optional skill, not consumed here), generating assumptions per pick (assist 9), re-brainstorming (assist 6), reading interview transcripts or the comparison matrix (everything needed is in the brainstormer JSON + `decisions.json`), surfacing alternatives or runners-up as a structured field (alternatives are surfaced in the milestone doc's "Also considered" section of `2-solutions.md`), scoring or ranking numerically, weighing effort or feasibility (Torres principle, carried), applying mechanism diversification as a constraint.
 
 ## Steps
 
-1. **Resolve scope.** Follow `references/workspace-scope.md`. Discovery scope only.
+1. **Resolve scope.** Follow `references/workspace-scope.md`. The scope is `OST-discovery/` itself in the default flat layout; multi-product / multi-round layouts are opt-in and resolved per that reference.
 
-2. **Load context via parent walk-up:**
+2. **Load context:**
    - `<scope>/decisions.json`
-   - Same-round predecessor: `<scope>/solution-candidates.json` (with sibling-round fallback)
+   - Predecessor: `<scope>/_working/solution-candidates.json`
 
 3. **Read the knowledge anchors:**
    - `references/top-three-selection.md` - the v0.2 schema, the four v2 locked decisions, the no-effort rule, the ratification-flag pattern, the field-notes section.
@@ -27,12 +27,12 @@ The output is a **proposal** that assist 9 (assumption generator) consumes after
    - `references/opportunity-solution-tree-teresa-torres.md` - Torres principles. The canonical anchor is "Choose three solutions to explore in parallel" (CDH ch 7 step 6). The "Don't assess effort during opportunity selection" rule is carried to solution selection prose.
 
 4. **Locate inputs:**
-   - Latest `solution-candidates.json` in `<scope>/` (with sibling-round fallback).
-   - `<scope>/decisions.json` (parent walk-up).
+   - `<scope>/_working/solution-candidates.json`.
+   - `<scope>/decisions.json`.
 
 5. **Hard-exit checks** (see Hard-exit format below). Do not write any output files when these fire:
    - Missing knowledge anchor `top-three-selection.md`, `solution-brainstorm.md`, or `opportunity-solution-tree-teresa-torres.md` (expected under `knowledge/discovery/`).
-   - Zero files match `solution-candidates.json` in `<scope>/`.
+   - `<scope>/_working/solution-candidates.json` missing.
    - `<scope>/decisions.json` missing.
    - `decisions.json` has no `decided.opportunity` key.
    - Source JSON does not parse.
@@ -159,7 +159,7 @@ The hard-exit triggers:
 | Trigger | Looked for | Remedy |
 |---|---|---|
 | Missing knowledge anchor (`top-three-selection.md`, `solution-brainstorm.md`, or `opportunity-solution-tree-teresa-torres.md`) | The anchor file at the expected path under `knowledge/discovery/` | Restore from git, or re-run Task 1 of the OST-select-top-three-solutions v2 build |
-| Zero `solution-candidates.json` in `<scope>/` | A source brainstormer file | Run `OST-brainstorm-solutions` |
+| `<scope>/_working/solution-candidates.json` missing | A source brainstormer file | Run `OST-brainstorm-solutions` |
 | `<scope>/decisions.json` missing | Round-level `decisions.json` | Re-run `OST-init-workspace` to scaffold the file |
 | `decisions.json` has no `decided.opportunity` key | `decided.opportunity` object in `decisions.json` | Run `OST-select-opportunity` to ratify the chosen opportunity |
 | Source JSON does not parse | Schema-conformant v0.1 JSON | Re-run `OST-brainstorm-solutions` |

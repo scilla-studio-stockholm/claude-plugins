@@ -15,9 +15,9 @@ The output is a **divergent candidate set**, not a recommendation. There is no c
 
 ## Steps
 
-1. **Resolve scope.** Follow the scope-resolution protocol in `references/workspace-scope.md`. The resolved scope is a discovery scope of the form `OST-discovery/<team>/<product>/opportunities/<opp>/<YYYY-MM-DD>/`. Hard-exit if the resolved scope contains `/opportunity-selection/` (this skill runs in phase B only).
+1. **Resolve scope.** Follow the scope-resolution protocol in `references/workspace-scope.md`. The scope is `OST-discovery/` itself in the default flat layout; multi-product / multi-round layouts are opt-in and resolved per that reference.
 
-2. **Load context from the round folder.** Per `references/workspace-scope.md`:
+2. **Load context from the scope.** Per `references/workspace-scope.md`:
    - `<scope>/decisions.json` — the ratified opportunity context (`decided.opportunity`) and product outcome (`product_outcome`)
 
 3. **Read the knowledge anchors:**
@@ -170,7 +170,7 @@ Generation summary: 3 rounds × 3 roles × 2 ideas = 18 total. Roles: Product Ma
 
 - **Read interview transcripts.** Solutions are generative, not evidence-traced.
 - **Read the comparison matrix, validated table, clustered experience map, or extracted opportunities.** All chosen-opportunity context is in `<scope>/decisions.json`.
-- **Read the selector's proposal in `<scope>/../../opportunity-selection/<round>/`.** The skill reads only the trio-ratified data in `<scope>/decisions.json`.
+- **Read the selector's proposal in `_working/`.** The skill reads only the trio-ratified data in `<scope>/decisions.json`.
 - **Modify upstream files.** `decisions.json` and the role anchors stay immutable.
 - **Cluster, score, rank, or select solutions.** Those are downstream (assist 7 clusterer, assist 8 top-3 selector).
 - **Generate assumptions, risk maps, or test cards.** Those are downstream (assists 9-12).

@@ -15,17 +15,17 @@ The selector applies a locked three-step decision rule:
 2. **Rank** the remaining by strongest aggregate profile across the other four criteria.
 3. **Tiebreak** on fewer evidence gaps.
 
-The output is a **proposal**, not a decision-of-record. The trio reviews the proposal markdown. If approved, `decided.opportunity` in `decisions.json` is the ratified record. The trio may edit `decisions.json` directly to adjust scores or rationale before approving. Creating `chosen-opportunity.md` at the opportunity-folder root is optional (human reference only — downstream skills read from `decisions.json`).
+The output is a **proposal**, not a decision-of-record. The trio reviews the proposal markdown. If approved, `decided.opportunity` in `decisions.json` is the ratified record. The trio may edit `decisions.json` directly to adjust scores or rationale before approving. Creating a `chosen-opportunity.md` is optional (human reference only — downstream skills read from `decisions.json`).
 
 **Out of scope:** transcript reading, citation validation (`OST-validate-opportunities` upstream), re-clustering (`OST-cluster-opportunities` upstream), re-comparing (`OST-compare-opportunities` upstream), summing scores, picking more than one opportunity, generating solutions (assist 6 onward), and weighing effort or feasibility (Torres principle).
 
 ## Steps
 
-1. **Resolve scope.** Follow `references/workspace-scope.md`. Opportunity-selection scope only.
+1. **Resolve scope.** Follow `references/workspace-scope.md`. The scope is `OST-discovery/` itself in the default flat layout; multi-product / multi-round layouts are opt-in and resolved per that reference.
 
-2. **Load context via parent walk-up:**
-   - `<scope>/../../_product-context/product-outcome.md`
-   - Same-round predecessor: `<scope>/_working/comparison-matrix.json`
+2. **Load context:**
+   - `<scope>/product-context/product-outcome.md`
+   - Predecessor: `<scope>/_working/comparison-matrix.json`
 
 3. **Read the knowledge anchors:**
    - `references/opportunity-selection.md` - the chosen-opportunity schema (v0.1), the three-step decision rule, the tie-handling convention, the evidence-gap-filter convention, the no-effort reminder.
@@ -35,13 +35,13 @@ The output is a **proposal**, not a decision-of-record. The trio reviews the pro
 4. **Locate inputs:**
    - `<scope>/_working/comparison-matrix.json` (same-round predecessor). Read this to populate the decision rule, the chosen opp's score profile, the alternatives-considered table (section 2 of the milestone doc), and the "How it compared" matrix slice (section 3).
    - `<scope>/_working/opportunities-validated.md` (if present). Read this for the verbatim approved-opportunity quotes and verdicts used to flesh out sections 2-3 of the milestone doc.
-   - `<scope>/../../_product-context/product-outcome.md`.
+   - `<scope>/product-context/product-outcome.md`.
 
    **Note:** `1-opportunity.md` must stand alone - the reader should not need to open `_working/`. Pull everything sections 1-4 need (quotes, sources, scores, comparison cells, gaps) into the milestone doc itself.
 
 5. **Hard-exit checks** (see Hard-exit format below). Do not write any output files when these fire:
    - `<scope>/_working/comparison-matrix.json` not found.
-   - `<scope>/../../_product-context/product-outcome.md` missing.
+   - `<scope>/product-context/product-outcome.md` missing.
    - Matrix JSON does not parse.
    - Matrix JSON `schema_version` is not `"0.1"`.
    - Zero items in matrix `opportunities_compared[]`.
@@ -49,7 +49,7 @@ The output is a **proposal**, not a decision-of-record. The trio reviews the pro
 
 6. **Parse inputs.**
    - Parse the matrix JSON. Index `opportunities_compared[]` by `id`. Build a per-opportunity score map from `cells[]` (key: `(criterion_id, opportunity_id)`, value: `score`).
-   - Parse the product outcome from `<scope>/../../_product-context/product-outcome.md`. Extract the outcome formulation under the `## Outcome` heading. Carry the team name from `## Team`.
+   - Parse the product outcome from `<scope>/product-context/product-outcome.md`. Extract the outcome formulation under the `## Outcome` heading. Carry the team name from `## Team`.
 
 7. **Step 1 (filter).** Identify opportunities where `outcome-alignment` score is `weak` or `unknown`. These are deprioritized. The remaining set is the candidate pool.
 
@@ -99,7 +99,7 @@ The output is a **proposal**, not a decision-of-record. The trio reviews the pro
     - `<scope>/_working/chosen-opportunity-proposal.json` (machine JSON, hidden in `_working/`)
     - `<scope>/1-opportunity.md` (the self-contained milestone doc at the scope root)
 
-    Upstream `comparison-matrix.json` and `product-outcome.md` are not modified. Create `<scope>/` and `<scope>/_working/` if they don't exist. Do NOT write to any `chosen-opportunity.md` under `opportunities/` - that is the trio's ratification step.
+    Upstream `comparison-matrix.json` and `product-outcome.md` are not modified. Create `<scope>/` and `<scope>/_working/` if they don't exist. Do NOT write any `chosen-opportunity.md` - that is the trio's ratification step.
 
     **`1-opportunity.md` must stand alone** - the reader (the trio) must be able to understand and challenge the decision without opening `_working/`.
 
@@ -142,11 +142,11 @@ The six hard-exit triggers:
 | Trigger | Looked for | Remedy |
 |---|---|---|
 | `<scope>/_working/comparison-matrix.json` not found | A comparison matrix at the resolved scope path | Run `OST-compare-opportunities` for this scope round |
-| `<scope>/../../_product-context/product-outcome.md` missing | Trio's product outcome file via parent walk-up | Restore from git or re-author using the template structure in `_product-context/` |
+| `<scope>/product-context/product-outcome.md` missing | Trio's product outcome file in the scope's `product-context/` | Restore from git or re-author using the template structure in `product-context/` |
 | Matrix JSON does not parse | Schema-conformant v0.1 JSON | Re-run `OST-compare-opportunities` |
 | Matrix JSON `schema_version` is not `"0.1"` | `"schema_version": "0.1"` | Re-run `OST-compare-opportunities` against the latest clustered map |
 | Zero items in matrix `opportunities_compared[]` | At least one approved opportunity in the matrix | Re-run `OST-validate-opportunities` and review verdicts; the selector cannot select from an empty set |
-| Product outcome file has no extractable `## Outcome` section | A heading `## Outcome` followed by the outcome formulation | Re-author `_product-context/product-outcome.md` using the template structure |
+| Product outcome file has no extractable `## Outcome` section | A heading `## Outcome` followed by the outcome formulation | Re-author `product-context/product-outcome.md` using the template structure |
 
 ## Markdown template
 
@@ -169,7 +169,7 @@ Schema version: 0.1
 Paired JSON: `_working/chosen-opportunity-proposal.json`
 Ratified record: `decisions.json` (`decided.opportunity`)
 
-> **Trio HITL:** This is the AI's proposal. Review the rationale and override if you disagree. If approved, `decided.opportunity` in `decisions.json` is the ratified record — you may edit it directly to adjust scores or rationale before approving. Creating `chosen-opportunity.md` in an opportunity folder is optional (human reference only — downstream skills read from `decisions.json`).
+> **Trio HITL:** This is the AI's proposal. Review the rationale and override if you disagree. If approved, `decided.opportunity` in `decisions.json` is the ratified record — you may edit it directly to adjust scores or rationale before approving. Creating a `chosen-opportunity.md` is optional (human reference only — downstream skills read from `decisions.json`).
 
 **Product outcome:** <full outcome formulation>
 
@@ -249,7 +249,7 @@ These gaps from the chosen opportunity were judged not to affect phase-2 solutio
 - **No silent degradation.** Hard exit on the conditions in the Hard-exit format table; never write partial output.
 - **No JSON self-validation pass.** Trust the prompt; downstream skills surface any malformed JSON.
 - **Upstream files are immutable.** Never modify `comparison-matrix-*.json` or `product-outcome.md`. The skill writes `_working/chosen-opportunity-proposal.json`, the milestone `<scope>/1-opportunity.md`, and updates `decisions.json`.
-- **Never write to any `chosen-opportunity.md` under `opportunities/`.** The skill writes `_working/chosen-opportunity-proposal.json` and the milestone `<scope>/1-opportunity.md`, and updates `decided.opportunity` in `decisions.json`. Creating `chosen-opportunity.md` in an opportunity folder is the trio's optional manual step.
+- **Never write any `chosen-opportunity.md`.** The skill writes `_working/chosen-opportunity-proposal.json` and the milestone `<scope>/1-opportunity.md`, and updates `decided.opportunity` in `decisions.json`. Creating a `chosen-opportunity.md` is the trio's optional manual step.
 - **Single pass.** No retries, no iteration over the inputs.
 
 ## What this skill does NOT do
@@ -258,7 +258,7 @@ These gaps from the chosen opportunity were judged not to affect phase-2 solutio
 - **Read the clustered experience-map JSON or extracted opportunities.** All quotes, sources, scores, and rationales the selector needs are already in the matrix. (`_working/opportunities-validated.md` may be consulted to flesh out the milestone doc's alternatives table, but the decision rule runs off the matrix alone.)
 - **Re-validate, re-cluster, or re-compare.** Those are upstream skills.
 - **Modify upstream files.** `comparison-matrix-*.json` and `product-outcome.md` stay immutable.
-- **Write to `OST-discovery/<team>/<product>/opportunities/<opp-slug>/chosen-opportunity.md`.** That is the trio's optional manual step; downstream skills read from `decisions.json`.
+- **Write any `chosen-opportunity.md`.** Creating one is the trio's optional manual step; downstream skills read from `decisions.json`.
 - **Pick more than one opportunity.** HITL flavor is locked as picks-one + alternatives.
 - **Produce a shortlist.** Even on tied picks, the AI commits to one and names the tie in the rationale.
 - **Produce a free-form recommendation without alternatives.** Every other approved opportunity from the matrix appears in `alternatives_considered[]`.

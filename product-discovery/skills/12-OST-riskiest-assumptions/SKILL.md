@@ -13,15 +13,15 @@ This skill IS the phase-3 trio HITL gate. The markdown output opens with a `Trio
 
 ## Prerequisites
 
-- `OST-assumption-categorizer` (assist 10) has run; `assumptions-categorized.json` exists in `<scope>/` (or a sibling round folder).
+- `OST-assumption-categorizer` (assist 10) has run; `assumptions-categorized.json` exists in `<scope>/_working/`.
 
 ## Steps
 
-1. **Resolve scope.** Follow `references/workspace-scope.md`. Discovery scope only.
+1. **Resolve scope.** Follow `references/workspace-scope.md`. The scope is `OST-discovery/` itself in the default flat layout; multi-product / multi-round layouts are opt-in and resolved per that reference.
 
-2. **Load context via parent walk-up:**
+2. **Load context:**
    - `<scope>/decisions.json` (chosen opportunity, product outcome)
-   - Same-round predecessor: `<scope>/_working/assumptions-categorized.json` (with sibling-round fallback)
+   - Predecessor: `<scope>/_working/assumptions-categorized.json`
 
 3. **Read the knowledge anchors:**
    - `references/assumption-risk-mapping.md` (v0.2; the 2x2 framework, the Swedish scoring questions, the soft-evidence rule, the rationale format rule, the carry-forward rules, the schema v0.2, the renderer template; this is the canonical source for everything below).
@@ -29,7 +29,7 @@ This skill IS the phase-3 trio HITL gate. The markdown output opens with a `Trio
    - `references/opportunity-solution-tree-teresa-torres.md` (the "test the riskiest assumptions" framing, CDH ch 9).
    - `references/assumption-categorization.md` (the upstream schema v0.1; parse the input JSON against this).
 
-4. **Locate input.** List `<scope>/_working/assumptions-categorized.json` (with sibling-round fallback), sort by the date in the filename descending, take the latest. Hard-exit if zero matches.
+4. **Locate input.** Read `<scope>/_working/assumptions-categorized.json`. Hard-exit if missing.
 
 5. **Hard-exit checks.** Apply the triggers below. If any fire, write no output files. Emit a three-line error in this exact shape:
 
@@ -42,7 +42,7 @@ This skill IS the phase-3 trio HITL gate. The markdown output opens with a `Trio
 
    Triggers:
 
-   - No `assumptions-categorized.json` in `<scope>/_working/` (with sibling-round fallback). Remedy: run `OST-assumption-categorizer` (assist 10) first.
+   - No `assumptions-categorized.json` in `<scope>/_working/`. Remedy: run `OST-assumption-categorizer` (assist 10) first.
    - Source JSON does not parse. Remedy: re-run `OST-assumption-categorizer`.
    - Source JSON `schema_version` is not `"0.1"`. Remedy: re-run `OST-assumption-categorizer` against v0.1.
    - Source `assumptions_per_solution.length` != 3. Remedy: re-run `OST-assumption-categorizer`.
@@ -287,7 +287,7 @@ This skill IS the phase-3 trio HITL gate. The markdown output opens with a `Trio
 ## Vad skill INTE gör
 
 - Reads interview transcripts, OST-brainstorm-solutions output, comparison matrix, validated opportunities, OST-cluster-solutions output, top-three-solutions JSON directly, the assumptions JSON, or the experience map. Only the upstream `assumptions-categorized.json` contract.
-- Reads `<scope>/../chosen-opportunity.md`, `<scope>/../../../_product-context/product-outcome.md`, or `ratifications.md` beyond what scope-resolution provides. Identifying context flows through the upstream JSON.
+- Reads `chosen-opportunity.md`, `<scope>/product-context/product-outcome.md`, or `ratifications.md` beyond what scope-resolution provides. Identifying context flows through the upstream JSON.
 - Appends to `ratifications.md`. The phase-3 HITL gate is markdown-banner-only.
 - Reads role anchors. Role info is data only.
 - Generates, modifies, merges, or drops assumptions. Identity-mapping is the contract.

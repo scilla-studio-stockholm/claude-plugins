@@ -15,23 +15,23 @@ The output is a **proposal** that assist 8 (top-3 selector) consumes. The trio r
 
 ## Steps
 
-1. **Resolve scope.** Follow `references/workspace-scope.md`. Discovery scope only; hard-exit if the resolved scope contains `/opportunity-selection/`.
+1. **Resolve scope.** Follow `references/workspace-scope.md`. The scope is `OST-discovery/` itself in the default flat layout; multi-product / multi-round layouts are opt-in and resolved per that reference.
 
-2. **Load context via parent walk-up:**
+2. **Load context:**
    - `<scope>/decisions.json`
-   - Same-round predecessor: `<scope>/_working/solution-candidates.json`. If missing in `<scope>/_working/`, walk siblings (other dated rounds under the same opportunity) in date-descending order.
+   - Predecessor: `<scope>/_working/solution-candidates.json`.
 
 3. **Read the knowledge anchors:**
    - `references/solution-cluster.md` - the clustered-solutions schema (v0.1), the four locked decisions, the clustering-axis convention, the chosen-opp cross-check rule, the field-notes section.
    - `references/solution-brainstorm.md` - the source schema (v0.1) so you can parse what `OST-brainstorm-solutions` produced.
 
 4. **Locate inputs:**
-   - `<scope>/_working/solution-candidates.json` (same-round predecessor; walk siblings in date-descending order if missing in `<scope>/_working/`).
+   - `<scope>/_working/solution-candidates.json` (predecessor).
    - `<scope>/decisions.json`
 
 5. **Hard-exit checks** (see Hard-exit format below). Do not write any output files when these fire:
    - Missing knowledge anchor `solution-cluster.md` or `solution-brainstorm.md` (expected under `knowledge/discovery/`).
-   - `<scope>/_working/solution-candidates.json` missing (no same-round or sibling predecessor found).
+   - `<scope>/_working/solution-candidates.json` missing (no predecessor found).
    - `<scope>/decisions.json` missing.
    - `decided.opportunity` key absent from `decisions.json`.
    - Source JSON does not parse.
