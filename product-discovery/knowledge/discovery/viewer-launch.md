@@ -17,7 +17,7 @@ Let `VIEWER_ROOT` be the resolved path (the directory containing `serve.py` and 
 
 Walk up from `<scope>` until you find a directory that:
 - contains `.current-scope`, OR
-- is named `discovery/`
+- is named `OST-discovery/`
 
 If neither is found after reaching the filesystem root, skip the viewer launch with a warning: "Could not resolve discovery root from `<scope>` — viewer launch skipped."
 

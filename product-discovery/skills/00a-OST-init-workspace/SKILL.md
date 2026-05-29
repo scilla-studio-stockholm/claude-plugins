@@ -1,22 +1,22 @@
 ---
 name: OST-init-workspace
-description: Low-level scaffolding for the OST discovery/ tree. Use when an existing workspace needs a new product, opportunity, or opportunity-selection round folder added without running the full guided setup, or when invoked as a building block by OST-setup-product. For first-time setup of a new product, prefer OST-setup-product, which wraps this skill and also walks the trio through filling in product-outcome.md, experience-map.md, and chosen-opportunity.md.
+description: Low-level scaffolding for the OST OST-discovery/ tree. Use when an existing workspace needs a new product, opportunity, or opportunity-selection round folder added without running the full guided setup, or when invoked as a building block by OST-setup-product. For first-time setup of a new product, prefer OST-setup-product, which wraps this skill and also walks the trio through filling in product-outcome.md, experience-map.md, and chosen-opportunity.md.
 user_invocable: true
 ---
 
 # OST-init-workspace
 
-Scaffolds the `discovery/` directory tree, context templates, round-folder READMEs, and `.current-scope` pointer that every other OST-* skill depends on. Without this scaffold, downstream skills hard-exit on missing files.
+Scaffolds the `OST-discovery/` directory tree, context templates, round-folder READMEs, and `.current-scope` pointer that every other OST-* skill depends on. Without this scaffold, downstream skills hard-exit on missing files.
 
 Two layout modes are supported:
-- **Multi-product** (default): `discovery/<team>/<product>/...` — for repos that hold work for multiple teams or products.
-- **Single-product** (`--single-product`): `discovery/...` directly — for repos that hold work for one product only.
+- **Multi-product** (default): `OST-discovery/<team>/<product>/...` — for repos that hold work for multiple teams or products.
+- **Single-product** (`--single-product`): `OST-discovery/...` directly — for repos that hold work for one product only.
 
 Both modes use the same relative-path math, so all 13 phase OST-* skills work identically regardless of mode.
 
 ## Prerequisites
 
-- Run from the repo root where the `discovery/` directory should live.
+- Run from the repo root where the `OST-discovery/` directory should live.
 - No other skills required.
 
 ## Steps
@@ -57,7 +57,7 @@ Both modes use the same relative-path math, so all 13 phase OST-* skills work id
 4. **Print the script's stdout verbatim.** Do not paraphrase paths or rename files. The script is the source of truth for what was scaffolded.
 
 5. **Tell the user what to do next.** Pick the relevant pointer:
-   - If `_product-context/product-outcome.md` was newly created: "Open `discovery/.../_product-context/product-outcome.md` and write the product outcome before running any other OST skill. Skills hard-exit when this file is empty or contains the TBD placeholder."
+   - If `_product-context/product-outcome.md` was newly created: "Open `OST-discovery/.../_product-context/product-outcome.md` and write the product outcome before running any other OST skill. Skills hard-exit when this file is empty or contains the TBD placeholder."
    - If `_product-context/experience-map.md` was newly created and no `.png/.jpg` is present: "Either save an experience-map screenshot at `_product-context/experience-map.png` and run `OST-extract-experience-map`, or run `OST-setup-product` to walk through the experience map interview (it writes `experience-map-extracted.{md,json}` into the active round folder, which is what downstream skills need)."
    - If `.current-scope` was set: "Scope is set to `<path>`. Open the round folder's `README.md` to see what files will land there. Subsequent OST-* skills will read/write inside that folder unless you pass `scope=` explicitly."
 
@@ -75,4 +75,4 @@ Both modes use the same relative-path math, so all 13 phase OST-* skills work id
 - Run downstream OST-* skills. After scaffolding, the user picks the next skill themselves.
 - Migrate existing non-conforming directories into the convention. Out of scope; if the user has prior artifacts in a different layout, they move them manually.
 - Set up the `product-discovery` plugin itself. That happens via `/plugin install product-discovery@scilla-studio` and is a prerequisite for this skill being available at all.
-- Initialize git, create README.md at repo root, or touch anything outside `discovery/`. The skill scopes its writes to `discovery/` only.
+- Initialize git, create README.md at repo root, or touch anything outside `OST-discovery/`. The skill scopes its writes to `OST-discovery/` only.

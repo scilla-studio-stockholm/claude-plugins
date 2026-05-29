@@ -15,7 +15,7 @@ The output is a **divergent candidate set**, not a recommendation. There is no c
 
 ## Steps
 
-1. **Resolve scope.** Follow the scope-resolution protocol in `references/workspace-scope.md`. The resolved scope is a discovery scope of the form `discovery/<team>/<product>/opportunities/<opp>/<YYYY-MM-DD>/`. Hard-exit if the resolved scope contains `/opportunity-selection/` (this skill runs in phase B only).
+1. **Resolve scope.** Follow the scope-resolution protocol in `references/workspace-scope.md`. The resolved scope is a discovery scope of the form `OST-discovery/<team>/<product>/opportunities/<opp>/<YYYY-MM-DD>/`. Hard-exit if the resolved scope contains `/opportunity-selection/` (this skill runs in phase B only).
 
 2. **Load context from the round folder.** Per `references/workspace-scope.md`:
    - `<scope>/decisions.json` — the ratified opportunity context (`decided.opportunity`) and product outcome (`product_outcome`)

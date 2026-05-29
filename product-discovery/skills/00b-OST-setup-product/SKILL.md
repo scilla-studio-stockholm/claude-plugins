@@ -1,6 +1,6 @@
 ---
 name: OST-setup-product
-description: For product trios starting OST discovery for a new product, when the discovery workspace needs both scaffolding and the product-context files filled in (product outcome, experience map, optional opportunity citation), output a fully ready discovery/ tree via a guided interview. Use when teammates say "set up OST for product X," "kick off OST discovery," or "start a new product in the discovery workspace." This is the high-level entrypoint that wraps OST-init-workspace plus the context-filling interview.
+description: For product trios starting OST discovery for a new product, when the discovery workspace needs both scaffolding and the product-context files filled in (product outcome, experience map, optional opportunity citation), output a fully ready OST-discovery/ tree via a guided interview. Use when teammates say "set up OST for product X," "kick off OST discovery," or "start a new product in the discovery workspace." This is the high-level entrypoint that wraps OST-init-workspace plus the context-filling interview.
 user_invocable: true
 ---
 
@@ -12,7 +12,7 @@ After this skill completes, the discovery workspace is **ready to run**: every d
 
 ## Prerequisites
 
-- Run from the repo root where `discovery/` should live.
+- Run from the repo root where `OST-discovery/` should live.
 - `OST-init-workspace` skill present in the same plugin (this skill calls its script).
 - The trio has at least the rough material for a product outcome (the measurable customer-behavior change to move). The interview shapes it; it does not invent it.
 
@@ -55,9 +55,9 @@ After this skill completes, the discovery workspace is **ready to run**: every d
    - `<product-root>/_product-context/product-outcome.md` — read it; if the body still contains "TBD" or is empty after the frontmatter, mark as **needs interview**. Same for `experience-map.md`.
    - If `--opportunity` was given: `<product-root>/opportunities/<opp>/chosen-opportunity.md` — read it; mark as **needs interview** if the opportunity body is still TBD.
 
-   `<product-root>` is `discovery/` in single-product mode, or `discovery/<team>/<product>/` in multi-product mode.
+   `<product-root>` is `OST-discovery/` in single-product mode, or `OST-discovery/<team>/<product>/` in multi-product mode.
 
-   If everything is already filled, tell the user: "Workspace is already set up and all context files have content. Nothing to interview. Active scope: `<path>` (from `discovery/.current-scope`)." Stop.
+   If everything is already filled, tell the user: "Workspace is already set up and all context files have content. Nothing to interview. Active scope: `<path>` (from `OST-discovery/.current-scope`)." Stop.
 
 5. **Interview: product outcome** (if needed). One question at a time:
    - "What customer behavior do you want to change? (the thing your users *do*, not what the business gets)"
@@ -89,7 +89,7 @@ After this skill completes, the discovery workspace is **ready to run**: every d
 9. **Final summary.** After all interviews, print:
    - Files written (full paths)
    - Files still TBD with the remedy for each (e.g., "experience-map.md deferred — run `OST-extract-experience-map` after saving a screenshot")
-   - Active scope: read `discovery/.current-scope` and print the path. If `.current-scope` does NOT point at the round folder just created (e.g. because it already existed from a previous product), print a warning: "Note: `.current-scope` still points at `<old path>`, not the round you just set up. To switch, run: `echo '<new round path>' > discovery/.current-scope`"
+   - Active scope: read `OST-discovery/.current-scope` and print the path. If `.current-scope` does NOT point at the round folder just created (e.g. because it already existed from a previous product), print a warning: "Note: `.current-scope` still points at `<old path>`, not the round you just set up. To switch, run: `echo '<new round path>' > OST-discovery/.current-scope`"
    - "Next OST-* skill to run" — pick the right one based on round type: opportunity-selection → `OST-opportunity-extractor`, discovery → `OST-brainstorm-solutions`.
 
 ## Output principles

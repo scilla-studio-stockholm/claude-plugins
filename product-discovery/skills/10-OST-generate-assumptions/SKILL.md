@@ -119,8 +119,8 @@ You help a product trio decompose their 3 chosen solutions into the assumptions 
    - `title`: `"Assumptions: <chosen_opportunity.id> - <first 5-10 words of chosen_opportunity.quote, trailing punctuation stripped>"`.
    - `product_outcome`: the verbatim outcome formulation.
    - `chosen_opportunity`: the object with `id`, `phase_id`, `quote`, `source` (carried from upstream).
-   - `source_decisions`: relative path to `decisions.json` from the repo root (e.g., `"discovery/fast/fsok/opportunities/sok-pa-karta/2026-05-11/decisions.json"`).
-   - `source_top_three_solutions`: relative path to the source top-three JSON from the repo root (e.g., `"discovery/fast/fsok/opportunities/sok-pa-karta/2026-05-11/top-three-solutions.json"`).
+   - `source_decisions`: relative path to `decisions.json` from the repo root (e.g., `"OST-discovery/fast/fsok/opportunities/sok-pa-karta/2026-05-11/decisions.json"`).
+   - `source_top_three_solutions`: relative path to the source top-three JSON from the repo root (e.g., `"OST-discovery/fast/fsok/opportunities/sok-pa-karta/2026-05-11/top-three-solutions.json"`).
    - `source_experience_map`: basename of the source experience-map JSON.
    - `generation_summary`: the fixed v0.1 block:
      ```json

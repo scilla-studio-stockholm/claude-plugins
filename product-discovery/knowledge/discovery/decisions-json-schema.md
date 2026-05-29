@@ -4,7 +4,7 @@ Single file per discovery round. Accumulates only what the trio ratified at each
 
 ## Location
 
-`discovery/<round-folder>/decisions.json`
+`OST-discovery/<round-folder>/decisions.json`
 
 ## Schema (v1.0)
 

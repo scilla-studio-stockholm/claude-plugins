@@ -148,7 +148,7 @@ The markdown output is rendered deterministically from the composed JSON using t
 ---
 title: Chosen opportunity - <title> (<team>)
 date: <YYYY-MM-DD>
-purpose: Selector proposal for OST opportunity selection, paired with chosen-opportunity-proposal.json. Trio reviews and ratifies into discovery/<team>/<product>/opportunities/<opp-slug>/chosen-opportunity.md.
+purpose: Selector proposal for OST opportunity selection, paired with chosen-opportunity-proposal.json. Trio reviews and ratifies into OST-discovery/<team>/<product>/opportunities/<opp-slug>/chosen-opportunity.md.
 tags: [opportunity-selection, ost, schema-v0.1]
 
 ---
@@ -243,7 +243,7 @@ These gaps from the chosen opportunity were judged not to affect phase-2 solutio
 - **Read the clustered experience-map JSON, validated table, or extracted opportunities.** All quotes, sources, scores, and rationales the selector needs are already in the matrix.
 - **Re-validate, re-cluster, or re-compare.** Those are upstream skills.
 - **Modify upstream files.** `comparison-matrix-*.json` and `product-outcome.md` stay immutable.
-- **Write to `discovery/<team>/<product>/opportunities/<opp-slug>/chosen-opportunity.md`.** That is the trio's optional manual step; downstream skills read from `decisions.json`.
+- **Write to `OST-discovery/<team>/<product>/opportunities/<opp-slug>/chosen-opportunity.md`.** That is the trio's optional manual step; downstream skills read from `decisions.json`.
 - **Pick more than one opportunity.** HITL flavor is locked as picks-one + alternatives.
 - **Produce a shortlist.** Even on tied picks, the AI commits to one and names the tie in the rationale.
 - **Produce a free-form recommendation without alternatives.** Every other approved opportunity from the matrix appears in `alternatives_considered[]`.
