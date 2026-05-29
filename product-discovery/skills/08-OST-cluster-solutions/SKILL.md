@@ -119,11 +119,11 @@ The output is a **proposal** that assist 8 (top-3 selector) consumes. The trio r
 
 11. **Set top-level `title`** to `"Clustered solutions: <first 5-10 words of chosen_opportunity.quote, trailing punctuation stripped>"`. Set `source_solution_candidates` to the basename of the source JSON file (no directory prefix).
 
-12. **Write JSON output** to `<scope>/_working/clustered-solutions.json` using today's date. Create the `<scope>/_working/` directory if it doesn't exist.
+12. **Write JSON output** to `<scope>/_working/clustered-solutions.json`. Create the `<scope>/_working/` directory if it doesn't exist.
 
 13. **Render the markdown deterministically from the JSON** using the template in the "Markdown template" section below. Write to `<scope>/_working/clustered-solutions.md`.
 
-    Use today's date in `YYYY-MM-DD` format. The two files share the same root name. Upstream files (`solution-candidates.json`, `decisions.json`) are not modified. This skill does not modify the opportunity folder root (`<scope>/..`) or `product-context/`.
+    The two files share the same root name. Upstream files (`solution-candidates.json`, `decisions.json`) are not modified. This skill does not modify the scope root or `product-context/`.
 
 ## Hard-exit format
 
@@ -141,7 +141,7 @@ The hard-exit triggers:
 | Trigger | Looked for | Remedy |
 |---|---|---|
 | Missing knowledge anchor `solution-cluster.md` or `solution-brainstorm.md` | The anchor file present at the expected path under `knowledge/discovery/` | Restore the anchor from git. |
-| `<scope>/_working/solution-candidates.json` missing (no same-round or sibling predecessor found) | `solution-candidates.json` in `<scope>/_working/` or sibling dated rounds under the same opportunity | Run `OST-brainstorm-solutions` |
+| `<scope>/_working/solution-candidates.json` missing | `solution-candidates.json` in `<scope>/_working/` | Run `OST-brainstorm-solutions` |
 | `<scope>/decisions.json` missing | `decisions.json` in `<scope>` | Run `OST-select-opportunity` to produce `decisions.json` |
 | `decided.opportunity` key absent from `decisions.json` | `decided.opportunity` object with `id`, `phase_id`, `quote`, `source` | Run `OST-select-opportunity` to ratify an opportunity into `decisions.json` |
 | Source JSON does not parse | Schema-conformant v0.1 JSON | Re-run `OST-brainstorm-solutions` |

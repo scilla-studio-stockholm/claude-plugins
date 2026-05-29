@@ -14,9 +14,9 @@ This anchor owns the schema, the three-method definitions, the parallel-blind or
 
 ## What the generator does
 
-The generator reads a trio-ratified `top-three-solutions.json` (the 3 specific solutions, located via the ratification-flag pattern in `<scope>/../ratifications.md`) plus the chosen-opportunity, the product outcome, and the latest extracted experience map.
+The generator reads the trio-ratified top-3 solutions from `<scope>/decisions.json` → `decided.solutions` plus the chosen opportunity (`decided.opportunity`), the product outcome, and the latest extracted experience map.
 
-> **Note:** As of schema v1.0, skill 10 reads `decisions.json` → `decided.solutions` directly. The `ratifications.md` lookup described above is deprecated.
+> **Note:** Ratification status lives in `decisions.json` → `decided.solutions`. Earlier versions located the ratified top-3 via a `ratifications.md` lookup; that file is no longer written or read.
 
 It spawns 9 method-pass sub-agents in parallel via the Agent tool (3 methods x 3 solutions), then runs 3 per-solution LLM dedup-passes that merge similar assumptions across methods and tag each surviving entry with a `source_methods` array.
 
@@ -94,7 +94,7 @@ This is the v0.1 contract that `OST-generate-assumptions` produces. Downstream c
   "title": "string (e.g., 'Assumptions: <chosen_opportunity.id> - <first 5-10 words of quote>')",
   "product_outcome": "string (carried)",
   "chosen_opportunity": {
-    "id": "string (carried; matches the bold-id row in <scope>/../chosen-opportunity.md)",
+    "id": "string (carried; matches decided.opportunity.id in <scope>/decisions.json)",
     "phase_id": "string (carried)",
     "quote": "string (carried verbatim)",
     "source": "string (carried verbatim)"
@@ -149,7 +149,7 @@ The skill enforces these as hard-exit-on-violation, no partial writes:
 - `assumption.id` values are unique across the entire output.
 - `assumption.source_methods.length` is in `{1, 2, 3}`.
 - `assumption.source_methods` values are a subset of `{storymap, pre-mortem, outcome-impact}`; no duplicates within an array.
-- `chosen_opportunity.id` matches upstream JSON AND the bold-id row in `<scope>/../chosen-opportunity.md`.
+- `chosen_opportunity.id` matches upstream JSON AND `decided.opportunity.id` in `<scope>/decisions.json`.
 - All carried fields (`solution_title`, `solution_description`, `generating_role`, `round_number`) byte-identical to upstream.
 - `generation_summary` is the fixed v0.1 block.
 

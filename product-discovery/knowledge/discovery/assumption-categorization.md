@@ -156,8 +156,8 @@ tags: [assumption-categorization, ost, schema-v0.1]
 
 Source assumptions: `<source_assumptions>`
 Source top 3 solutions: `<source_top_three_solutions>`
-Source chosen opportunity: `<scope>/../chosen-opportunity.md`
-Source product outcome: `<scope>/../../../_product-context/product-outcome.md`
+Source chosen opportunity: `<scope>/decisions.json` → `decided.opportunity`
+Source product outcome: `<scope>/product-context/product-outcome.md`
 Schema version: 0.1
 Paired JSON: `assumptions-categorized-<YYYY-MM-DD>.json`
 

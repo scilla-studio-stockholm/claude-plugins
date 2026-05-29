@@ -123,7 +123,7 @@ The output is a **proposal** that assist 9 (assumption generator) consumes after
 
 13. **Render the milestone markdown deterministically from the JSON** using the template in the "Markdown template" section below. Write to `<scope>/2-solutions.md`.
 
-    `2-solutions.md` must stand alone - the reader should not need to open `_working/`. Use today's date in `YYYY-MM-DD` format. Upstream files (`solution-candidates.json`, `clustered-solutions.json`) are not modified.
+    `2-solutions.md` must stand alone - the reader should not need to open `_working/`. Upstream files (`solution-candidates.json`, `clustered-solutions.json`) are not modified.
 
 14. **Write to decisions.json:** Read `<scope>/decisions.json` (scope ROOT). Set `decided.solutions`:
 

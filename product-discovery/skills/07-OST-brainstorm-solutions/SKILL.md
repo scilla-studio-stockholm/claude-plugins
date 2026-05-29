@@ -80,7 +80,7 @@ The output is a **divergent candidate set**, not a recommendation. There is no c
     - `<scope>/_working/solution-candidates.json`
     - `<scope>/_working/solution-candidates.md`
 
-    Use today's date in `YYYY-MM-DD` format for the round folder name (already part of `<scope>`). The two files share the same root name. Create the `<scope>/_working/` directory if it doesn't exist. Upstream files (`decisions.json`, role anchors) are not modified.
+    The two files share the same root name. Create the `<scope>/_working/` directory if it doesn't exist. Upstream files (`decisions.json`, role anchors) are not modified.
 
 16. **Launch the viewer.** Follow `knowledge/discovery/viewer-launch.md` to resolve the viewer path, start the server, and open the browser.
 

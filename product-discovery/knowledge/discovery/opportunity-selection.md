@@ -14,7 +14,7 @@ This anchor owns the schema, the decision rule, and the conventions. It correspo
 
 ## What the selector does
 
-The selector reads a comparison matrix (5 criteria × N approved opportunities, qualitatively scored) and applies a locked three-step decision rule to propose one chosen opportunity. The output is a proposal: the trio reviews it, overrides if it disagrees, and ratifies the final pick into the opportunity folder's `chosen-opportunity.md` (which assist 6 reads).
+The selector reads a comparison matrix (5 criteria × N approved opportunities, qualitatively scored) and applies a locked three-step decision rule to propose one chosen opportunity. The output is a proposal: the trio reviews it, overrides if it disagrees, and ratifies the final pick into `<scope>/decisions.json` → `decided.opportunity` (which downstream phase-2 skills read).
 
 The selector does not pick more than one opportunity. Even on tied picks it commits to one and names the tie inline so the trio sees the closeness.
 
@@ -65,14 +65,14 @@ Do not introduce effort thinking in `rationale`, `reason_not_picked`, `why_relev
 
 ## Ratification format
 
-> **Note:** As of schema v1.0, the ratified opportunity is recorded in `decisions.json` → `decided.opportunity`. Creating `chosen-opportunity.md` is optional (human reference only).
+The ratified opportunity is recorded in `<scope>/decisions.json` → `decided.opportunity` (schema in `knowledge/discovery/decisions-json-schema.md`). That block is the decision-of-record consumed by downstream phase-2 skills (the solution brainstormer at assist 6 and the top-3 selector at assist 8). There is no nested `<team>/<product>/opportunities/` folder and no `chosen-opportunity.md` file in the flat model.
 
-The selector produces a proposal at `<scope>/chosen-opportunity-proposal.{json,md}`. The trio reviews the proposal, overrides if it disagrees, and ratifies the final pick into the opportunity folder. This file is the decision-of-record consumed by downstream phase-2 skills (the solution brainstormer at assist 6 and the top-3 selector at assist 8).
+The selector produces its machine JSON in `<scope>/_working/chosen-opportunity-proposal.json` and a self-contained milestone markdown, `<scope>/1-opportunity.md`, that surfaces the proposal for human review. The trio reviews `1-opportunity.md`, overrides if it disagrees, and commits the ratified pick to `decided.opportunity`.
 
-The ratified file mirrors the selector's proposal markdown structure, minus the alternatives section and the HITL banner. Required structure:
+`1-opportunity.md` is self-contained — a reader should be able to understand and challenge the decision without opening `_working/`. Required structure:
 
 - YAML frontmatter (title, date, purpose, tags) with a blank line before the closing `---`.
-- `## Product outcome` section, with the outcome formulation as a blockquote (carried verbatim from `<scope>/../../_product-context/product-outcome.md`).
+- `## Product outcome` section, with the outcome formulation as a blockquote (carried verbatim from `<scope>/product-context/product-outcome.md`).
 - `## Chosen opportunity` section, with a single bold-id line of the form: `**<opp-id>** (Phase: <phase-id>) - "<quote>" - *<source>*`.
 - `### Score profile` subsection with a 5-row markdown table (one row per criterion: outcome-alignment, customer-importance, market-size, strategic-fit, competitive-landscape) and a `Profile summary:` line.
 - `### Rationale` subsection with prose explaining the pick. The trio may carry the selector's rationale as-is, edit it, or rewrite it.
@@ -80,14 +80,12 @@ The ratified file mirrors the selector's proposal markdown structure, minus the 
 
 The trio's ratification action is concrete:
 
-1. Create a new opportunity folder at `OST-discovery/<team>/<product>/opportunities/<opp-slug>/` (slug from the chosen opportunity's title per `knowledge/discovery/workspace-scope.md`) and copy `<scope>/chosen-opportunity-proposal.md` into it as `chosen-opportunity.md`.
-2. Delete the `> **Trio HITL:** ...` blockquote.
-3. Delete the entire `## Alternatives considered` section and its bullet entries.
-4. Edit the chosen opportunity / rationale / score profile if overriding the selector's pick (otherwise leave as-is).
-5. Update the frontmatter `purpose:` line to reflect that this is the ratified decision-of-record (not a proposal).
-6. Commit.
+1. Review `<scope>/1-opportunity.md` and the proposal it surfaces.
+2. Commit the chosen opportunity to `decisions.json` → `decided.opportunity` (id, phase_id, quote, source, scores, rationale, evidence gaps), with `ratified` set to the sign-off date.
+3. Edit the chosen opportunity / rationale / score profile if overriding the selector's pick (otherwise keep as-is).
+4. Commit.
 
-Downstream skills (`OST-brainstorm-solutions`, the future top-3 solution selector) read `chosen-opportunity.md` at the opportunity-folder root (`<scope>/../chosen-opportunity.md` from a discovery scope). They hard-exit if the file is missing or malformed.
+Downstream skills (`OST-brainstorm-solutions`, the top-3 solution selector) read `decided.opportunity` from `<scope>/decisions.json`. They hard-exit if the `decided.opportunity` key is absent or malformed.
 
 This format is locked at the same v0.1 schema version as the selector's JSON output. Format changes require a schema bump and a coordinated update across the selector, the brainstormer, and the top-3 selector.
 

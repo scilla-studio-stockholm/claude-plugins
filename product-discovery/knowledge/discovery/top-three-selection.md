@@ -1,7 +1,7 @@
 ---
 title: Top-three selection - schema and conventions
 date: 2026-05-11
-purpose: Owns the top-three-solutions schema (v0.2 current; v0.1 in Evolution), the four v2 locked decisions, the no-effort rule, and the ratification-flag pattern. Read at runtime by the OST-select-top-three-solutions skill (assist 8); consumed by assist 9 (assumption generator).
+purpose: Owns the top-three-solutions schema (v0.2 current; v0.1 in Evolution), the four v2 locked decisions, the no-effort rule, and the ratification pattern. Read at runtime by the OST-select-top-three-solutions skill (assist 8); consumed by assist 9 (assumption generator).
 tags: [discovery, ost, top-three-selection, schema-v0.2, torres]
 
 ---
@@ -10,13 +10,13 @@ tags: [discovery, ost, top-three-selection, schema-v0.2, torres]
 
 The structured selection artifact between a divergent brainstorm and assumption decomposition. Produced by `OST-select-top-three-solutions` (assist 8) and consumed by assist 9 (assumption generator) after trio ratification.
 
-This anchor owns the schema, the four v2 locked decisions, the no-effort rule, and the ratification-flag pattern. It corresponds to Torres "Continuous Discovery Habits" chapter 7 step 6 ("Choose three solutions to explore in parallel").
+This anchor owns the schema, the four v2 locked decisions, the no-effort rule, and the ratification pattern. It corresponds to Torres "Continuous Discovery Habits" chapter 7 step 6 ("Choose three solutions to explore in parallel").
 
 ## What the selector does
 
 The selector reads the v0.1 solution-candidates JSON from `OST-brainstorm-solutions` (the 18 specific solutions) plus the trio-ratified chosen-opportunity and product-outcome context, then runs one LLM call to pick 3 specific solutions ranked by outcome-impact probability. Each pick is one of the 18 specific solutions (no clustering, no theme-grouping); each has a 2-3 sentence outcome-mapping rationale.
 
-Output is a proposal that assist 9 consumes after trio ratification. The trio reviews the markdown, edits if needed, then writes a one-line ratification entry into `<scope>/../ratifications.md`. The selector itself does not write to the opportunity-folder root.
+Output is a proposal that assist 9 consumes after trio ratification. The trio reviews the markdown, edits if needed, then the ratified top-3 is recorded in `<scope>/decisions.json` → `decided.solutions`. The selector itself does not write the ratified decision; it writes only its proposal.
 
 The selector does NOT consume OST-cluster-solutions output. `OST-cluster-solutions` is a separate optional skill the trio may invoke for their own clustered review of the brainstorm; it is off the critical path as of v0.2.
 
@@ -43,32 +43,15 @@ Forbidden vocabulary (eyeball list):
 - `quick win`, `low-hanging fruit`, `ambitious`, `risky-to-build`
 - `effort`, `implementation cost`, `build time`
 
-## The ratification-flag pattern
+## The ratification pattern
 
-> **Note:** As of schema v1.0, trio ratification is recorded in `decisions.json` → `decided.solutions`. The `ratifications.md` append pattern described below is deprecated. Skills read `decisions.json` for ratification status.
+Trio ratification of the top-3 is recorded in `<scope>/decisions.json` → `decided.solutions` (schema in `knowledge/discovery/decisions-json-schema.md`). The block carries the date the trio signed off (`ratified`) plus exactly 3 `picks`, each with `id`, `title`, `description`, and `rationale`.
 
-A convention introduced in v0.1; carried unchanged into v0.2. `ratifications.md` lives at the opportunity-folder root (`<scope>/../ratifications.md`) and is a markdown file with a top-level `# Ratifications` heading and a flat bulleted list. Each line records one ratification event:
+The selector itself does not write `decided.solutions`. It writes only its proposal (`top-three-solutions.json` + the `2-solutions.md` milestone). The trio reviews the proposal, edits if needed, and the ratified top-3 is committed to `decided.solutions`.
 
-```markdown
-# Ratifications
+**Reading rule for assist 9** (and any future consumer): read `decided.solutions` from `<scope>/decisions.json`. Key presence signals the upstream gate is ratified; absence means it is not yet ready.
 
-Trio sign-off log for AI-produced proposals that downstream skills consume. Append-only; no edits to past entries.
-
-- 2026-05-11 top-three-solutions.json ratified by Norrsken trio (no overrides) [round: workspace/norrsken/fsok/opportunities/brist-pa-oversikt/2026-05-11]
-- 2026-05-13 top-three-solutions.json ratified by Norrsken trio (Pick 2 rationale tightened by trio) [round: workspace/norrsken/fsok/opportunities/brist-pa-oversikt/2026-05-13]
-```
-
-**Line format:**
-
-```text
-- <YYYY-MM-DD> <artifact-filename> ratified by <approver> (<note-or-empty>) [round: <scope-path>]
-```
-
-The `[round: <scope-path>]` suffix disambiguates when the same filename appears for multiple rounds. The artifact-filename is always `top-three-solutions.json` (no date suffix; the date is on the round folder).
-
-**Reading rule for assist 9** (and any future consumer): find the latest entry whose `<artifact-filename>` matches `top-three-solutions.json` AND whose `[round: ...]` path matches the active scope. Latest = last matching line in file order (the file is append-only).
-
-The selector itself does not write to `ratifications.md`. The trio appends manually after reviewing the proposal. If `ratifications.md` doesn't exist yet, the trio creates it with the heading + intro paragraph the first time they ratify.
+> **Historical note:** v0.1/v0.2 recorded ratifications in an append-only `ratifications.md` log at the opportunity-folder root. As of schema v1.0 that file is no longer written or read — `decisions.json` → `decided.solutions` is the single source of truth.
 
 ## JSON schema (v0.2)
 
@@ -81,7 +64,7 @@ This is the v0.2 contract that `OST-select-top-three-solutions` produces. Downst
   "title": "string (e.g., 'Top solutions: <first clause of chosen opportunity quote>')",
   "product_outcome": "string (carried)",
   "chosen_opportunity": {
-    "id": "string (carried; e.g., 'opp-5-1'; matches the bold-id row in <scope>/../chosen-opportunity.md)",
+    "id": "string (carried; e.g., 'opp-5-1'; matches decided.opportunity.id in <scope>/decisions.json)",
     "phase_id": "string (carried)",
     "quote": "string (carried verbatim)",
     "source": "string (carried verbatim)"
@@ -104,7 +87,7 @@ This is the v0.2 contract that `OST-select-top-three-solutions` produces. Downst
 ### Field notes
 
 - **`team`, `title` (top level), `product_outcome`** are carried from the source brainstormer JSON. Top-level `title` is rewritten to `"Top solutions: <first 5-10 words of chosen_opportunity.quote, trailing punctuation stripped>"` for downstream readability.
-- **`chosen_opportunity`** is carried verbatim from the source brainstormer JSON. Cross-check against the bold-id row in `<scope>/../chosen-opportunity.md` is mandatory.
+- **`chosen_opportunity`** is carried verbatim from the source brainstormer JSON. Cross-check against `decided.opportunity.id` in `<scope>/decisions.json` is mandatory.
 - **`source_solution_candidates`** is the filename (no directory prefix) of the source brainstormer JSON (located at `<scope>/solution-candidates.json`).
 - **`picks[]`** is exactly 3 entries. Order is descending outcome-impact probability (strongest first). Soft convention in prompt; not invariant-enforced post-hoc.
 - **`picks[].{id, title, generating_role, round_number, description}`** are carried verbatim from the source brainstormer's `solutions[]` entry with matching `id`.
@@ -120,7 +103,7 @@ The skill enforces these hard invariants on its output JSON. Violation results i
 - **No duplicate pick ids.** Every picked id appears exactly once.
 - **Verbatim carry of member fields.** `picks[].{title, generating_role, round_number, description}` byte-identical to source.
 - **Verbatim carry of chosen-opp fields.** `chosen_opportunity.{id, phase_id, quote, source}` byte-identical to source brainstormer JSON.
-- **Chosen-opp consistency.** `chosen_opportunity.id` matches source JSON's `chosen_opportunity.id` AND the bold-id row in `<scope>/../chosen-opportunity.md`.
+- **Chosen-opp consistency.** `chosen_opportunity.id` matches source JSON's `chosen_opportunity.id` AND `decided.opportunity.id` in `<scope>/decisions.json`.
 
 ### Missing optional fields convention
 
