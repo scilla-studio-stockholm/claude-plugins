@@ -13,15 +13,15 @@ This skill IS the phase-3 trio HITL gate. The markdown output opens with a `Trio
 
 ## Prerequisites
 
-- `OST-assumption-categorizer` (assist 10) has run; `assumptions-categorized.json` exists in `<scope>/` (or a sibling round folder).
+- `OST-assumption-categorizer` (assist 10) has run; `assumptions-categorized.json` exists in `<scope>/_working/`.
 
 ## Steps
 
-1. **Resolve scope.** Follow `references/workspace-scope.md`. Discovery scope only.
+1. **Resolve scope.** Follow `references/workspace-scope.md`. The scope is `OST-discovery/` itself in the default flat layout; multi-product / multi-round layouts are opt-in and resolved per that reference.
 
-2. **Load context via parent walk-up:**
+2. **Load context:**
    - `<scope>/decisions.json` (chosen opportunity, product outcome)
-   - Same-round predecessor: `<scope>/assumptions-categorized.json` (with sibling-round fallback)
+   - Predecessor: `<scope>/_working/assumptions-categorized.json`
 
 3. **Read the knowledge anchors:**
    - `references/assumption-risk-mapping.md` (v0.2; the 2x2 framework, the Swedish scoring questions, the soft-evidence rule, the rationale format rule, the carry-forward rules, the schema v0.2, the renderer template; this is the canonical source for everything below).
@@ -29,7 +29,7 @@ This skill IS the phase-3 trio HITL gate. The markdown output opens with a `Trio
    - `references/opportunity-solution-tree-teresa-torres.md` (the "test the riskiest assumptions" framing, CDH ch 9).
    - `references/assumption-categorization.md` (the upstream schema v0.1; parse the input JSON against this).
 
-4. **Locate input.** List `<scope>/assumptions-categorized.json` (with sibling-round fallback), sort by the date in the filename descending, take the latest. Hard-exit if zero matches.
+4. **Locate input.** Read `<scope>/_working/assumptions-categorized.json`. Hard-exit if missing.
 
 5. **Hard-exit checks.** Apply the triggers below. If any fire, write no output files. Emit a three-line error in this exact shape:
 
@@ -42,7 +42,7 @@ This skill IS the phase-3 trio HITL gate. The markdown output opens with a `Trio
 
    Triggers:
 
-   - No `assumptions-categorized.json` in `<scope>/` (with sibling-round fallback). Remedy: run `OST-assumption-categorizer` (assist 10) first.
+   - No `assumptions-categorized.json` in `<scope>/_working/`. Remedy: run `OST-assumption-categorizer` (assist 10) first.
    - Source JSON does not parse. Remedy: re-run `OST-assumption-categorizer`.
    - Source JSON `schema_version` is not `"0.1"`. Remedy: re-run `OST-assumption-categorizer` against v0.1.
    - Source `assumptions_per_solution.length` != 3. Remedy: re-run `OST-assumption-categorizer`.
@@ -149,10 +149,10 @@ This skill IS the phase-3 trio HITL gate. The markdown output opens with a `Trio
 
     Any violation → hard-exit, no write.
 
-14. **Write paired output:**
-    - `<scope>/riskiest-assumptions.json`
-    - `<scope>/riskiest-assumptions.md`
-    Create the directory if absent.
+14. **Write output:**
+    - Machine JSON → `<scope>/_working/riskiest-assumptions.json` (plumbing; not read by the trio directly).
+    - Milestone markdown → `<scope>/3-riskiest-assumptions.md` (the self-contained MILESTONE doc the trio reads and challenges; see step 16).
+    Create directories if absent.
 
 15. **Write to decisions.json.** Read `<scope>/decisions.json`. Set `decided.assumptions`:
 
@@ -175,13 +175,13 @@ This skill IS the phase-3 trio HITL gate. The markdown output opens with a `Trio
 
     Include only assumptions where `is_riskiest == true`.
 
-16. **Render the markdown deterministically from the JSON.** Use this exact template:
+16. **Render the milestone markdown deterministically from the JSON.** Write to `<scope>/3-riskiest-assumptions.md`. This is the self-contained MILESTONE doc: the trio must be able to understand and challenge the riskiest-assumption decision WITHOUT opening `_working/`. Two top-level sections carry that weight: **Riskiest assumptions** (the flagged ones, with rationale) and **Seen against the full set** (every assumption with its importance/evidence score, so the reader sees why the others were NOT flagged). Use this exact template:
 
     ````markdown
     ---
     title: "Riskiest assumptions: <chosen_opportunity.id> - <first 5-10 words of quote>"
     date: <YYYY-MM-DD>
-    purpose: Per-solution assumptions scored on importance x evidence (Bland 2x2), with the riskiest flagged. Phase-3 trio review-and-approve gate. Paired with riskiest-assumptions.json. Input to assist 12 (OST-validation-experiment-designer).
+    purpose: Per-solution assumptions scored on importance x evidence (Bland 2x2), with the riskiest flagged and seen against the full categorized set. Phase-3 trio review-and-approve gate. Machine JSON at _working/riskiest-assumptions.json. Input to assist 12 (OST-validation-experiment-designer).
     tags: [assumption-risk-mapping, ost, bland, schema-v0.2]
 
     ---
@@ -190,13 +190,13 @@ This skill IS the phase-3 trio HITL gate. The markdown output opens with a `Trio
 
     > **Trio HITL gate.** Review the importance/evidence calls per assumption. If you disagree with any importance/evidence scoring, edit `decided.assumptions.riskiest[]` in `decisions.json` directly (add or remove entries). The `decided.assumptions` section is the ratified record. Riskiest rows are flagged `[RISKIEST]` inline; each solution opens with a `Riskiest:` summary line of the flagged ids.
 
-    Source assumptions-categorized: `<source_assumptions_categorized>`
+    Source assumptions-categorized: `_working/assumptions-categorized.json`
     Source assumptions: `<source_assumptions>`
     Source top 3 solutions: `<source_top_three_solutions>`
     Source chosen opportunity: `<scope>/decisions.json`
     Source product outcome: `<scope>/decisions.json`
     Schema version: 0.2
-    Paired JSON: `riskiest-assumptions.json`
+    Machine JSON: `_working/riskiest-assumptions.json`
 
     Framework: 2x2 importance x evidence (David Bland, *Testing Business Ideas* 2019). Riskiest = high importance + weak evidence. Evidence rule: soft (domain norms and industry conventions count). Rationale format: single sentence, importance-then-evidence.
 
@@ -210,7 +210,21 @@ This skill IS the phase-3 trio HITL gate. The markdown output opens with a `Trio
 
     > <outcome formulation>
 
-    ## Solution 1: <solution_title>
+    ## Riskiest assumptions (<M>)
+
+    The assumptions scored **importance=high AND evidence=weak**. These carry forward to assist 12 (validation experiments). If <M> is 0, write `_No assumptions scored high importance and weak evidence._`
+
+    - **<asm-id>** (<solution_id>: <solution_title>) [<category>] [high/weak] <text>
+      - <rationale>
+      - Why high importance: <the importance reason from rationale>
+      - Why weak evidence: <the evidence reason from rationale>
+    - ...
+
+    ## Seen against the full set
+
+    Every categorized assumption with its importance/evidence score, grouped by solution. This is why the OTHER assumptions were NOT flagged as riskiest: only `[high/weak]` rows qualify. Read against `_working/assumptions-categorized.json` for the upstream categorization, but this section stands alone.
+
+    ### Solution 1: <solution_title>
 
     **<solution_id>** [<role-abbrev>, R<round_number>]
 
@@ -218,7 +232,7 @@ This skill IS the phase-3 trio HITL gate. The markdown output opens with a `Trio
 
     **Riskiest:** <comma-separated ids of riskiest in this solution, or "(none)">
 
-    ### Assumptions (<count>)
+    #### Assumptions (<count>)
 
     - **<asm-id>** [<methods-tag>] [<category>] [<importance>/<evidence>] [optional **[RISKIEST]**] <text>
       - <rationale>
@@ -226,17 +240,20 @@ This skill IS the phase-3 trio HITL gate. The markdown output opens with a `Trio
       - <rationale>
     - ...
 
-    ## Solution 2: <solution_title>
+    ### Solution 2: <solution_title>
 
     (same shape)
 
-    ## Solution 3: <solution_title>
+    ### Solution 3: <solution_title>
 
     (same shape)
     ````
 
     **Rendering rules:**
 
+    - `3-riskiest-assumptions.md` must stand alone - the reader should not need to open `_working/`. The "Riskiest assumptions" section names the flagged ones with full rationale; the "Seen against the full set" section shows every assumption with its score so the reader sees why the others were not flagged.
+    - **Riskiest assumptions section:** one row per assumption where `is_riskiest=true`, in upstream order (solution 1 first, then 2, then 3; preserve `assumptions[]` order within each). Score tag is always `[high/weak]` here. The "Why high importance" / "Why weak evidence" sub-bullets split the rationale: the importance reason is the parenthetical after `Importance=high`, the evidence reason is the parenthetical after `evidence=weak`. If <M> is 0, render the placeholder line and no rows.
+    - **Seen against the full set:** per-solution full listing. Section headings drop one level vs. the old layout: solutions are `### Solution N: <title>` and their assumption lists are `#### Assumptions (<count>)`.
     - Role abbreviation: `product-manager` -> `PM`, `ux-designer` -> `UX`, `tech-lead` -> `TL`. Render in the solution header as `[<role-abbrev>, R<round_number>]`.
     - Method tag: `storymap` -> `SM`, `pre-mortem` -> `PrM`, `outcome-impact` -> `OI`. Multi-source combined alphabetically with `+`. Examples: `[OI+SM]`, `[PrM+SM]`, `[OI+PrM+SM]`.
     - Category tag: lowercase verbatim in brackets, no abbreviation: `[desirability]`, `[usability]`, `[feasibility]`, `[viability]`, `[other]`.
@@ -259,7 +276,7 @@ This skill IS the phase-3 trio HITL gate. The markdown output opens with a `Trio
 
 ## Output principles
 
-- The output is the phase-3 trio HITL gate. Markdown opens with a `Trio HITL gate.` banner; the trio reviews the calls and edits the paired JSON to override; assist 12 picks up the latest by date.
+- The output is the phase-3 trio HITL gate. The self-contained milestone `3-riskiest-assumptions.md` opens with a `Trio HITL gate.` banner; the trio reviews the calls and edits `decided.assumptions` in `decisions.json` to override; assist 12 picks up the latest by date.
 - Identity-mapping is the load-bearing invariant. Every upstream field byte-identical; only 4 new fields added per assumption.
 - `is_riskiest` is computed by the skill, not returned by the LLM. Prevents LLM drift on the riskiest definition.
 - The soft-evidence rule means the LLM may use domain norms as evidence. The trio overrides at HITL.
@@ -270,7 +287,7 @@ This skill IS the phase-3 trio HITL gate. The markdown output opens with a `Trio
 ## Vad skill INTE gör
 
 - Reads interview transcripts, OST-brainstorm-solutions output, comparison matrix, validated opportunities, OST-cluster-solutions output, top-three-solutions JSON directly, the assumptions JSON, or the experience map. Only the upstream `assumptions-categorized.json` contract.
-- Reads `<scope>/../chosen-opportunity.md`, `<scope>/../../../_product-context/product-outcome.md`, or `ratifications.md` beyond what scope-resolution provides. Identifying context flows through the upstream JSON.
+- Reads `chosen-opportunity.md`, `<scope>/product-context/product-outcome.md`, or `ratifications.md` beyond what scope-resolution provides. Identifying context flows through the upstream JSON.
 - Appends to `ratifications.md`. The phase-3 HITL gate is markdown-banner-only.
 - Reads role anchors. Role info is data only.
 - Generates, modifies, merges, or drops assumptions. Identity-mapping is the contract.
@@ -280,7 +297,7 @@ This skill IS the phase-3 trio HITL gate. The markdown output opens with a `Trio
 - Designs Test Cards or validation experiments. (Assist 12.)
 - Scores riskiness across solutions (cross-solution comparison). Per-solution scoring only.
 - Modifies upstream files. The `assumptions-categorized-*.json` and all context files stay immutable.
-- Writes outside `<scope>/`. Output lives at `<scope>/riskiest-assumptions.{json,md}`.
+- Writes outside `<scope>/`. The milestone markdown lives at `<scope>/3-riskiest-assumptions.md`; the machine JSON lives at `<scope>/_working/riskiest-assumptions.json`.
 - Adds an in-skill ratification mechanism. Trio gate is markdown-banner-only.
 - Runs a JSON self-validation pass beyond the invariant check.
 - Retries the scoring pass on partial failures. Hard-exit; operator re-runs end-to-end.

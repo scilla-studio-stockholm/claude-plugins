@@ -1,10 +1,16 @@
 #!/usr/bin/env bash
-# OST-init-workspace: scaffold the discovery/ tree and context templates
-# that all OST-* skills depend on.
+# OST-init-workspace: scaffold the flat OST-discovery/ tree and context
+# templates that all OST-* skills depend on.
 #
-# Two layout modes:
-#   - Multi-product (default): discovery/<team>/<product>/...
-#   - Single-product (--single-product): discovery/...   (no team/product nesting)
+# Default layout is flat, single-product, single-round:
+#   OST-discovery/
+#   ├── product-context/   product-outcome.md, experience-map.md
+#   ├── _working/          all phase JSON + intermediate markdown
+#   └── decisions.json     ratified decisions (the spine)
+#
+# Multi-product and multi-round nesting are opt-in and created manually
+# only when needed (see workspace-scope.md). This script scaffolds the
+# flat default.
 #
 # Idempotent: existing files are never overwritten. Each action prints
 # CREATED, SKIPPED (exists), or ERROR. Summary at the end.
@@ -14,49 +20,29 @@ set -euo pipefail
 usage() {
   cat <<'EOF'
 Usage:
-  Multi-product mode (default):
-    init_workspace.sh --team <slug> --product <slug>
-                      [--opportunity <slug>] [--selection]
-                      [--date YYYY-MM-DD]
-
-  Single-product mode:
-    init_workspace.sh --single-product --product <slug>
-                      [--opportunity <slug>] [--selection]
-                      [--date YYYY-MM-DD]
+  init_workspace.sh --product <slug> [--date YYYY-MM-DD]
 
 Required:
-  --product <slug>      Short lowercase ASCII slug (e.g. fsok, pmf-analyse)
-  --team <slug>         Required unless --single-product. Short slug (e.g. fast).
+  --product <slug>   Short lowercase ASCII slug (e.g. fsok, pmf-analyse).
+                     Names the product in decisions.json and context templates.
 
 Optional:
-  --single-product      Drop the <team>/<product>/ nesting. Use when the repo
-                        will only ever hold one product. Cannot combine with --team.
-  --opportunity <slug>  Also scaffold opportunities/<slug>/ + a discovery round
-                        folder dated today; set .current-scope to that round.
-  --selection           Scaffold opportunity-selection/<today>/ and set
-                        .current-scope there. Mutually exclusive with --opportunity.
-  --date YYYY-MM-DD     Override today's date for the round folder name.
+  --date YYYY-MM-DD  Override today's date used in template frontmatter.
 
-Run from the repo root where discovery/ should live.
+Run from the repo root where OST-discovery/ should live. Scaffolds the
+flat default layout. For multi-product or multi-round setups, see
+product-discovery/knowledge/discovery/workspace-scope.md.
 EOF
 }
 
-TEAM=""
 PRODUCT=""
-OPPORTUNITY=""
-SELECTION=0
-SINGLE_PRODUCT=0
 DATE=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --team)            TEAM="$2"; shift 2 ;;
-    --product)         PRODUCT="$2"; shift 2 ;;
-    --opportunity)     OPPORTUNITY="$2"; shift 2 ;;
-    --selection)       SELECTION=1; shift ;;
-    --single-product)  SINGLE_PRODUCT=1; shift ;;
-    --date)            DATE="$2"; shift 2 ;;
-    -h|--help)         usage; exit 0 ;;
+    --product) PRODUCT="$2"; shift 2 ;;
+    --date)    DATE="$2"; shift 2 ;;
+    -h|--help) usage; exit 0 ;;
     *) echo "ERROR: unknown argument: $1" >&2; usage >&2; exit 2 ;;
   esac
 done
@@ -67,39 +53,16 @@ if [[ -z "$PRODUCT" ]]; then
   exit 2
 fi
 
-if [[ "$SINGLE_PRODUCT" -eq 1 ]]; then
-  if [[ -n "$TEAM" ]]; then
-    echo "ERROR: --single-product and --team are mutually exclusive." >&2
-    echo "Single-product mode drops the team/product nesting; the team layer has no place to live." >&2
-    exit 2
-  fi
-else
-  if [[ -z "$TEAM" ]]; then
-    echo "ERROR: --team is required in multi-product mode." >&2
-    echo "Use --single-product if this repo will only ever hold one product." >&2
-    usage >&2
-    exit 2
-  fi
-fi
-
-if [[ "$SELECTION" -eq 1 && -n "$OPPORTUNITY" ]]; then
-  echo "ERROR: --selection and --opportunity are mutually exclusive (a single .current-scope can only point at one round)." >&2
-  exit 2
-fi
-
 is_slug() {
   [[ "$1" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]]
 }
 
-for arg_name in TEAM PRODUCT OPPORTUNITY; do
-  val="${!arg_name}"
-  if [[ -n "$val" ]] && ! is_slug "$val"; then
-    echo "ERROR: --${arg_name,,} value '$val' is not a valid slug." >&2
-    echo "Slug rules: lowercase ASCII letters/digits, hyphen-separated, no leading/trailing hyphen." >&2
-    echo "Transliterate Swedish chars: å→a, ä→a, ö→o." >&2
-    exit 2
-  fi
-done
+if ! is_slug "$PRODUCT"; then
+  echo "ERROR: --product value '$PRODUCT' is not a valid slug." >&2
+  echo "Slug rules: lowercase ASCII letters/digits, hyphen-separated, no leading/trailing hyphen." >&2
+  echo "Transliterate Swedish chars: å→a, ä→a, ö→o." >&2
+  exit 2
+fi
 
 if [[ -z "$DATE" ]]; then
   DATE=$(date +%Y-%m-%d)
@@ -110,15 +73,9 @@ if ! [[ "$DATE" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
   exit 2
 fi
 
-DISCOVERY_DIR="discovery"
-if [[ "$SINGLE_PRODUCT" -eq 1 ]]; then
-  PRODUCT_ROOT="$DISCOVERY_DIR"
-  MODE="single-product"
-else
-  PRODUCT_ROOT="$DISCOVERY_DIR/$TEAM/$PRODUCT"
-  MODE="multi-product"
-fi
-CONTEXT_DIR="$PRODUCT_ROOT/_product-context"
+DISCOVERY_DIR="OST-discovery"
+CONTEXT_DIR="$DISCOVERY_DIR/product-context"
+WORKING_DIR="$DISCOVERY_DIR/_working"
 
 declare -a TOUCHED=()
 
@@ -175,14 +132,9 @@ EOF
 )
 
 # ----- experience-map.md template -----
-if [[ "$SINGLE_PRODUCT" -eq 1 ]]; then
-  EXP_TITLE="$PRODUCT"
-else
-  EXP_TITLE="$TEAM/$PRODUCT"
-fi
 EXPERIENCE_MAP_TEMPLATE=$(cat <<EOF
 ---
-title: Experience map — $EXP_TITLE
+title: Experience map — $PRODUCT
 date: $DATE
 purpose: The customer journey this product supports. Consumed by OST-cluster-opportunities and OST-extract-experience-map.
 tags: [product-context, experience-map]
@@ -193,281 +145,52 @@ tags: [product-context, experience-map]
 
 <!-- Two ways to populate the experience map:
 
-     1. Save a screenshot at _product-context/experience-map.png and run
-        OST-extract-experience-map. The skill will produce a structured
-        JSON + markdown rendering inside the active round folder.
+     1. Save a screenshot at product-context/experience-map.png and run
+        OST-extract-experience-map. The skill writes the structured
+        experience-map-extracted.{md,json} into _working/.
 
      2. Run OST-setup-product and walk through the experience map
-        interview. It writes experience-map-extracted.{md,json} into
-        the active round folder.
+        interview. It writes experience-map-extracted.{md,json} into _working/.
 
-     Both paths write to the round folder, not this file. Downstream
-     skills (OST-cluster-opportunities) require experience-map-extracted.json
-     in the round folder. This file stays as a placeholder. -->
+     Both paths write to _working/, not this file. Downstream skills
+     (OST-cluster-opportunities) read _working/experience-map-extracted.json.
+     This file stays as a human-readable placeholder/summary. -->
 
 TBD.
 EOF
 )
 
-# ----- chosen-opportunity.md template (only if --opportunity) -----
-chosen_opportunity_template() {
-  local opp="$1"
-  cat <<EOF
----
-title: Chosen opportunity — $opp
-date: $DATE
-purpose: Persistent context for this opportunity. Survives across discovery rounds and is read by every phase-B OST-* skill.
-tags: [opportunity, persistent-context]
-
----
-
-# Chosen opportunity: $opp
-
-## Product outcome
-
-<!-- Copy the product outcome formulation from _product-context/product-outcome.md
-     as a blockquote so phase-B skills have it in context. -->
-
-> TBD — paste the product outcome here.
-
-## Chosen opportunity
-
-<!-- Format: **<opp-id>** (Phase: <phase-id>) - "<quote>" - *<source>*
-     Example: **opp-3-2** (Phase: onboarding) - "Jag fattar inte vad jag ska göra först" - *P03, licensansvarig*
-     See product-discovery/knowledge/discovery/opportunity-citation-format.md for citation rules. -->
-
-TBD — fill in the opportunity citation in the format above.
-
-### Score profile
-
-<!-- If this opportunity came through OST-select-opportunity, copy the
-     score profile table from chosen-opportunity-proposal.md. Otherwise
-     leave this section empty — it is optional context for brainstorming. -->
-
-### Rationale
-
-<!-- 2-4 sentences: why the trio picked this opportunity over alternatives.
-     Reference the comparison-matrix if useful. -->
-
-TBD.
-
-## Ratified
-
-$DATE by <names>
-EOF
-}
-
 # ----- decisions.json template -----
 decisions_json_template() {
   local product="$1"
-  local team="$2"
-  local round="$3"
   cat <<ENDJSON
 {
   "schema_version": "1.0",
   "product": "$product",
-  "team": ${team:+"\"$team\""}${team:-"null"},
-  "round": "$round",
+  "team": null,
+  "round": ".",
   "product_outcome": "",
   "decided": {}
 }
 ENDJSON
 }
 
-# ----- round-folder READMEs -----
-SELECTION_ROUND_README=$(cat <<'EOF'
-# Opportunity-selection round (phase A)
-
-This dated folder collects the artifacts from one run of the
-opportunity-selection workflow: extract candidates from interviews,
-validate them against the citation format, compare against the product
-outcome, and produce a proposal for one opportunity to ratify.
-
-Each dated subfolder under `opportunity-selection/` is a separate run.
-Re-run when you have new interview material or want to compare a fresh
-set of candidates against the same outcome.
-
-## Files that will land here (produced by the OST-* skills in order)
-
-- `opportunities-extracted.{md,json}` — raw opportunity citations extracted from interview transcripts (OST-opportunity-extractor).
-- `experience-map-extracted.{md,json}` — structured experience map, from a screenshot via OST-extract-experience-map or from the OST-setup-product interview.
-- `experience-map-clustered.{md,json}` — opportunities clustered onto the journey phases (OST-cluster-opportunities).
-- `opportunities-validated.md` — trio's verdict per opportunity: approved / needs tweak / solution in disguise (OST-validate-opportunities).
-- `comparison-matrix.{md,json}` — qualitative matrix of approved opportunities × Torres criteria (OST-compare-opportunities).
-- `chosen-opportunity-proposal.{md,json}` — AI's proposal of one opportunity to ratify, with rationale and alternatives considered (OST-select-opportunity).
-
-After the trio ratifies a proposal, copy/refine it into
-`../../opportunities/<opp-slug>/chosen-opportunity.md` (or re-run
-`OST-init-workspace --opportunity <slug>` to scaffold that folder).
-EOF
-)
-
-DISCOVERY_ROUND_README=$(cat <<'EOF'
-# Discovery round (phase B)
-
-This dated folder collects the artifacts from one run of the
-solution-discovery workflow for the chosen opportunity in the parent
-folder. Brainstorm divergent solutions, cluster, pick top three,
-surface assumptions, and design validation experiments.
-
-Each dated subfolder is a separate run. Re-run when you want to
-brainstorm again with new constraints or after experiments invalidate
-earlier assumptions.
-
-## Files that will land here (produced by the OST-* skills in order)
-
-- `solution-candidates.{md,json}` — 18 divergent solution candidates from three role-diverse sub-agents (OST-brainstorm-solutions).
-- `clustered-solutions.{md,json}` — candidates collapsed into 3-5 thematic clusters (OST-cluster-solutions).
-- `top-three-solutions.{md,json}` — three solutions picked to carry into assumption testing (OST-select-top-three-solutions).
-- `assumptions.{md,json}` — assumptions that must hold for each of the three solutions to move the product outcome (OST-generate-assumptions).
-- `assumptions-categorized.{md,json}` — assumptions tagged into Cagan's five product-risk categories (OST-assumption-categorizer).
-- `riskiest-assumptions.{md,json}` — assumptions where importance is high AND evidence is weak (OST-riskiest-assumptions).
-- `validation-experiments.{md,json}` — Bland Test Cards for each riskiest assumption (OST-validation-experiment-designer).
-
-The parent folder `../chosen-opportunity.md` holds the persistent context
-for this opportunity. The parent's `../ratifications.md` is an optional
-trio log of decisions made.
-EOF
-)
-
-# ----- discovery README (formerly workspace README) -----
-DISCOVERY_README=$(cat <<'EOF'
-# Discovery workspace
-
-This directory holds artifacts produced by the `product-discovery` plugin's
-OST-* skills. Layout and conventions are shared across all skills — do
-not move files around without checking the workspace-scope spec.
-
-## Layout modes
-
-Two modes are supported. Both use the same relative-path math, so the
-phase skills do not care which mode the repo uses.
-
-### Multi-product
-
-For organisations with multiple teams or products in one repo:
-
-```text
-discovery/
-├── .current-scope                                # one-line file: relative path to the active round folder
-├── <team>/                                       # e.g. fast, norrsken
-│   ├── _team-context/                            # team-level docs (optional)
-│   └── <product>/                                # e.g. fsok
-│       ├── _product-context/                     # product-outcome.md, experience-map.{md,json}
-│       ├── opportunity-selection/<YYYY-MM-DD>/   # phase A round
-│       └── opportunities/<opp-slug>/             # ratified opportunity
-│           ├── chosen-opportunity.md             # persistent context
-│           ├── ratifications.md                  # optional trio log
-│           └── <YYYY-MM-DD>/                     # phase B round
-```
-
-### Single-product
-
-For small repos with exactly one product (no team/product nesting):
-
-```text
-discovery/
-├── .current-scope
-├── _product-context/                             # product-outcome.md, experience-map.{md,json}
-├── opportunity-selection/<YYYY-MM-DD>/           # phase A round
-└── opportunities/<opp-slug>/                     # ratified opportunity
-    ├── chosen-opportunity.md
-    ├── ratifications.md                          # optional
-    └── <YYYY-MM-DD>/                             # phase B round
-```
-
-## Scope resolution
-
-Every OST-* skill resolves its scope (the round folder it reads/writes
-inside) in this order, taking the first that exists:
-
-1. Explicit `scope=` argument passed by the user when invoking the skill.
-2. `discovery/.current-scope` — one-line file with a relative path from
-   the repo root to the active round folder.
-3. Prompt the user, defaulting to the latest dated round under the most
-   recently touched opportunity.
-
-A scope is an **opportunity-selection round** if its path contains
-`/opportunity-selection/`, otherwise a **discovery round** if it
-contains `/opportunities/`.
-
-## Adding a new opportunity or round
-
-Re-run `OST-init-workspace` with the new `--opportunity <slug>` or
-`--selection` flag. The script is idempotent: existing files are never
-overwritten.
-
-## Full spec
-
-The canonical convention (filenames, slug rules, context walk-up rules,
-both layout modes) lives in the plugin source at
-`product-discovery/knowledge/discovery/workspace-scope.md`.
-EOF
-)
-
 # ----- scaffold -----
-if [[ "$MODE" == "single-product" ]]; then
-  echo "Scaffolding OST discovery workspace (single-product mode) for product=$PRODUCT (date=$DATE)..."
-else
-  echo "Scaffolding OST discovery workspace for team=$TEAM product=$PRODUCT (date=$DATE)..."
-fi
+echo "Scaffolding flat OST-discovery/ workspace for product=$PRODUCT (date=$DATE)..."
 echo
 
 mk_dir "$DISCOVERY_DIR"
-if [[ "$PRODUCT_ROOT" != "$DISCOVERY_DIR" ]]; then
-  mk_dir "$PRODUCT_ROOT"
-fi
 mk_dir "$CONTEXT_DIR"
-mk_dir "$PRODUCT_ROOT/opportunity-selection"
-mk_dir "$PRODUCT_ROOT/opportunities"
+mk_dir "$WORKING_DIR"
 
-mk_file "$DISCOVERY_DIR/README.md" "$DISCOVERY_README"
 mk_file "$CONTEXT_DIR/product-outcome.md" "$PRODUCT_OUTCOME_TEMPLATE"
 mk_file "$CONTEXT_DIR/experience-map.md" "$EXPERIENCE_MAP_TEMPLATE"
-
-CURRENT_SCOPE_TARGET=""
-
-if [[ -n "$OPPORTUNITY" ]]; then
-  OPP_DIR="$PRODUCT_ROOT/opportunities/$OPPORTUNITY"
-  ROUND_DIR="$OPP_DIR/$DATE"
-  mk_dir "$OPP_DIR"
-  mk_file "$OPP_DIR/chosen-opportunity.md" "$(chosen_opportunity_template "$OPPORTUNITY")"
-  mk_dir "$ROUND_DIR"
-  mk_file "$ROUND_DIR/README.md" "$DISCOVERY_ROUND_README"
-  mk_file "$ROUND_DIR/decisions.json" "$(decisions_json_template "$PRODUCT" "$TEAM" "$ROUND_DIR")"
-  CURRENT_SCOPE_TARGET="$ROUND_DIR"
-fi
-
-if [[ "$SELECTION" -eq 1 ]]; then
-  ROUND_DIR="$PRODUCT_ROOT/opportunity-selection/$DATE"
-  mk_dir "$ROUND_DIR"
-  mk_file "$ROUND_DIR/README.md" "$SELECTION_ROUND_README"
-  mk_file "$ROUND_DIR/decisions.json" "$(decisions_json_template "$PRODUCT" "$TEAM" "$ROUND_DIR")"
-  CURRENT_SCOPE_TARGET="$ROUND_DIR"
-fi
-
-CURRENT_SCOPE_FILE="$DISCOVERY_DIR/.current-scope"
-if [[ -n "$CURRENT_SCOPE_TARGET" ]]; then
-  if [[ -e "$CURRENT_SCOPE_FILE" ]]; then
-    existing=$(cat "$CURRENT_SCOPE_FILE")
-    if [[ "$existing" == "$CURRENT_SCOPE_TARGET" ]]; then
-      echo "SKIPPED (exists): $CURRENT_SCOPE_FILE (already points at $CURRENT_SCOPE_TARGET)"
-    else
-      echo "SKIPPED (exists): $CURRENT_SCOPE_FILE (currently points at $existing; not overwriting)"
-      echo "                  To change scope, edit $CURRENT_SCOPE_FILE manually or delete it and re-run."
-    fi
-  else
-    printf '%s\n' "$CURRENT_SCOPE_TARGET" > "$CURRENT_SCOPE_FILE"
-    echo "CREATED:          $CURRENT_SCOPE_FILE → $CURRENT_SCOPE_TARGET"
-    TOUCHED+=("$CURRENT_SCOPE_FILE")
-  fi
-fi
+mk_file "$DISCOVERY_DIR/decisions.json" "$(decisions_json_template "$PRODUCT")"
 
 # ----- summary -----
 echo
 echo "Summary"
 echo "-------"
-echo "Mode: $MODE"
 if [[ ${#TOUCHED[@]} -eq 0 ]]; then
   echo "Nothing scaffolded — all targets already existed."
 else
@@ -487,8 +210,4 @@ if [[ ! -f "$CONTEXT_DIR/experience-map.png" && ! -f "$CONTEXT_DIR/experience-ma
   echo "2. Either save a screenshot at $CONTEXT_DIR/experience-map.{png,jpg} and run OST-extract-experience-map,"
   echo "   or write the journey directly into $CONTEXT_DIR/experience-map.md."
 fi
-if [[ -n "$CURRENT_SCOPE_TARGET" ]]; then
-  echo "3. Active scope: $CURRENT_SCOPE_TARGET"
-  echo "   Subsequent OST-* skills will read/write inside that folder unless you pass scope= explicitly."
-  echo "   Open $CURRENT_SCOPE_TARGET/README.md to see what files will land there."
-fi
+echo "3. Active scope: $DISCOVERY_DIR/ (flat). OST-* skills read/write here; plumbing lands in _working/."

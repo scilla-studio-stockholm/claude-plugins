@@ -17,11 +17,13 @@ Let `VIEWER_ROOT` be the resolved path (the directory containing `serve.py` and 
 
 Walk up from `<scope>` until you find a directory that:
 - contains `.current-scope`, OR
-- is named `discovery/`
+- is named `OST-discovery/`
 
 If neither is found after reaching the filesystem root, skip the viewer launch with a warning: "Could not resolve discovery root from `<scope>` — viewer launch skipped."
 
-This becomes `DISCOVERY_ROOT` (the `--data` argument to `serve.py`).
+This becomes `DISCOVERY_ROOT` (the `--data` argument to `serve.py`), e.g. `--data OST-discovery/`.
+
+Within a scope, `decisions.json` lives at the scope root and every other view JSON lives under `<scope>/_working/`; the viewer fetches its view JSON from `_working/`.
 
 ## Round path
 

@@ -74,16 +74,16 @@ This is the contract that `OST-brainstorm-solutions` produces. Downstream consum
 ```json
 {
   "schema_version": "0.1",
-  "team": "string (carried from product-outcome.md ## Team)",
-  "title": "string (carried from chosen-opportunity.md frontmatter title)",
-  "product_outcome": "string (carried from product-outcome.md ## Outcome)",
+  "team": "string (carried from <scope>/decisions.json top-level team)",
+  "title": "string (derived from decided.opportunity.id, e.g. 'opp-42')",
+  "product_outcome": "string (carried from <scope>/decisions.json product_outcome)",
   "chosen_opportunity": {
-    "id": "string (carried from chosen-opportunity.md ## Chosen opportunity)",
+    "id": "string (carried from <scope>/decisions.json decided.opportunity.id)",
     "phase_id": "string",
     "quote": "string",
     "source": "string"
   },
-  "source_chosen_opportunity_file": "string (repo-root-relative resolved path of the ratified chosen-opportunity, e.g. workspace/fast/fsok/opportunities/brist-pa-oversikt/chosen-opportunity.md; resolved from <scope>/../chosen-opportunity.md at runtime)",
+  "source_chosen_opportunity_file": "string (repo-root-relative resolved path of the ratified decisions file, e.g. OST-discovery/decisions.json; resolved from <scope>/decisions.json at runtime)",
   "generation_summary": {
     "rounds": 3,
     "roles": ["product-manager", "ux-designer", "tech-lead"],
@@ -104,7 +104,7 @@ This is the contract that `OST-brainstorm-solutions` produces. Downstream consum
 
 ### Field notes
 
-- **`chosen_opportunity`** is denormalized at the top level so assist 7 can read the chosen opp without reloading the opportunity-folder root (`<scope>/../`).
+- **`chosen_opportunity`** is denormalized at the top level so assist 7 can read the chosen opp without re-reading `<scope>/decisions.json`.
 - **`generation_summary`** is a fixed-shape sanity block. v0.1 always reads `{rounds: 3, roles: [...], ideas_per_role_per_round: 2, total_solutions: 18}`. Configurable counts is a v0.2 follow-up.
 - **`solutions[]`** is one flat array of 18 entries, not nested by round/role. Round and role are properties of each entry. Trivial to group/filter in either dimension.
 - **`solutions[].id`** is deterministic: `sol-r<round>-<role-prefix>-<index>` where role-prefix is `pm` (product-manager) / `ux` (ux-designer) / `tl` (tech-lead) and index is 1..2 within (round, role). Predictable, sortable, easy to cite in build-on prose.
@@ -119,14 +119,14 @@ This is the contract that `OST-brainstorm-solutions` produces. Downstream consum
 - `solutions[].id` matches the regex `^sol-r[123]-(pm|ux|tl)-[12]$`.
 - `solutions[].round_number` ∈ {1, 2, 3}.
 - `solutions[].generating_role` ∈ {`product-manager`, `ux-designer`, `tech-lead`}.
-- `chosen_opportunity.id` matches the id parsed from `<scope>/../chosen-opportunity.md` (the ratified chosen-opportunity at the opportunity-folder root).
+- `chosen_opportunity.id` matches `decided.opportunity.id` in `<scope>/decisions.json` (the ratified chosen opportunity).
 - `generation_summary` is the fixed v0.1 block.
 - No `build_on`, `assumptions`, `risk_level`, or other extension fields anywhere.
 
 ## Open questions
 
 - Configurable idea / round / role counts: v0.1 locks 3×3×2=18. v0.2 if trios consistently want different sizing.
-- Per-team role-anchor overrides: v0.1 reads generic anchors from `knowledge/foundations/`. v0.2 may let trios shadow defaults from the opportunity-folder root (e.g., `<scope>/../role-*.md`).
+- Per-team role-anchor overrides: v0.1 reads generic anchors from `knowledge/foundations/`. v0.2 may let trios shadow defaults from the scope root (e.g., `<scope>/role-*.md`).
 - Configurable role set: v0.1 fixes PM/UX/Tech Lead. v0.2 if teams have different trios (e.g., engineering manager + designer + researcher).
 - Optional `build_on` schema field for structural cross-round linkage: parked. Add if the clusterer benefits.
 - HITL flavor variants (curated top-N, themed-prep): parked. Add if trios push back on pure-divergent.

@@ -14,7 +14,7 @@ This skill is assist 3a (validator) in the OST discovery workflow.
 1. **Resolve scope.** Follow `references/workspace-scope.md`. Portfolio scope only.
 
 2. **Resolve input path:**
-   - Default to `<scope>/opportunities-extracted.md` if it exists; otherwise ask the user for a path.
+   - Default to `<scope>/_working/opportunities-extracted.md` if it exists; otherwise ask the user for a path.
 
 3. **Read the knowledge anchors:**
    - `references/opportunity-citation-format.md` — the citation-format rules (what a valid citation contains, when and when not to tweak, examples).
@@ -54,7 +54,7 @@ This skill is assist 3a (validator) in the OST discovery workflow.
    - Solution in disguise: <N>
    ```
 
-8. **Save the output** as `<scope>/opportunities-validated.md` unless the user specifies a different path.
+8. **Save the output** as `<scope>/_working/opportunities-validated.md` unless the user specifies a different path.
 
 ## Output principles
 

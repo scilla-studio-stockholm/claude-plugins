@@ -69,7 +69,7 @@ This is the contract that `OST-compare-opportunities` produces. Downstream skill
   "schema_version": "0.1",
   "team": "string (carried from clustered map)",
   "title": "string (carried from clustered map)",
-  "product_outcome": "string (full outcome from <scope>/../../_product-context/product-outcome.md)",
+  "product_outcome": "string (full outcome from <scope>/product-context/product-outcome.md)",
   "source_clustered_map": "string (filename of source experience-map-clustered-*.json)",
   "criteria": [
     {

@@ -11,16 +11,14 @@ The skill is an identity map over upstream assumptions plus one new `category` f
 
 ## Prerequisites
 
-- `OST-generate-assumptions` (assist 9) has run; `assumptions.json` exists in the resolved `<scope>/` (or a sibling-round fallback).
+- `OST-generate-assumptions` (assist 9) has run; `assumptions.json` exists in the resolved `<scope>/_working/`.
 
 ## Steps
 
-1. **Resolve scope.** Follow `references/workspace-scope.md`. Discovery scope only.
+1. **Resolve scope.** Follow `references/workspace-scope.md`. The scope is `OST-discovery/` itself in the default flat layout; multi-product / multi-round layouts are opt-in and resolved per that reference.
 
-2. **Load context via parent walk-up:**
-   - `<scope>/../chosen-opportunity.md`
-   - `<scope>/../../../_product-context/product-outcome.md`
-   - Same-round predecessor: `<scope>/assumptions.json` (with sibling-round fallback)
+2. **Load context:**
+   - Predecessor: `<scope>/_working/assumptions.json` (identifying context flows through this upstream JSON)
 
 3. **Read the knowledge anchors:**
    - `references/assumption-categorization.md` (the schema, the category enum, the risk-falls tiebreaker rule, the 'other'-reservation rule, the carry-forward rules, the renderer template; this is the canonical source for everything below).
@@ -28,7 +26,7 @@ The skill is an identity map over upstream assumptions plus one new `category` f
    - `references/product-operating-model-marty-cagan.md` (the Cagan-five framing that anchors the taxonomy).
    - `references/assumption-generation.md` (the upstream schema v0.1; parse the input JSON against this).
 
-4. **Locate input.** List `<scope>/assumptions.json` (with sibling-round fallback), take the latest. Hard-exit if zero matches.
+4. **Locate input.** Read `<scope>/_working/assumptions.json`. Hard-exit if missing.
 
 5. **Hard-exit checks.** Apply the triggers below. If any fire, write no output files. Emit a three-line error in this exact shape:
 
@@ -41,7 +39,7 @@ The skill is an identity map over upstream assumptions plus one new `category` f
 
    Triggers:
 
-   - No `assumptions.json` in `<scope>/` (or sibling-round fallback). Remedy: run `OST-generate-assumptions` (assist 9) first.
+   - No `assumptions.json` in `<scope>/_working/`. Remedy: run `OST-generate-assumptions` (assist 9) first.
    - Source JSON does not parse. Remedy: re-run `OST-generate-assumptions`.
    - Source JSON `schema_version` is not `"0.1"`. Remedy: re-run `OST-generate-assumptions` against v0.1.
    - Source `assumptions_per_solution.length` != 3. Remedy: re-run `OST-generate-assumptions`.
@@ -137,10 +135,10 @@ The skill is an identity map over upstream assumptions plus one new `category` f
 
 13. **Write paired output.**
 
-    - `<scope>/assumptions-categorized.json`.
-    - `<scope>/assumptions-categorized.md`.
+    - `<scope>/_working/assumptions-categorized.json`.
+    - `<scope>/_working/assumptions-categorized.md`.
 
-    Create `<scope>/` if it does not exist. Same root name on both files.
+    Create `<scope>/_working/` if it does not exist. Same root name on both files.
 
 14. **Render the markdown deterministically from the JSON.** Use this exact template:
 
@@ -157,8 +155,7 @@ The skill is an identity map over upstream assumptions plus one new `category` f
 
     Source assumptions: `<source_assumptions>`
     Source top 3 solutions: `<source_top_three_solutions>`
-    Source chosen opportunity: `<scope>/../chosen-opportunity.md`
-    Source product outcome: `<scope>/../../../_product-context/product-outcome.md`
+    Source product outcome: `<scope>/product-context/product-outcome.md`
     Schema version: 0.1
     Paired JSON: `assumptions-categorized.json`
 
@@ -228,7 +225,7 @@ The skill is an identity map over upstream assumptions plus one new `category` f
 - Generates test cards, validation plans, or experiment designs. (Future phase 4.)
 - Applies cross-solution analysis or marks shared assumptions across solutions.
 - Modifies upstream files. The `assumptions-*.json` and all context files stay immutable.
-- Writes outside `<scope>/`. Output lives in `<scope>/`.
+- Writes outside `<scope>/_working/`. Output lives in `<scope>/_working/`.
 - Appends to `ratifications.md`.
 - Adds an in-skill HITL banner. Trio gate is downstream at assist 11.
 - Runs a JSON self-validation pass beyond the invariant check.

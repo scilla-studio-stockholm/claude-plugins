@@ -16,14 +16,15 @@ This skill is assist 2 in the OST discovery workflow.
 1. **Resolve scope.** Follow `references/workspace-scope.md`. Portfolio scope only.
 
 2. **Resolve target paths:**
-   - Output: `<scope>/../../_product-context/experience-map-extracted.{md,json}`
+   - Machine output: `<scope>/_working/experience-map-extracted.{md,json}`
+   - Visible foundation copy: `<scope>/product-context/experience-map.md` — a short human-readable rendering of the journey for the trio to read (see step 12).
 
 3. **Load context (optional):**
-   - `<scope>/../../_product-context/product-outcome.md` — fallback for the `product_outcome` field if it's missing from the screenshot.
+   - `<scope>/product-context/product-outcome.md` — fallback for the `product_outcome` field if it's missing from the screenshot.
 
 4. **Read the knowledge anchor** at `references/experience-mapping.md` for schema v0.1 and the structural pattern.
 
-5. **Get input from the user.** Ask for a screenshot path. Default to `<scope>/../../_product-context/experience-map.png` if present, otherwise check for `<scope>/../../_product-context/experience-map.jpg`. If neither exists, prompt the user explicitly. If both exist, use the PNG and emit a warning that both were present.
+5. **Get input from the user.** Ask for a screenshot path. Default to `<scope>/product-context/experience-map.png` if present, otherwise check for `<scope>/product-context/experience-map.jpg`. If neither exists, prompt the user explicitly. If both exist, use the PNG and emit a warning that both were present.
 
 6. **Read the screenshot** using the Read tool (vision). One pass only. No retries, no multi-screenshot iteration.
 
@@ -60,16 +61,18 @@ This skill is assist 2 in the OST discovery workflow.
 
 9. **Apply tiered strictness.**
    - If a required field cannot be extracted with confidence: respond with the hard-exit message in the "Hard-exit format" section below and stop. Do not write any output files.
-   - Exception for `product_outcome`: if it is missing from the screenshot but `<scope>/../../_product-context/product-outcome.md` exists, read the outcome from that file and add a Warning entry to the markdown output.
+   - Exception for `product_outcome`: if it is missing from the screenshot but `<scope>/product-context/product-outcome.md` exists, read the outcome from that file and add a Warning entry to the markdown output.
    - If an optional field is ambiguous: omit the key from the JSON and add an entry to the Warnings section.
 
 10. **Compose the JSON object** strictly against schema v0.1. For optional fields without an extractable value, omit the key entirely; never write `null`. Always omit `phases[].opportunities`.
 
 11. **Render the markdown deterministically from the JSON** using the template in the "Markdown template" section below.
 
-12. **Write paired output** to:
-   - `<scope>/../../_product-context/experience-map-extracted.json`
-   - `<scope>/../../_product-context/experience-map-extracted.md`
+12. **Write paired machine output** to:
+   - `<scope>/_working/experience-map-extracted.json`
+   - `<scope>/_working/experience-map-extracted.md`
+
+   Also write the **visible foundation copy** of the journey to `<scope>/product-context/experience-map.md` — the same human-readable markdown rendering (per the "Markdown template" section), placed at the product-context root so the trio has a readable copy of the foundation alongside `product-outcome.md`. This is the visible counterpart of the `_working/` machine output.
 
 13. **Launch the viewer.** Follow `knowledge/discovery/viewer-launch.md` to resolve the viewer path, start the server, and open the browser.
 
@@ -82,7 +85,7 @@ ERROR: Required field '<field name>' could not be extracted.
 - Screenshot: <path>
 - Looked for: <what the skill expected to see>
 - Found: <what the skill actually saw>
-- Fallback: <whether a fallback was attempted, e.g. <scope>/../../_product-context/product-outcome.md>
+- Fallback: <whether a fallback was attempted, e.g. <scope>/product-context/product-outcome.md>
 - Remedy: <what the operator should do, e.g. re-screenshot the map including the header section>
 ```
 
@@ -173,7 +176,7 @@ If the friction line shows `(friction: not recorded)`, the field was omitted fro
 
 (only if any warnings; otherwise omit this whole section)
 
-- product_outcome was missing from the screenshot; fell back to `<scope>/../../_product-context/product-outcome.md`
+- product_outcome was missing from the screenshot; fell back to `<scope>/product-context/product-outcome.md`
 - Phase 4 friction_level was ambiguous; field omitted from JSON [uncertain]
 - Phase 2 step 3 description was illegible; description field omitted from JSON [uncertain]
 ```

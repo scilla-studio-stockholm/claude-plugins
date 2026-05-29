@@ -4,7 +4,9 @@ Single file per discovery round. Accumulates only what the trio ratified at each
 
 ## Location
 
-`discovery/<round-folder>/decisions.json`
+Default flat layout: `OST-discovery/decisions.json`.
+
+With opt-in product/round nesting: `OST-discovery/[<product>/][rounds/<date>/]decisions.json`. `decisions.json` always sits at the scope root; all phase JSON and intermediate markdown live under that scope's `_working/`.
 
 ## Schema (v1.0)
 
@@ -89,7 +91,7 @@ Single file per discovery round. Accumulates only what the trio ratified at each
 - **`assumptions.riskiest` contains only assumptions where importance=high AND evidence=weak.**
 - **`experiments.test_cards` has one entry per riskiest assumption.**
 - **`ratified` is the date the trio signed off, not the date the skill ran.**
-- **No alternatives, no process metadata, no source filenames.** The file is self-contained. Working artifacts (comparison matrices, brainstorm lists, clustering) stay as markdown in `_working/`.
+- **No alternatives, no process metadata, no source filenames.** The file is self-contained. All phase JSON plus intermediate markdown (comparison matrices, brainstorm lists, clustering) live in `_working/`.
 - **`success_criteria` must contain at least one numeric anchor** (regex-enforced).
 
 ## What this replaces

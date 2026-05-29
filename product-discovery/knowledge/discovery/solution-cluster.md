@@ -43,7 +43,7 @@ The LLM may use one of these dimensions, combine several, or invent a fitting on
 
 ## The chosen-opportunity cross-check rule
 
-The source candidates JSON carries a top-level `chosen_opportunity.id` (set by the brainstormer at build time). `<scope>/../chosen-opportunity.md` carries the trio-ratified chosen opportunity, with the id in a bold-id row (e.g., `**opp-5-1** (Phase: fas-5) - "..." - *...*`).
+The source candidates JSON carries a top-level `chosen_opportunity.id` (set by the brainstormer at build time). `<scope>/decisions.json` → `decided.opportunity` carries the trio-ratified chosen opportunity, with the id in `decided.opportunity.id`.
 
 The clusterer parses both and compares. Mismatch → hard-exit. This catches a mismatch downstream of the brainstormer; the same check should also be added to `OST-brainstorm-solutions` to fail earlier (separate TODO item).
 
@@ -58,7 +58,7 @@ This is the contract that `OST-cluster-solutions` produces. Downstream consumers
   "title": "string (e.g., 'Clustered solutions: <first clause of chosen opportunity quote>')",
   "product_outcome": "string (carried from source)",
   "chosen_opportunity": {
-    "id": "string (carried; e.g., 'opp-5-1'; matches the bold-id row in <scope>/../chosen-opportunity.md)",
+    "id": "string (carried; e.g., 'opp-5-1'; matches decided.opportunity.id in <scope>/decisions.json)",
     "phase_id": "string (carried)",
     "quote": "string (carried verbatim)",
     "source": "string (carried verbatim)"
@@ -89,7 +89,7 @@ This is the contract that `OST-cluster-solutions` produces. Downstream consumers
 ### Field notes
 
 - **`team`, `title` (top level), `product_outcome`** are carried verbatim from the source candidates JSON, except `title` is rewritten to the form `"Clustered solutions: <first clause of chosen opportunity quote>"` for downstream readability.
-- **`chosen_opportunity`** is carried verbatim from the source candidates JSON. Cross-check against the bold-id row in `<scope>/../chosen-opportunity.md` is mandatory (see The chosen-opportunity cross-check rule above).
+- **`chosen_opportunity`** is carried verbatim from the source candidates JSON. Cross-check against `decided.opportunity.id` in `<scope>/decisions.json` is mandatory (see The chosen-opportunity cross-check rule above).
 - **`source_solution_candidates`** is the filename (no directory prefix) of the source JSON. The clusterer found it under `<scope>/` (the active discovery round folder).
 - **`cluster_count`** equals `clusters.length`. Hard invariant.
 - **`clusters[]`** is ordered by member count descending; ties broken by first-appearing member id. `cluster_id` values are assigned post-sort as `c1, c2, ...`.

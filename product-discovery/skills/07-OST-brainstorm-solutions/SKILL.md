@@ -15,9 +15,9 @@ The output is a **divergent candidate set**, not a recommendation. There is no c
 
 ## Steps
 
-1. **Resolve scope.** Follow the scope-resolution protocol in `references/workspace-scope.md`. The resolved scope is a discovery scope of the form `discovery/<team>/<product>/opportunities/<opp>/<YYYY-MM-DD>/`. Hard-exit if the resolved scope contains `/opportunity-selection/` (this skill runs in phase B only).
+1. **Resolve scope.** Follow the scope-resolution protocol in `references/workspace-scope.md`. The scope is `OST-discovery/` itself in the default flat layout; multi-product / multi-round layouts are opt-in and resolved per that reference.
 
-2. **Load context from the round folder.** Per `references/workspace-scope.md`:
+2. **Load context from the scope.** Per `references/workspace-scope.md`:
    - `<scope>/decisions.json` — the ratified opportunity context (`decided.opportunity`) and product outcome (`product_outcome`)
 
 3. **Read the knowledge anchors:**
@@ -77,10 +77,10 @@ The output is a **divergent candidate set**, not a recommendation. There is no c
 14. **Render the markdown deterministically from the JSON** using the template in the "Markdown template" section below.
 
 15. **Write paired output** to:
-    - `<scope>/solution-candidates.json`
-    - `<scope>/solution-candidates.md`
+    - `<scope>/_working/solution-candidates.json`
+    - `<scope>/_working/solution-candidates.md`
 
-    Use today's date in `YYYY-MM-DD` format for the round folder name (already part of `<scope>`). The two files share the same root name. Create the scope directory if it doesn't exist. Upstream files (`decisions.json`, role anchors) are not modified.
+    The two files share the same root name. Create the `<scope>/_working/` directory if it doesn't exist. Upstream files (`decisions.json`, role anchors) are not modified.
 
 16. **Launch the viewer.** Follow `knowledge/discovery/viewer-launch.md` to resolve the viewer path, start the server, and open the browser.
 
@@ -113,7 +113,7 @@ The markdown output is rendered deterministically from the composed JSON using t
 ---
 title: Solution candidates - <title> (<team>)
 date: <YYYY-MM-DD>
-purpose: Divergent solution-candidate set for the chosen opportunity, paired with solution-candidates-<date>.json. Consumed by assist 7 (OST-cluster-solutions). Trio review at assist 8 (top-3 selector).
+purpose: Divergent solution-candidate set for the chosen opportunity, paired with solution-candidates.json. Consumed by assist 7 (OST-cluster-solutions). Trio review at assist 8 (top-3 selector).
 tags: [solution-brainstorm, ost, schema-v0.1]
 
 ---
@@ -122,7 +122,7 @@ tags: [solution-brainstorm, ost, schema-v0.1]
 
 Source: `<scope>/decisions.json`
 Schema version: 0.1
-Paired JSON: `solution-candidates-<YYYY-MM-DD>.json`
+Paired JSON: `_working/solution-candidates.json`
 
 Generation summary: 3 rounds × 3 roles × 2 ideas = 18 total. Roles: Product Manager (PM), UX Designer (UX), Tech Lead (TL).
 
@@ -163,14 +163,14 @@ Generation summary: 3 rounds × 3 roles × 2 ideas = 18 total. Roles: Product Ma
 - **Build-on entries** in rounds 2 and 3 reference the prior idea inline in the description (e.g., "Builds on sol-r1-pm-2 by adding ..." or "Builds on the 'auto-renewal nudge' idea by ..."). No structural reference field.
 - **No silent degradation.** Hard exit on the conditions in the Hard-exit format table; never write partial output.
 - **No JSON self-validation pass.** Trust the prompt; downstream skills surface any malformed JSON.
-- **Upstream files are immutable.** Never modify `decisions.json` or the role anchors. The skill writes only the two `solution-candidates.*` files inside `<scope>/`.
+- **Upstream files are immutable.** Never modify `decisions.json` or the role anchors. The skill writes only the two `solution-candidates.*` files inside `<scope>/_working/`.
 - **Single orchestrator pass.** Three rounds executed in sequence; sub-agent calls happen via the Agent tool but the skill itself doesn't iterate or retry beyond the structured rounds.
 
 ## What this skill does NOT do
 
 - **Read interview transcripts.** Solutions are generative, not evidence-traced.
 - **Read the comparison matrix, validated table, clustered experience map, or extracted opportunities.** All chosen-opportunity context is in `<scope>/decisions.json`.
-- **Read the selector's proposal in `<scope>/../../opportunity-selection/<round>/`.** The skill reads only the trio-ratified data in `<scope>/decisions.json`.
+- **Read the selector's proposal in `_working/`.** The skill reads only the trio-ratified data in `<scope>/decisions.json`.
 - **Modify upstream files.** `decisions.json` and the role anchors stay immutable.
 - **Cluster, score, rank, or select solutions.** Those are downstream (assist 7 clusterer, assist 8 top-3 selector).
 - **Generate assumptions, risk maps, or test cards.** Those are downstream (assists 9-12).
@@ -188,7 +188,7 @@ Generation summary: 3 rounds × 3 roles × 2 ideas = 18 total. Roles: Product Ma
 - **Group solutions by role within a round.** Flat-list rendering with role tags.
 - **Read each other's output mid-round.** Within-round sub-agents are blind to peers.
 - **Self-validate or re-rank ideas.** No post-pass scoring.
-- **Write outside the resolved scope.** The skill writes only to `<scope>/solution-candidates.{md,json}`.
+- **Write outside the resolved scope.** The skill writes only to `<scope>/_working/solution-candidates.{md,json}`.
 - **Re-run sub-agents on partial failures.** Any sub-agent failure (malformed JSON, wrong count) hard-exits the orchestrator.
 - **Use a `Cites:` line in the markdown.**
 - **Use emoji or numeric encoding for role tags.**

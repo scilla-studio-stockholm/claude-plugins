@@ -11,15 +11,15 @@ This skill is assist 8 in the OST discovery workflow.
 
 The output is a **proposal** that assist 9 (assumption generator) consumes after trio ratification. The trio reviews the markdown output. If approved, `decided.solutions` in `decisions.json` is the ratified record. The trio may edit `decisions.json` to swap picks or adjust rationale. This skill does NOT write outside `<scope>/`.
 
-**Out of scope:** clustering or grouping solutions (`OST-cluster-solutions` is a separate optional skill, not consumed here), generating assumptions per pick (assist 9), re-brainstorming (assist 6), reading interview transcripts or the comparison matrix (everything needed is in the brainstormer JSON + `decisions.json`), surfacing alternatives or runners-up as a structured field (trio reads brainstormer markdown directly), scoring or ranking numerically, weighing effort or feasibility (Torres principle, carried), applying mechanism diversification as a constraint.
+**Out of scope:** clustering or grouping solutions (`OST-cluster-solutions` is a separate optional skill, not consumed here), generating assumptions per pick (assist 9), re-brainstorming (assist 6), reading interview transcripts or the comparison matrix (everything needed is in the brainstormer JSON + `decisions.json`), surfacing alternatives or runners-up as a structured field (alternatives are surfaced in the milestone doc's "Also considered" section of `2-solutions.md`), scoring or ranking numerically, weighing effort or feasibility (Torres principle, carried), applying mechanism diversification as a constraint.
 
 ## Steps
 
-1. **Resolve scope.** Follow `references/workspace-scope.md`. Discovery scope only.
+1. **Resolve scope.** Follow `references/workspace-scope.md`. The scope is `OST-discovery/` itself in the default flat layout; multi-product / multi-round layouts are opt-in and resolved per that reference.
 
-2. **Load context via parent walk-up:**
+2. **Load context:**
    - `<scope>/decisions.json`
-   - Same-round predecessor: `<scope>/solution-candidates.json` (with sibling-round fallback)
+   - Predecessor: `<scope>/_working/solution-candidates.json`
 
 3. **Read the knowledge anchors:**
    - `references/top-three-selection.md` - the v0.2 schema, the four v2 locked decisions, the no-effort rule, the ratification-flag pattern, the field-notes section.
@@ -27,12 +27,12 @@ The output is a **proposal** that assist 9 (assumption generator) consumes after
    - `references/opportunity-solution-tree-teresa-torres.md` - Torres principles. The canonical anchor is "Choose three solutions to explore in parallel" (CDH ch 7 step 6). The "Don't assess effort during opportunity selection" rule is carried to solution selection prose.
 
 4. **Locate inputs:**
-   - Latest `solution-candidates.json` in `<scope>/` (with sibling-round fallback).
-   - `<scope>/decisions.json` (parent walk-up).
+   - `<scope>/_working/solution-candidates.json`.
+   - `<scope>/decisions.json`.
 
 5. **Hard-exit checks** (see Hard-exit format below). Do not write any output files when these fire:
    - Missing knowledge anchor `top-three-selection.md`, `solution-brainstorm.md`, or `opportunity-solution-tree-teresa-torres.md` (expected under `knowledge/discovery/`).
-   - Zero files match `solution-candidates.json` in `<scope>/`.
+   - `<scope>/_working/solution-candidates.json` missing.
    - `<scope>/decisions.json` missing.
    - `decisions.json` has no `decided.opportunity` key.
    - Source JSON does not parse.
@@ -117,13 +117,15 @@ The output is a **proposal** that assist 9 (assumption generator) consumes after
 
 10. **Set top-level `title`** to `"Top solutions: <first 5-10 words of chosen_opportunity.quote, trailing punctuation stripped>"`. Set `source_solution_candidates` to the basename of the source brainstormer JSON file (no directory prefix).
 
-11. **Write JSON output** to `<scope>/top-three-solutions.json`. Create the directory if it doesn't exist.
+11. **Write JSON output** to `<scope>/_working/top-three-solutions.json`. Create the `_working/` directory if it doesn't exist.
 
-12. **Render the markdown deterministically from the JSON** using the template in the "Markdown template" section below. Write to `<scope>/top-three-solutions.md`.
+12. **Read the non-selected clusters/candidates for "Also considered":** Read `<scope>/_working/clustered-solutions.json` (the OST-cluster-solutions output). Use it to populate the "Also considered" section in the milestone markdown — list the clusters/candidates that are NOT among the 3 picks, each with a one-line why-not. If `<scope>/_working/clustered-solutions.json` is absent, list the non-selected solutions from the source brainstormer `solutions[]` (the 15 not picked), each with a one-line why-not.
 
-    Use today's date in `YYYY-MM-DD` format. The two files share the same root name. Upstream files (`solution-candidates.json`) are not modified.
+13. **Render the milestone markdown deterministically from the JSON** using the template in the "Markdown template" section below. Write to `<scope>/2-solutions.md`.
 
-13. **Write to decisions.json:** Read `<scope>/decisions.json`. Set `decided.solutions`:
+    `2-solutions.md` must stand alone - the reader should not need to open `_working/`. Upstream files (`solution-candidates.json`, `clustered-solutions.json`) are not modified.
+
+14. **Write to decisions.json:** Read `<scope>/decisions.json` (scope ROOT). Set `decided.solutions`:
 
     ```json
     {
@@ -157,7 +159,7 @@ The hard-exit triggers:
 | Trigger | Looked for | Remedy |
 |---|---|---|
 | Missing knowledge anchor (`top-three-selection.md`, `solution-brainstorm.md`, or `opportunity-solution-tree-teresa-torres.md`) | The anchor file at the expected path under `knowledge/discovery/` | Restore from git, or re-run Task 1 of the OST-select-top-three-solutions v2 build |
-| Zero `solution-candidates.json` in `<scope>/` | A source brainstormer file | Run `OST-brainstorm-solutions` |
+| `<scope>/_working/solution-candidates.json` missing | A source brainstormer file | Run `OST-brainstorm-solutions` |
 | `<scope>/decisions.json` missing | Round-level `decisions.json` | Re-run `OST-init-workspace` to scaffold the file |
 | `decisions.json` has no `decided.opportunity` key | `decided.opportunity` object in `decisions.json` | Run `OST-select-opportunity` to ratify the chosen opportunity |
 | Source JSON does not parse | Schema-conformant v0.1 JSON | Re-run `OST-brainstorm-solutions` |
@@ -173,23 +175,20 @@ The hard-exit triggers:
 
 ## Markdown template
 
-The markdown output is rendered deterministically from the composed JSON using this template:
+The milestone markdown output (`2-solutions.md`) is rendered deterministically from the composed JSON using this template. It is SELF-CONTAINED: the trio must be able to understand and challenge the decision without opening `_working/`.
 
 ```markdown
 ---
 title: "Top solutions: <chosen_opportunity.id> - <first 5-10 words of chosen_opportunity.quote>"
 date: <YYYY-MM-DD>
-purpose: Selector proposal for OST step 6 (top solutions to explore in parallel). Paired with top-three-solutions-<date>.json. Trio reviews; decided.solutions in decisions.json is the ratified record. Input to assist 9 (assumption generator).
+purpose: Milestone for OST step 6 (top solutions to explore in parallel). Trio reviews; decided.solutions in decisions.json is the ratified record. Input to assist 9 (assumption generator).
 tags: [top-three-selection, ost, schema-v0.2]
 
 ---
 
 # Top solutions: <chosen_opportunity.id>
 
-Source solution candidates: `<source_solution_candidates>`
-Source context: `<scope>/decisions.json`
 Schema version: 0.2
-Paired JSON: `top-three-solutions-<YYYY-MM-DD>.json`
 
 > **Trio HITL:** This is the AI's proposal. Review the rationales, override if you disagree. When approved, `decided.solutions` in `decisions.json` is the ratified record. The trio may edit `decisions.json` directly to swap picks or adjust rationale.
 
@@ -201,7 +200,7 @@ Paired JSON: `top-three-solutions-<YYYY-MM-DD>.json`
 
 > <product_outcome>
 
-## Picks (3)
+## The three picks
 
 ### Pick 1: <picks[0].title>
 
@@ -209,7 +208,7 @@ Paired JSON: `top-three-solutions-<YYYY-MM-DD>.json`
 
 <picks[0].description>
 
-*Rationale:* <picks[0].rationale>
+*Why it can move the outcome:* <picks[0].rationale>
 
 ### Pick 2: <picks[1].title>
 
@@ -217,7 +216,7 @@ Paired JSON: `top-three-solutions-<YYYY-MM-DD>.json`
 
 <picks[1].description>
 
-*Rationale:* <picks[1].rationale>
+*Why it can move the outcome:* <picks[1].rationale>
 
 ### Pick 3: <picks[2].title>
 
@@ -225,7 +224,15 @@ Paired JSON: `top-three-solutions-<YYYY-MM-DD>.json`
 
 <picks[2].description>
 
-*Rationale:* <picks[2].rationale>
+*Why it can move the outcome:* <picks[2].rationale>
+
+## Also considered
+
+The clusters/candidates that were NOT selected (read from `_working/clustered-solutions.json`, or the non-picked source solutions if that file is absent), each with a one-line why-not:
+
+- **<cluster-or-solution title>** - <one-line why-not>
+- **<cluster-or-solution title>** - <one-line why-not>
+- ... (one bullet per non-selected cluster/candidate)
 ```
 
 **Role abbreviation mapping** (used in the markdown bullet, not in JSON):
@@ -245,10 +252,10 @@ Paired JSON: `top-three-solutions-<YYYY-MM-DD>.json`
 - **Output language for prose** (`rationale`) matches the source language detected in the chosen-opportunity quote and brainstormer descriptions.
 - **Frontmatter on the markdown output** complies with the project rule (blank line before closing `---`).
 - **HITL banner** rendered verbatim every run.
-- **No `Cites:` line.** No alternatives section. No notes section.
+- **No `Cites:` line.** No notes section. The JSON schema has no `alternatives_considered[]` field; the markdown "Also considered" section is rendered from `_working/clustered-solutions.json` (or non-picked source solutions), not from a JSON field on this skill's output.
 - **No silent degradation.** Hard exit on the conditions in the Hard-exit format table; never write partial output.
 - **No JSON self-validation pass after composition.** Trust the invariant check.
-- **Upstream files are immutable.** Never modify `solution-candidates.json`. The skill writes the two `top-three-solutions.*` files under `<scope>/` and updates `decided.solutions` in `<scope>/decisions.json`.
+- **Upstream files are immutable.** Never modify `solution-candidates.json` or `clustered-solutions.json`. The skill writes machine JSON to `<scope>/_working/top-three-solutions.json`, the self-contained milestone to `<scope>/2-solutions.md`, and updates `decided.solutions` in `<scope>/decisions.json` (scope ROOT).
 - **Creating `ratifications.md` entries is no longer required.** `decided.solutions` in `decisions.json` is the ratified record.
 - **Single pass.** No retries, no iteration.
 

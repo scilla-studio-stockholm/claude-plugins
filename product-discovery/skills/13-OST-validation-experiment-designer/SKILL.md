@@ -159,11 +159,13 @@ This skill is terminal. There is no downstream skill. The markdown output opens 
     Any violation → hard-exit, no write.
 
 13. **Write paired output:**
-    - `<scope>/validation-experiments.json`
-    - `<scope>/validation-experiments.md`
-    Create the directory if absent.
+    - `<scope>/_working/validation-experiments.json` (machine JSON; plumbing)
+    - `<scope>/4-experiments.md` (self-contained MILESTONE doc at scope ROOT)
+    Create the `_working/` directory if absent.
 
-14. **Write to decisions.json:** Read the round's `decisions.json`. Set `decided.experiments`:
+    `4-experiments.md` must stand alone — the reader (trio) should not need to open `_working/`. The milestone doc carries, per riskiest assumption, one full Bland Test Card (hypothesis, test, metric, success criteria with the required numeric anchor) plus the 2 alternative tests, so the trio can pick execution order and run experiments without touching the machine JSON.
+
+14. **Write to decisions.json:** Read the round's `<scope>/decisions.json` (scope ROOT, not `_working/`). Set `decided.experiments`:
 
     ```json
     {
@@ -191,7 +193,7 @@ This skill is terminal. There is no downstream skill. The markdown output opens 
     ---
     title: "Validation experiments: <chosen_opportunity.id> - <first 5-10 words of quote>"
     date: <YYYY-MM-DD>
-    purpose: Bland Test Cards for the riskiest assumptions surfaced in phase 4. Terminal run-list for the trio. Paired with validation-experiments-<date>.json.
+    purpose: Self-contained MILESTONE doc. Bland Test Cards for the riskiest assumptions surfaced in phase 4. Terminal run-list for the trio. Machine JSON at _working/validation-experiments.json (plumbing; not required to run experiments).
     tags: [assumption-validation, ost, bland, test-card, schema-v0.2]
 
     ---
@@ -206,7 +208,7 @@ This skill is terminal. There is no downstream skill. The markdown output opens 
     Source assumptions-categorized: `<source_assumptions_categorized>`
     Source top 3 solutions: `<source_top_three_solutions>`
     Schema version: 0.2
-    Paired JSON: `validation-experiments-<YYYY-MM-DD>.json`
+    Machine JSON (plumbing, not required to run): `_working/validation-experiments.json`
 
     Framework: Bland Test Card with cheapest-viable selection. Category-default + named override. alternative_tests fixed at 2. success_criteria regex-anchored.
 

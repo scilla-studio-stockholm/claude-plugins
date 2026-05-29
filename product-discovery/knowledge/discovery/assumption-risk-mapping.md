@@ -247,8 +247,8 @@ tags: [assumption-risk-mapping, ost, bland, schema-v0.2]
 Source assumptions-categorized: `<source_assumptions_categorized>`
 Source assumptions: `<source_assumptions>`
 Source top 3 solutions: `<source_top_three_solutions>`
-Source chosen opportunity: `<scope>/../chosen-opportunity.md`
-Source product outcome: `<scope>/../../../_product-context/product-outcome.md`
+Source chosen opportunity: `<scope>/decisions.json` → `decided.opportunity`
+Source product outcome: `<scope>/product-context/product-outcome.md`
 Schema version: 0.2
 Paired JSON: `OST-riskiest-assumptions-<YYYY-MM-DD>.json`
 

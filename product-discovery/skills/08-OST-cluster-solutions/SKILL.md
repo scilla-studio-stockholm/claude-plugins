@@ -9,29 +9,29 @@ You help a product trio cluster 18 divergent solution candidates from a brainsto
 
 This skill is assist 7 in the OST discovery workflow.
 
-The output is a **proposal** that assist 8 (top-3 selector) consumes. The trio reviews assist 8's top-3 proposal, not this intermediate cluster map. This skill does not modify the opportunity folder root (`<scope>/..`) or `_product-context/`.
+The output is a **proposal** that assist 8 (top-3 selector) consumes. The trio reviews assist 8's top-3 proposal, not this intermediate cluster map. This skill does not modify the opportunity folder root (`<scope>/..`) or `product-context/`.
 
 **Out of scope:** picking winners, ranking clusters by quality (assist 8's job), filtering or modifying source candidates, generating cluster-level outcome rationale, adding assumptions or risks per cluster (assist 9+), re-running the brainstormer.
 
 ## Steps
 
-1. **Resolve scope.** Follow `references/workspace-scope.md`. Discovery scope only; hard-exit if the resolved scope contains `/opportunity-selection/`.
+1. **Resolve scope.** Follow `references/workspace-scope.md`. The scope is `OST-discovery/` itself in the default flat layout; multi-product / multi-round layouts are opt-in and resolved per that reference.
 
-2. **Load context via parent walk-up:**
+2. **Load context:**
    - `<scope>/decisions.json`
-   - Same-round predecessor: `<scope>/solution-candidates.json`. If missing in `<scope>`, walk siblings (other dated rounds under the same opportunity) in date-descending order.
+   - Predecessor: `<scope>/_working/solution-candidates.json`.
 
 3. **Read the knowledge anchors:**
    - `references/solution-cluster.md` - the clustered-solutions schema (v0.1), the four locked decisions, the clustering-axis convention, the chosen-opp cross-check rule, the field-notes section.
    - `references/solution-brainstorm.md` - the source schema (v0.1) so you can parse what `OST-brainstorm-solutions` produced.
 
 4. **Locate inputs:**
-   - `<scope>/solution-candidates.json` (same-round predecessor; walk siblings in date-descending order if missing in `<scope>`).
+   - `<scope>/_working/solution-candidates.json` (predecessor).
    - `<scope>/decisions.json`
 
 5. **Hard-exit checks** (see Hard-exit format below). Do not write any output files when these fire:
    - Missing knowledge anchor `solution-cluster.md` or `solution-brainstorm.md` (expected under `knowledge/discovery/`).
-   - `<scope>/solution-candidates.json` missing (no same-round or sibling predecessor found).
+   - `<scope>/_working/solution-candidates.json` missing (no predecessor found).
    - `<scope>/decisions.json` missing.
    - `decided.opportunity` key absent from `decisions.json`.
    - Source JSON does not parse.
@@ -119,11 +119,11 @@ The output is a **proposal** that assist 8 (top-3 selector) consumes. The trio r
 
 11. **Set top-level `title`** to `"Clustered solutions: <first 5-10 words of chosen_opportunity.quote, trailing punctuation stripped>"`. Set `source_solution_candidates` to the basename of the source JSON file (no directory prefix).
 
-12. **Write JSON output** to `<scope>/clustered-solutions.json` using today's date. Create the scope directory if it doesn't exist.
+12. **Write JSON output** to `<scope>/_working/clustered-solutions.json`. Create the `<scope>/_working/` directory if it doesn't exist.
 
-13. **Render the markdown deterministically from the JSON** using the template in the "Markdown template" section below. Write to `<scope>/clustered-solutions.md`.
+13. **Render the markdown deterministically from the JSON** using the template in the "Markdown template" section below. Write to `<scope>/_working/clustered-solutions.md`.
 
-    Use today's date in `YYYY-MM-DD` format. The two files share the same root name. Upstream files (`solution-candidates.json`, `decisions.json`) are not modified. This skill does not modify the opportunity folder root (`<scope>/..`) or `_product-context/`.
+    The two files share the same root name. Upstream files (`solution-candidates.json`, `decisions.json`) are not modified. This skill does not modify the scope root or `product-context/`.
 
 ## Hard-exit format
 
@@ -141,7 +141,7 @@ The hard-exit triggers:
 | Trigger | Looked for | Remedy |
 |---|---|---|
 | Missing knowledge anchor `solution-cluster.md` or `solution-brainstorm.md` | The anchor file present at the expected path under `knowledge/discovery/` | Restore the anchor from git. |
-| `<scope>/solution-candidates.json` missing (no same-round or sibling predecessor found) | `solution-candidates.json` in `<scope>` or sibling dated rounds under the same opportunity | Run `OST-brainstorm-solutions` |
+| `<scope>/_working/solution-candidates.json` missing | `solution-candidates.json` in `<scope>/_working/` | Run `OST-brainstorm-solutions` |
 | `<scope>/decisions.json` missing | `decisions.json` in `<scope>` | Run `OST-select-opportunity` to produce `decisions.json` |
 | `decided.opportunity` key absent from `decisions.json` | `decided.opportunity` object with `id`, `phase_id`, `quote`, `source` | Run `OST-select-opportunity` to ratify an opportunity into `decisions.json` |
 | Source JSON does not parse | Schema-conformant v0.1 JSON | Re-run `OST-brainstorm-solutions` |
@@ -171,7 +171,7 @@ Source candidates: `<source_solution_candidates>`
 Source chosen opportunity: `<scope>/decisions.json` → `decided.opportunity`
 Source product outcome: `<scope>/decisions.json` → `product_outcome`
 Schema version: 0.1
-Paired JSON: `clustered-solutions.json`
+Paired JSON: `_working/clustered-solutions.json`
 
 > **Assist 8 consumes this map.** Trio reviews the top-3 proposal that assist 8 produces, not this intermediate map.
 
@@ -225,8 +225,8 @@ Members (<N>):
 - **The assist-8-consumer banner** (`> **Assist 8 consumes this map.** ...`) is rendered verbatim every run.
 - **No silent degradation.** Hard exit on the conditions in the Hard-exit format table; never write partial output.
 - **No JSON self-validation pass after composition.** Trust the invariant check; downstream skills surface any malformed JSON.
-- **Upstream files are immutable.** Never modify `solution-candidates.json` or `decisions.json`. The skill writes only the two `clustered-solutions.*` files inside `<scope>/`.
-- **This skill does not modify the opportunity folder root (`<scope>/..`) or `_product-context/`.** The cluster map is a proposal, not a ratified artifact.
+- **Upstream files are immutable.** Never modify `solution-candidates.json` or `decisions.json`. The skill writes only the two `clustered-solutions.*` files inside `<scope>/_working/`.
+- **This skill does not modify the opportunity folder root (`<scope>/..`) or `product-context/`.** The cluster map is a proposal, not a ratified artifact.
 - **Single pass.** No retries, no iteration over the inputs.
 
 ## What this skill does NOT do
@@ -235,11 +235,11 @@ Members (<N>):
 - **Filter, dedupe, or modify source candidates.** The clusterer is read-only against its input.
 - **Re-cluster on disagreement.** If the trio disagrees with the cluster map, that's a re-run scenario, not a feature of this skill.
 - **Generate cluster-level rationale tied to product outcome.** Also assist 8's territory.
-- **Modify the opportunity folder root (`<scope>/..`) or `_product-context/`.** The cluster map is a proposal, not ratified.
+- **Modify the opportunity folder root (`<scope>/..`) or `product-context/`.** The cluster map is a proposal, not ratified.
 - **Add assumptions, risks, or test cards per cluster.** That's assist 9+.
 - **Re-run the brainstormer or request additional candidates.** It consumes what it gets.
 - **Read interview transcripts.** Candidates come from the brainstormer.
-- **Read the experience map, validated opportunities table, opportunity-comparison matrix, or chosen-opportunity selector output.** Everything the clusterer needs is in `<scope>/solution-candidates.json` and `<scope>/decisions.json`.
+- **Read the experience map, validated opportunities table, opportunity-comparison matrix, or chosen-opportunity selector output.** Everything the clusterer needs is in `<scope>/_working/solution-candidates.json` and `<scope>/decisions.json`.
 - **Use a `Cites:` line or per-member trace-back invariant.** Members are carried verbatim; no trace-back needed beyond `id` matching.
 - **Apply effort or feasibility weighing.** Torres principle is in effect through the whole discovery pipeline; no exceptions here.
 - **Parse `build_on` references from description prose.** Deferred to v0.2 if assist 8 reports needing it.

@@ -17,9 +17,9 @@ The comparator filters by verdict before scoring: only `verdict == "approved"` o
 
 1. **Resolve scope.** Follow `references/workspace-scope.md`. Portfolio scope only.
 
-2. **Load context via parent walk-up:**
-   - `<scope>/../../_product-context/product-outcome.md`
-   - Same-round predecessor: `<scope>/experience-map-clustered.json` and `<scope>/opportunities-validated.md`
+2. **Load context:**
+   - `<scope>/product-context/product-outcome.md`
+   - Same-round predecessor: `<scope>/_working/experience-map-clustered.json` and `<scope>/_working/opportunities-validated.md`
 
 3. **Read the knowledge anchors:**
    - `references/opportunity-comparison.md` - the matrix schema (v0.1), the five criteria, the score vocabulary, the trace-back rule, the no-effort rule.
@@ -27,12 +27,12 @@ The comparator filters by verdict before scoring: only `verdict == "approved"` o
    - `references/experience-mapping.md` - schema v0.2 of the input clustered JSON.
 
 4. **Locate inputs:**
-   - `<scope>/experience-map-clustered.json` (same-round predecessor).
-   - `<scope>/../../_product-context/product-outcome.md` (parent walk-up).
+   - `<scope>/_working/experience-map-clustered.json` (same-round predecessor).
+   - `<scope>/product-context/product-outcome.md`.
 
 5. **Hard-exit checks** (see Hard-exit format below). Do not write any output files when these fire:
-   - `<scope>/experience-map-clustered.json` missing.
-   - `<scope>/../../_product-context/product-outcome.md` missing.
+   - `<scope>/_working/experience-map-clustered.json` missing.
+   - `<scope>/product-context/product-outcome.md` missing.
    - Clustered JSON does not parse.
    - Clustered JSON `schema_version` is not `"0.2"`.
    - Zero approved opportunities after verdict filtering.
@@ -41,7 +41,7 @@ The comparator filters by verdict before scoring: only `verdict == "approved"` o
 
 6. **Parse, filter, and partition.**
    - Parse the clustered JSON. Index `phases[]` by `id`. Walk `phases[].opportunities[]`.
-   - Parse the product outcome from `<scope>/../../_product-context/product-outcome.md`. Extract the outcome formulation under the `## Outcome` heading. Carry the team name from `## Team`.
+   - Parse the product outcome from `<scope>/product-context/product-outcome.md`. Extract the outcome formulation under the `## Outcome` heading. Carry the team name from `## Team`.
    - **Snapshot `journey_phases[]`** from the clustered JSON: one entry per `phases[]` element in upstream array order, carrying `{ id, name }` verbatim. Include every phase, even those with zero approved opportunities.
    - Partition opportunities by verdict:
      - `verdict == "approved"` → `opportunities_compared[]`. Carry verbatim: `id`, `phase_id`, `quote`, `source`.
@@ -82,7 +82,7 @@ The comparator filters by verdict before scoring: only `verdict == "approved"` o
     - quote: "Mejlkonversation om beställningen drar ut på tiden..." → summary_title: `Mejlkonversation drar ut på tiden`
     - quote: "Customers can't tell whether their order shipped..." → summary_title: `Unclear shipping status`
 
-    Cache rule: if the input `<scope>/comparison-matrix.json` already exists and contains `summary_title` values for any opportunities, carry those titles through unchanged. Generate titles only for opportunities missing the field. This makes re-renders cheap and stable.
+    Cache rule: if the input `<scope>/_working/comparison-matrix.json` already exists and contains `summary_title` values for any opportunities, carry those titles through unchanged. Generate titles only for opportunities missing the field. This makes re-renders cheap and stable.
 
     Compute `score_counts` per opportunity in `opportunities_compared[]` as `{ strong, medium, weak, unknown, na }` (integer counts of cells with each score across the five criteria, for that opportunity's column).
 
@@ -98,10 +98,10 @@ The comparator filters by verdict before scoring: only `verdict == "approved"` o
 12. **Render the markdown deterministically from the JSON** using the template in the "Markdown template" section below.
 
 13. **Write paired output** to:
-    - `<scope>/comparison-matrix.json`
-    - `<scope>/comparison-matrix.md`
+    - `<scope>/_working/comparison-matrix.json`
+    - `<scope>/_working/comparison-matrix.md`
 
-    Both artifacts are written from the same composed JSON in a single pass. Upstream `experience-map-clustered.json` and `product-outcome.md` are not modified. Create `<scope>/` if it doesn't exist.
+    Both artifacts are written from the same composed JSON in a single pass. Upstream `experience-map-clustered.json` and `product-outcome.md` are not modified. Create `<scope>/_working/` if it doesn't exist.
 
 14. **Launch the viewer.** Follow `knowledge/discovery/viewer-launch.md` to resolve the viewer path, start the server, and open the browser.
 
@@ -120,14 +120,14 @@ The eight hard-exit triggers:
 
 | Trigger | Looked for | Remedy |
 |---|---|---|
-| `<scope>/experience-map-clustered.json` missing | A clustered experience map at the resolved scope path | Run `OST-cluster-opportunities` for this round |
-| `<scope>/../../_product-context/product-outcome.md` missing | Trio's product outcome file via parent walk-up | Restore from git or re-author using the template structure |
+| `<scope>/_working/experience-map-clustered.json` missing | A clustered experience map at the resolved scope path | Run `OST-cluster-opportunities` for this round |
+| `<scope>/product-context/product-outcome.md` missing | Trio's product outcome file | Restore from git or re-author using the template structure |
 | Clustered JSON does not parse | Schema-conformant v0.2 JSON | Re-run `OST-cluster-opportunities` |
 | Clustered JSON `schema_version` is not `"0.2"` | `"schema_version": "0.2"` | Re-run `OST-cluster-opportunities` against the latest extracted file |
 | Zero approved opportunities after verdict filtering | At least one opportunity with `verdict == "approved"` | Re-run `OST-validate-opportunities` and review verdicts; the comparator cannot compare an empty set |
-| Product outcome file has no extractable `## Outcome` section | A heading `## Outcome` followed by the outcome formulation | Re-author `<scope>/../../_product-context/product-outcome.md` using the template structure |
+| Product outcome file has no extractable `## Outcome` section | A heading `## Outcome` followed by the outcome formulation | Re-author `<scope>/product-context/product-outcome.md` using the template structure |
 | One or more clustered opportunities missing the `verdict` field | `verdict` set on every opportunity in the clustered JSON | Re-run `OST-cluster-opportunities`; do not hand-edit the clustered JSON |
-| AI title generation failed for one or more opportunities | A 3-6 word noun-phrase `summary_title` for every approved opportunity | Re-run the skill; if it recurs, hand-edit the missing `summary_title` values into `<scope>/comparison-matrix.json` and re-run (cached titles are reused) |
+| AI title generation failed for one or more opportunities | A 3-6 word noun-phrase `summary_title` for every approved opportunity | Re-run the skill; if it recurs, hand-edit the missing `summary_title` values into `<scope>/_working/comparison-matrix.json` and re-run (cached titles are reused) |
 
 ## Markdown template
 
@@ -137,17 +137,17 @@ The markdown output is rendered deterministically from the composed JSON using t
 ---
 title: Comparison matrix - <title> (<team>)
 date: <YYYY-MM-DD>
-purpose: Opportunity comparison matrix for OST opportunity selection, paired with comparison-matrix-<date>.json
+purpose: Opportunity comparison matrix for OST opportunity selection, paired with comparison-matrix.json
 tags: [opportunity-comparison, ost, schema-v0.1]
 
 ---
 
 # Comparison matrix: <title> (<team>)
 
-Source clustered map: `<scope>/experience-map-clustered.json`
-Source product outcome: `<scope>/../../_product-context/product-outcome.md`
+Source clustered map: `<scope>/_working/experience-map-clustered.json`
+Source product outcome: `<scope>/product-context/product-outcome.md`
 Schema version: 0.1
-Paired JSON: `<scope>/comparison-matrix.json`
+Paired JSON: `<scope>/_working/comparison-matrix.json`
 
 ## Product outcome
 
@@ -223,7 +223,7 @@ Cells where evidence was thin and an honest score wasn't defensible. Each gap na
 - **Matrix row order** matches `criteria[]` order in the JSON: outcome-alignment, customer-importance, market-size, strategic-fit, competitive-landscape.
 - **No silent degradation.** Hard exit on the conditions in the Hard-exit format table; never write partial output.
 - **No JSON self-validation pass.** Trust the prompt; downstream skills surface any malformed JSON.
-- **Upstream files are immutable.** Never modify `<scope>/experience-map-clustered.json` or `<scope>/../../_product-context/product-outcome.md`. The skill only writes `<scope>/comparison-matrix.json` and `<scope>/comparison-matrix.md`.
+- **Upstream files are immutable.** Never modify `<scope>/_working/experience-map-clustered.json` or `<scope>/product-context/product-outcome.md`. The skill only writes `<scope>/_working/comparison-matrix.json` and `<scope>/_working/comparison-matrix.md`.
 - **Two artifacts, one render.** `.json` and `.md` are written from the same composed JSON in a single pass. They carry identical data; the markdown is a different view of the JSON. Never write one without the other.
 - **Single pass.** No retries, no iteration over the inputs.
 
@@ -233,7 +233,7 @@ Cells where evidence was thin and an honest score wasn't defensible. Each gap na
 - **Read the original `opportunities-extracted-*` or `opportunities-validated-*` files.** All quotes, sources, and verdicts the comparator needs are already in the clustered JSON.
 - **Validate citation format.** That is `OST-validate-opportunities` upstream.
 - **Re-cluster opportunities or change phase placement.** That is `OST-cluster-opportunities`.
-- **Modify upstream files.** `<scope>/experience-map-clustered.json` and `<scope>/../../_product-context/product-outcome.md` stay immutable.
+- **Modify upstream files.** `<scope>/_working/experience-map-clustered.json` and `<scope>/product-context/product-outcome.md` stay immutable.
 - **Compare opportunities against criteria other than the five hardcoded ones.** The criteria list is fixed in v0.1.
 - **Sum, average, or otherwise aggregate scores across criteria.** The matrix is for comparison, not ranking. The selector decides.
 - **Pick a winning opportunity.** That is the selector (assist 5).
@@ -244,7 +244,7 @@ Cells where evidence was thin and an honest score wasn't defensible. Each gap na
 - **Use emoji or numeric encoding for scores.** Words only.
 - **Iterate, retry, or run multiple passes.** One pass over the inputs, one set of two output files.
 - **Run a JSON self-validation pass after composition.**
-- **Write to Miro or any external surface.** JSON + markdown only, all local files under `<scope>/`.
+- **Write to Miro or any external surface.** JSON + markdown only, all local files under `<scope>/_working/`.
 - **Audit the cluster JSON for invariant violations** beyond what's needed to filter. The comparator only filters by verdict and reads quote/source/phase fields.
 - **Ask the trio for clustering choices interactively.** If a cell is genuinely uncertain, score `unknown` and add a gap entry; don't ask.
 - **Mark accepted gaps in the product outcome's "Known limitations" section as problems.** Those gaps are trio-accepted.

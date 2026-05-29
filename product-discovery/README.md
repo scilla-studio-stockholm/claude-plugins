@@ -41,7 +41,7 @@ The plugin generates everything else — validated opportunity lists, clustered 
 
 ## Skill flow
 
-Each round produces a single `decisions.json` that accumulates the trio's ratified decisions at each gate. Intermediate artifacts (comparison matrices, brainstorm outputs, assumption inventories) are working documents consumed within their phase. See `knowledge/discovery/decisions-json-schema.md` for the schema.
+A single `decisions.json` at the scope root accumulates the trio's ratified decisions at each gate. Intermediate artifacts (comparison matrices, brainstorm outputs, assumption inventories) are working documents that live in the `_working/` subfolder and are consumed within their phase. See `knowledge/discovery/decisions-json-schema.md` for the schema.
 
 Red diamonds = **required HITL** (workflow blocks until the trio acts). Yellow diamonds = **optional HITL** (trio can review/override but the workflow doesn't block).
 
@@ -118,8 +118,8 @@ The plugin ships 15 skills organized into five phases. Each skill outputs paired
 
 | Skill | What it does |
 |---|---|
-| `OST-setup-product` | Guided entrypoint. Walks the trio through product outcome, experience map, and opportunity citation to scaffold a ready-to-use `discovery/` workspace. Start here. |
-| `OST-init-workspace` | Low-level scaffolding. Adds product, opportunity, or selection-round folders to an existing workspace. Called by `OST-setup-product` under the hood. |
+| `OST-setup-product` | Guided entrypoint. Walks the trio through product outcome, experience map, and opportunity citation to scaffold a ready-to-use `OST-discovery/` workspace. Start here. |
+| `OST-init-workspace` | Low-level scaffolding. Creates the flat `OST-discovery/` scope (`product-context/`, `_working/`, milestone docs, `decisions.json`). Called by `OST-setup-product` under the hood. Multi-product / multi-round layouts are opt-in — see `knowledge/discovery/workspace-scope.md`. |
 
 ### Phase 1 — Opportunities
 

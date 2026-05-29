@@ -78,7 +78,7 @@ def make_handler(templates_dir: Path, data_dir: Path):
 def main():
     parser = argparse.ArgumentParser(description="OST Viewer server")
     parser.add_argument("--templates", required=True, help="Path to viewer/ directory")
-    parser.add_argument("--data", required=True, help="Path to workspace discovery/ directory")
+    parser.add_argument("--data", required=True, help="Path to workspace OST-discovery/ directory")
     parser.add_argument("--port", type=int, default=3000, help="Port (default: 3000)")
     args = parser.parse_args()
 
