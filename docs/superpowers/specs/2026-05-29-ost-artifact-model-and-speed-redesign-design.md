@@ -88,8 +88,10 @@ discovery/
 
 ### After
 
+The top-level folder is renamed `discovery/` → `OST-discovery/` so its purpose is self-evident in any repo.
+
 ```
-discovery/
+OST-discovery/
 ├── product-context/              ← inputs (outcome + experience map)
 │   ├── product-outcome.md
 │   └── experience-map.md (+ .json)
@@ -107,7 +109,8 @@ discovery/
 - **Drop date-stamped round folders** for the first/only round. A dated subfolder appears only when a *second* round starts.
 - **Drop the `_underscore` context convention** in favor of a plain `product-context/` name.
 - **Numbered `1-`…`4-` milestone docs** make the journey order self-evident.
-- **Optional, low-cost orientation aid:** a one-paragraph header (in `decisions.json` or a tiny `discovery/README.md`). Marked optional; structural simplification leads.
+- **Rename the top-level folder** `discovery/` → `OST-discovery/` so its purpose is legible in any repo.
+- **Optional, low-cost orientation aid:** a one-paragraph header (in `decisions.json` or a tiny `OST-discovery/README.md`). Marked optional; structural simplification leads.
 
 ## Track B — Speed (quality-neutral levers only)
 
