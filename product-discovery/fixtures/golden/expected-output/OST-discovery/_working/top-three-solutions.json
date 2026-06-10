@@ -1,0 +1,40 @@
+{
+  "schema_version": "0.2",
+  "team": "Aurora",
+  "title": "Top solutions: jag har inte haft någon guide eller information",
+  "product_outcome": "Öka andelen nya kunder som på egen hand når sitt första lyckade produktionsanrop mot API:et utan att kontakta Flowbase, från 40% till 80% inom 60 dagar från avtalstecknande.",
+  "chosen_opportunity": {
+    "id": "opp-7-1",
+    "phase_id": "fas-7",
+    "quote": "jag har inte haft någon guide eller information, och ni har ju också sagt att ni inte jobbar med att hjälpa till att implementera - det får kunden göra själv",
+    "source": "David, intervju-4-aurora-apr-13, ~rad 58"
+  },
+  "source_solution_candidates": "solution-candidates.json",
+  "picks": [
+    {
+      "id": "sol-r1-pm-1",
+      "title": "Automatiserad onboarding-portal med självbetjäning från dag ett",
+      "generating_role": "product-manager",
+      "round_number": 1,
+      "description": "När kunden signerar avtalet aktiveras automatiskt en personaliserad onboarding-portal med steg-för-steg-guide, API-nycklar och testmiljö - allt utan att Flowbase behöver agera. Kunden kan göra sitt första lyckade API-anrop helt på egen hand, vilket direkt mäter sig mot målet om 80% självbetjänade kunder.",
+      "rationale": "Den kausala vägen är direkt: signerat avtal triggar automatisk aktivering av allt kunden behöver - credentials, guided workflow, testmiljö - utan att kunden behöver initiera kontakt med Flowbase. Lösningen adresserar aktiveringsgapet som ett systemsteg snarare än ett hjälpinnehåll, vilket gör den till den enskilt starkaste rörelsen mot 80% självbetjänade kunder."
+    },
+    {
+      "id": "sol-r1-ux-1",
+      "title": "Interaktiv kom-igång-guide direkt efter avtalssignering",
+      "generating_role": "ux-designer",
+      "round_number": 1,
+      "description": "Kunden möts av en steg-för-steg-guide i portalen så fort avtalet är signerat - guiden leder dem från API-nyckel till första lyckade anrop i produktionsmiljö utan att behöva kontakta Flowbase. Varje steg bekräftas med direkt feedback (grönt bock = lyckat anrop) så att kunden vet exakt var de befinner sig i processen och vad som återstår.",
+      "rationale": "Den valda opportuniteten namnger explicit 'ingen guide' som friktion - den här lösningen är den direkta motpolen. Realtidsfeedback per steg eliminerar de vanligaste kontaktskälen under aktivering: 'var är jag?', 'vad gör jag härnäst?' och 'fungerade det?'. Den kausala vägen är: kunden vet alltid sitt nästa steg och får bekräftelse på varje genomfört steg → behöver aldrig initiera kontakt med Flowbase → interaktionsräknaren stannar på noll."
+    },
+    {
+      "id": "sol-r1-ux-2",
+      "title": "Automatisk välkomstpåse med konfigurerade kodexempel för kundens miljö",
+      "generating_role": "ux-designer",
+      "round_number": 1,
+      "description": "Direkt vid aktivering skickas ett personaliserat paket - med API-nyckel, bas-URL och färdiga kodexempel i de vanligaste språken (Python, JavaScript, cURL) - där variablerna redan är ifyllda med kundens faktiska uppgifter. Kunden kopierar och kör, inget att konfigurera eller slå upp, vilket eliminerar det vanligaste skälet till att höra av sig till Flowbase under onboarding.",
+      "rationale": "Konfigurationsförvirring - rätt bas-URL, autentiseringshuvud, request-format - är det vanligaste skälet till att kunder kontaktar Flowbase under API-aktivering. Pre-populerade kodexempel med kundens egna credentials tar bort den interaktionen helt. Den kausala vägen är: kunden kör ett fungerande anrop utan att behöva fråga om syntax eller konfiguration → uppnår första lyckade produktionsanrop utan en enda kontakt med Flowbase."
+    }
+  ],
+  "extensions": {}
+}

@@ -1,0 +1,206 @@
+{
+  "schema_version": "0.1",
+  "team": "Aurora",
+  "title": "Licenstilldelning",
+  "product_outcome": "Öka andelen nya kunder som på egen hand når sitt första lyckade produktionsanrop mot API:et utan att kontakta Flowbase, från 40% till 80% inom 60 dagar från avtalstecknande.",
+  "narrativ": "Idag är det svårt och resurskrävande att erbjuda och skala våra API-licenser. Processen för behörighetsgivning är komplex och innebär hög risk för fel, vilket leder till att både utvecklings- och supportinsatser blir omfattande. Som konsekvens undviker vi i praktiken att sälja API-licenser, trots att det finns efterfrågan, eftersom vi inte har kapacitet att hantera alla potentiella kunder.",
+  "phases": [
+    {
+      "id": "fas-1",
+      "order": 1,
+      "name": "Förfrågan inkommer",
+      "friction_level": "low",
+      "steps": [
+        {
+          "id": "step-1-1",
+          "description": "Inkommen förfrågan, offert, förnyelse/tillval. Kund eller säljare."
+        },
+        {
+          "id": "step-1-2",
+          "description": "Rabatt?",
+          "decision_branches": [
+            { "label": "Ja", "leads_to": "step-1-3" },
+            { "label": "Nej", "leads_to": "fas-2" }
+          ]
+        },
+        {
+          "id": "step-1-3",
+          "description": "Säljare förhandlar rabatt"
+        }
+      ]
+    },
+    {
+      "id": "fas-2",
+      "order": 2,
+      "name": "Behovsanalys & avtal",
+      "friction_level": "low",
+      "steps": [
+        {
+          "id": "step-2-1",
+          "description": "Skickar avtal (Word) till kund per post i Freshdesk"
+        }
+      ]
+    },
+    {
+      "id": "fas-3",
+      "order": 3,
+      "name": "Avtalsskrivning",
+      "friction_level": "medium",
+      "steps": [
+        {
+          "id": "step-3-1",
+          "description": "Avtalsprocess"
+        },
+        {
+          "id": "step-3-2",
+          "description": "Ny eller befintlig kund?",
+          "decision_branches": [
+            { "label": "Ny", "leads_to": "step-3-3" },
+            { "label": "Befintlig", "leads_to": "fas-4" }
+          ]
+        },
+        {
+          "id": "step-3-3",
+          "description": "Lägg upp kund / Uppdatera kundinfo i SalesForce"
+        }
+      ]
+    },
+    {
+      "id": "fas-4",
+      "order": 4,
+      "name": "Kreditkontroll & ekonomi",
+      "friction_level": "medium",
+      "steps": [
+        {
+          "id": "step-4-1",
+          "description": "Kreditbetyg",
+          "decision_branches": [
+            { "label": "Rating under 40", "leads_to": "step-4-2" },
+            { "label": "Rating över 40", "leads_to": "step-4-4" }
+          ]
+        },
+        {
+          "id": "step-4-2",
+          "description": "Support gör kreditprövning via Credit Safe"
+        },
+        {
+          "id": "step-4-3",
+          "description": "Godkänd?",
+          "decision_branches": [
+            { "label": "Nej", "leads_to": "Meddela avslag till kund" },
+            { "label": "Ja", "leads_to": "step-4-4" }
+          ]
+        },
+        {
+          "id": "step-4-4",
+          "description": "Beställer faktureringsunderlag. Ekonomi via e-post"
+        },
+        {
+          "id": "step-4-5",
+          "description": "Färdigställer avtalet och laddar upp i SalesForce"
+        }
+      ]
+    },
+    {
+      "id": "fas-5",
+      "order": 5,
+      "name": "Licens-upplägg",
+      "friction_level": "high",
+      "steps": [
+        {
+          "id": "step-5-1",
+          "description": "API-flöde / SSO-flöde / Webb-flöde",
+          "decision_branches": [
+            { "label": "API", "leads_to": "step-5-2" },
+            { "label": "SSO", "leads_to": "step-5-2" },
+            { "label": "Webb", "leads_to": "step-5-2" }
+          ]
+        },
+        {
+          "id": "step-5-2",
+          "description": "Skapar avtal i Kärnprodukten Admin med konfiguration, transaktioner och behörigheter"
+        },
+        {
+          "id": "step-5-3",
+          "description": "Kopplar avtal och projekt för fakturering via Debiteringssystemet"
+        },
+        {
+          "id": "step-5-4",
+          "description": "Lägger till abonnemangsavgift i Debiteringssystemet"
+        },
+        {
+          "id": "step-5-5",
+          "description": "Skapar transaktionsanvändare i Keycloak"
+        },
+        {
+          "id": "step-5-6",
+          "description": "Finns licenspaket i Licenshanteraren?",
+          "decision_branches": [
+            { "label": "Ja", "leads_to": "step-5-8" },
+            { "label": "Nej", "leads_to": "step-5-7" }
+          ]
+        },
+        {
+          "id": "step-5-7",
+          "description": "Beställer nytt licenspaket från Aurora"
+        },
+        {
+          "id": "step-5-8",
+          "description": "Tilldelar licens till kund utifrån licenspaket i Licenshanteraren"
+        },
+        {
+          "id": "step-5-9",
+          "description": "Lägger till användare och licensadministratör för kund i Licenshanteraren"
+        }
+      ]
+    },
+    {
+      "id": "fas-6",
+      "order": 6,
+      "name": "Rabatter",
+      "friction_level": "high",
+      "steps": [
+        {
+          "id": "step-6-1",
+          "description": "Rabatt avtalad?",
+          "decision_branches": [
+            { "label": "Ja", "leads_to": "step-6-2" },
+            { "label": "Nej", "leads_to": "fas-7" }
+          ]
+        },
+        {
+          "id": "step-6-2",
+          "description": "Petra/Karin beställer tillägg av rabatter via e-post till Olof. Uppdaterar rabatt-fil"
+        },
+        {
+          "id": "step-6-3",
+          "description": "Olof räknar ut och fyller i rabattprislistan i Prisverktyget"
+        }
+      ]
+    },
+    {
+      "id": "fas-7",
+      "order": 7,
+      "name": "Aktivering & leverans",
+      "friction_level": "low",
+      "steps": [
+        {
+          "id": "step-7-1",
+          "description": "Skickar välkomstmail till kund med inloggningsuppgifter, prislista och lathund. Meddelar licensadministratör"
+        }
+      ]
+    }
+  ],
+  "extensions": {
+    "systems_in_use": [
+      "Freshdesk",
+      "SalesForce",
+      "Credit Safe",
+      "Kärnprodukten Admin",
+      "Debiteringssystemet",
+      "Keycloak",
+      "Licenshanteraren",
+      "Prisverktyget"
+    ]
+  }
+}

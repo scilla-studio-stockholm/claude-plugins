@@ -1,0 +1,457 @@
+{
+  "schema_version": "1.0",
+  "product": "flowbase",
+  "team": "Aurora",
+  "round": ".",
+  "product_outcome": "Öka andelen nya kunder som på egen hand når sitt första lyckade produktionsanrop mot API:et utan att kontakta Flowbase, från 40% till 80% inom 60 dagar från avtalstecknande.",
+  "decided": {
+    "opportunity": {
+      "ratified": "2026-05-29",
+      "id": "opp-7-1",
+      "phase_id": "fas-7",
+      "quote": "jag har inte haft någon guide eller information, och ni har ju också sagt att ni inte jobbar med att hjälpa till att implementera - det får kunden göra själv",
+      "source": "David, intervju-4-aurora-apr-13, ~rad 58",
+      "scores": {
+        "outcome_alignment": "strong",
+        "customer_importance": "strong",
+        "market_size_frequency": "strong",
+        "strategic_fit": "strong",
+        "competitive_landscape": "medium"
+      },
+      "rationale": "opp-7-1 och opp-5-1 delar den starkaste profilen i kandidatpoolen med 3 strong vardera på de fyra övriga kriterierna och 0 weak. Tiebreak i steg 3 avgörs av opp-7-1:s 0 unknown-celler över samtliga fem kriterier, jämfört med opp-5-1:s 1 unknown på competitive-landscape. Den valda opportunity - avsaknad av guide och implementeringsstöd i fas 7 (Aktivering & leverans) - är korsbekräftad av både intern (Lina, stödjande opp-7-3) och extern (David) källa och drabbar varje ny API-kund universellt.",
+      "evidence_gaps": []
+    },
+    "solutions": {
+      "ratified": "2026-05-29",
+      "picks": [
+        {
+          "id": "sol-r1-pm-1",
+          "title": "Automatiserad onboarding-portal med självbetjäning från dag ett",
+          "description": "När kunden signerar avtalet aktiveras automatiskt en personaliserad onboarding-portal med steg-för-steg-guide, API-nycklar och testmiljö - allt utan att Flowbase behöver agera. Kunden kan göra sitt första lyckade API-anrop helt på egen hand, vilket direkt mäter sig mot målet om 80% självbetjänade kunder.",
+          "rationale": "Den kausala vägen är direkt: signerat avtal triggar automatisk aktivering av allt kunden behöver - credentials, guided workflow, testmiljö - utan att kunden behöver initiera kontakt med Flowbase. Lösningen adresserar aktiveringsgapet som ett systemsteg snarare än ett hjälpinnehåll, vilket gör den till den enskilt starkaste rörelsen mot 80% självbetjänade kunder."
+        },
+        {
+          "id": "sol-r1-ux-1",
+          "title": "Interaktiv kom-igång-guide direkt efter avtalssignering",
+          "description": "Kunden möts av en steg-för-steg-guide i portalen så fort avtalet är signerat - guiden leder dem från API-nyckel till första lyckade anrop i produktionsmiljö utan att behöva kontakta Flowbase. Varje steg bekräftas med direkt feedback (grönt bock = lyckat anrop) så att kunden vet exakt var de befinner sig i processen och vad som återstår.",
+          "rationale": "Den valda opportuniteten namnger explicit 'ingen guide' som friktion - den här lösningen är den direkta motpolen. Realtidsfeedback per steg eliminerar de vanligaste kontaktskälen under aktivering: 'var är jag?', 'vad gör jag härnäst?' och 'fungerade det?'. Den kausala vägen är: kunden vet alltid sitt nästa steg och får bekräftelse på varje genomfört steg → behöver aldrig initiera kontakt med Flowbase → interaktionsräknaren stannar på noll."
+        },
+        {
+          "id": "sol-r1-ux-2",
+          "title": "Automatisk välkomstpåse med konfigurerade kodexempel för kundens miljö",
+          "description": "Direkt vid aktivering skickas ett personaliserat paket - med API-nyckel, bas-URL och färdiga kodexempel i de vanligaste språken (Python, JavaScript, cURL) - där variablerna redan är ifyllda med kundens faktiska uppgifter. Kunden kopierar och kör, inget att konfigurera eller slå upp, vilket eliminerar det vanligaste skälet till att höra av sig till Flowbase under onboarding.",
+          "rationale": "Konfigurationsförvirring - rätt bas-URL, autentiseringshuvud, request-format - är det vanligaste skälet till att kunder kontaktar Flowbase under API-aktivering. Pre-populerade kodexempel med kundens egna credentials tar bort den interaktionen helt. Den kausala vägen är: kunden kör ett fungerande anrop utan att behöva fråga om syntax eller konfiguration → uppnår första lyckade produktionsanrop utan en enda kontakt med Flowbase."
+        }
+      ]
+    },
+    "assumptions": {
+      "ratified": "2026-05-29",
+      "riskiest": [
+        {
+          "id": "asm-sol-r1-pm-1-004",
+          "solution_id": "sol-r1-pm-1",
+          "text": "Steg-för-steg-guiden är tillräckligt tydlig och heltäckande för att kunden ska kunna följa den helt på egen hand, och täcker de vanligaste tekniska miljöerna, integrationsmönstren och hindren som Flowbases kunder faktiskt stöter på.",
+          "category": "usability",
+          "importance": "high",
+          "evidence": "weak",
+          "rationale": "Importance=high (en otydlig eller ofullständig guide leder direkt till kontakt med Flowbase); evidence=weak (att en guide täcker alla vanliga miljöer och hinder är obevisat)."
+        },
+        {
+          "id": "asm-sol-r1-pm-1-005",
+          "solution_id": "sol-r1-pm-1",
+          "text": "Testmiljön liknar produktionsmiljön tillräckligt för att ett lyckat testanrop ger kunden tillräcklig tillit och direkt översätts till ett lyckat produktionsanrop utan ytterligare felsökning.",
+          "category": "feasibility",
+          "importance": "high",
+          "evidence": "weak",
+          "rationale": "Importance=high (utfallet mäts på produktionsanrop, inte testanrop); evidence=weak (paritet mellan test- och produktionsmiljö är ett känt svårt problem)."
+        },
+        {
+          "id": "asm-sol-r1-pm-1-006",
+          "solution_id": "sol-r1-pm-1",
+          "text": "Guiden täcker hela vägen från testmiljö till produktionsmiljö, inklusive eventuella konfigurationsskillnader, så att kunden klarar det sista steget utan extern hjälp.",
+          "category": "usability",
+          "importance": "high",
+          "evidence": "weak",
+          "rationale": "Importance=high (sista steget till produktion är just där utfallet avgörs); evidence=weak (att guiden täcker konfigurationsskillnaderna hela vägen är obevisat)."
+        },
+        {
+          "id": "asm-sol-r1-pm-1-009",
+          "solution_id": "sol-r1-pm-1",
+          "text": "Kunden vet vem internt som ska genomföra den tekniska integrationen och att rätt person får tillgång till onboarding-portalen från dag ett.",
+          "category": "usability",
+          "importance": "high",
+          "evidence": "weak",
+          "rationale": "Importance=high (når åtkomsten fel person stannar integrationen och kontakt uppstår); evidence=weak (vem internt som äger integrationen är ett oprövat organisationsantagande)."
+        },
+        {
+          "id": "asm-sol-r1-pm-1-010",
+          "solution_id": "sol-r1-pm-1",
+          "text": "Antalet kundinitierade interaktioner med Flowbase minskar när tillgång till credentials och guidad dokumentation ges omedelbart - det vill säga att avsaknad av självbetjäning är den primära orsaken till dagens interaktioner, inte andra faktorer.",
+          "category": "desirability",
+          "importance": "high",
+          "evidence": "weak",
+          "rationale": "Importance=high (är självbetjäning inte den primära orsaken rör lösningen inte utfallet); evidence=weak (endast en intervju stödjer orsakshypotesen)."
+        },
+        {
+          "id": "asm-sol-r1-ux-1-004",
+          "solution_id": "sol-r1-ux-1",
+          "text": "Guiden täcker de tekniska konfigurationssteg, miljöer, autentiseringsmetoder och programmeringsspråk som kunderna faktiskt använder, så att ingen fastnar på ett steg som guiden inte adresserar.",
+          "category": "usability",
+          "importance": "high",
+          "evidence": "weak",
+          "rationale": "Importance=high (ett steg guiden inte adresserar gör att kunden fastnar och kontaktar Flowbase); evidence=weak (att guiden täcker alla språk, miljöer och autentiseringsmetoder är obevisat)."
+        },
+        {
+          "id": "asm-sol-r1-ux-1-005",
+          "solution_id": "sol-r1-ux-1",
+          "text": "Portalen kan detektera om ett anrop mot produktionsmiljön lyckades och ge kunden omedelbar, korrekt feedback per steg utan fördröjning.",
+          "category": "feasibility",
+          "importance": "high",
+          "evidence": "weak",
+          "rationale": "Importance=high (utan korrekt feedback per steg uteblir lösningens kärndifferentiator); evidence=weak (realtidsdetektering av kundens produktionsanrop per steg är tekniskt oprövat)."
+        },
+        {
+          "id": "asm-sol-r1-ux-1-008",
+          "solution_id": "sol-r1-ux-1",
+          "text": "Den direkta feedbacken per steg (t.ex. grönt bock) är tillräckligt tydlig för att kunden ska förstå om ett anrop lyckades eller om felet ligger i deras egen integration, och inte initiera kontakt med Flowbase för verifiering.",
+          "category": "usability",
+          "importance": "high",
+          "evidence": "weak",
+          "rationale": "Importance=high (oklar feedback utlöser verifieringskontakter som ska elimineras); evidence=weak (att feedbacken särskiljer lyckat anrop från eget integrationsfel är spekulativt)."
+        },
+        {
+          "id": "asm-sol-r1-ux-1-009",
+          "solution_id": "sol-r1-ux-1",
+          "text": "Kunderna väljer att följa guiden i stället för att falla tillbaka på gamla kontaktmönster när de stöter på motstånd.",
+          "category": "desirability",
+          "importance": "high",
+          "evidence": "weak",
+          "rationale": "Importance=high (faller kunden tillbaka på gamla kontaktmönster bryts utfallet); evidence=weak (att kunder väljer guiden framför invant kontaktbeteende är ett oprövat beteendeantagande)."
+        },
+        {
+          "id": "asm-sol-r1-ux-1-010",
+          "solution_id": "sol-r1-ux-1",
+          "text": "Flowbase kan hålla guiden uppdaterad i takt med förändringar i API:et, så att steg-för-steg-instruktionerna inte leder kunden fel vid nästa release.",
+          "category": "viability",
+          "importance": "high",
+          "evidence": "weak",
+          "rationale": "Importance=high (en inaktuell guide leder kunden fel och utlöser kontakt); evidence=weak (att Flowbase orkar hålla guiden synkad med varje release är obevisat)."
+        },
+        {
+          "id": "asm-sol-r1-ux-1-012",
+          "solution_id": "sol-r1-ux-1",
+          "text": "En steg-för-steg-guide i portalen räcker som enda informationskälla - kunden behöver inte komplettera med extern dokumentation, support eller kollegors hjälp för att ta sig från API-nyckel till första lyckade anrop.",
+          "category": "usability",
+          "importance": "high",
+          "evidence": "weak",
+          "rationale": "Importance=high (räcker inte guiden ensam söker kunden extern hjälp eller support); evidence=weak (att en enda guide ersätter all annan informationskälla är obevisat)."
+        },
+        {
+          "id": "asm-sol-r1-ux-1-013",
+          "solution_id": "sol-r1-ux-1",
+          "text": "De vanligaste skälen till att kunder kontaktar Flowbase under aktivering är informationsbrist och osäkerhet om nästa steg - inte tekniska blockerare som kräver mänsklig hjälp från Flowbase.",
+          "category": "desirability",
+          "importance": "high",
+          "evidence": "weak",
+          "rationale": "Importance=high (är orsaken tekniska blockerare rör en informationsguide inte utfallet); evidence=weak (endast en intervju stödjer orsakshypotesen)."
+        },
+        {
+          "id": "asm-sol-r1-ux-2-001",
+          "solution_id": "sol-r1-ux-2",
+          "text": "Flowbases system känner till exakt när en kund aktiveras och kan automatiskt trigga utskicket av välkomstpåsen utan manuellt steg, och levererar uppgifterna snabbt nog för att välkomstpåsen ska skickas i rätt tid i förhållande till när kunden är redo att testa.",
+          "category": "feasibility",
+          "importance": "high",
+          "evidence": "weak",
+          "rationale": "Importance=high (uteblir automatiskt och rättidigt utskick återinförs manuell hantering); evidence=weak (att systemet skickar i rätt tid relativt kundens faktiska redo-läge är oprövat)."
+        },
+        {
+          "id": "asm-sol-r1-ux-2-002",
+          "solution_id": "sol-r1-ux-2",
+          "text": "Alla uppgifter som behövs för att personalisera paketet - API-nyckel, bas-URL och kundens föredragna programmeringsspråk - finns tillgängliga i Flowbases system vid aktiveringstillfället, och är korrekta och giltiga när kunden faktiskt försöker använda dem.",
+          "category": "feasibility",
+          "importance": "high",
+          "evidence": "weak",
+          "rationale": "Importance=high (saknas eller felar persondatan blir paketet obrukbart och kontakt uppstår); evidence=weak (kundens föredragna programmeringsspråk finns sällan i Flowbases system)."
+        },
+        {
+          "id": "asm-sol-r1-ux-2-003",
+          "solution_id": "sol-r1-ux-2",
+          "text": "Välkomstpåsen når rätt teknisk kontaktperson hos kunden i rätt tid, och hamnar inte hos en icke-teknisk mottagare eller i ett spamfilter.",
+          "category": "usability",
+          "importance": "high",
+          "evidence": "weak",
+          "rationale": "Importance=high (når paketet fel mottagare eller spam agerar ingen och kontakt uppstår); evidence=weak (att B2B-utskick når rätt teknisk kontakt och undviker spamfilter är osäkert)."
+        },
+        {
+          "id": "asm-sol-r1-ux-2-004",
+          "solution_id": "sol-r1-ux-2",
+          "text": "Mottagaren av välkomstpåsen är samma person som utför den tekniska integrationen - paketet hamnar hos den som faktiskt ska använda kodexemplen, inte bara hos den som skrivit under avtalet.",
+          "category": "usability",
+          "importance": "high",
+          "evidence": "weak",
+          "rationale": "Importance=high (hamnar paketet inte hos integratören används kodexemplen aldrig); evidence=weak (att mottagaren är samma person som integrerar är ett oprövat organisationsantagande)."
+        },
+        {
+          "id": "asm-sol-r1-ux-2-005",
+          "solution_id": "sol-r1-ux-2",
+          "text": "Kunden läser och agerar på välkomstpåsen vid rätt tidpunkt i sin onboarding - paketet missas inte, arkiveras inte eller återfinns inte för sent.",
+          "category": "desirability",
+          "importance": "high",
+          "evidence": "weak",
+          "rationale": "Importance=high (missas eller arkiveras paketet kringgås hela mekanismen); evidence=weak (att ett pushat paket faktiskt konsumeras i rätt tid är ett spekulativt beteendeantagande)."
+        },
+        {
+          "id": "asm-sol-r1-ux-2-006",
+          "solution_id": "sol-r1-ux-2",
+          "text": "Kodexemplen täcker det programmeringsspråk eller det tekniska format som kundens utvecklare faktiskt använder, och de vanligaste språken Python, JavaScript och cURL räcker för att täcka merparten av fallen - kunder med andra stackar utgör inte en tillräckligt stor grupp för att ge upphov till supportkontakter.",
+          "category": "usability",
+          "importance": "high",
+          "evidence": "weak",
+          "rationale": "Importance=high (saknas kundens språk fastnar utvecklaren och kontaktar Flowbase); evidence=weak (att Python, JavaScript och cURL täcker merparten av kundernas stackar är obevisat)."
+        },
+        {
+          "id": "asm-sol-r1-ux-2-007",
+          "solution_id": "sol-r1-ux-2",
+          "text": "De förifyllda credentials och kodexemplen är syntaktiskt korrekta, körbara utan att kunden behöver ändra något, och pekar mot rätt miljö så att ett lyckat testanrop bekräftar att integrationen är klar.",
+          "category": "feasibility",
+          "importance": "high",
+          "evidence": "weak",
+          "rationale": "Importance=high (felaktiga eller icke-körbara exempel utlöser direkt kontakt); evidence=weak (per-kund-genererad, körbar och rätt-riktad kod utan ändring är tekniskt oprövat)."
+        },
+        {
+          "id": "asm-sol-r1-ux-2-009",
+          "solution_id": "sol-r1-ux-2",
+          "text": "Kunder som får API-nyckel, bas-URL och färdiga kodexempel direkt vid aktivering kan genomföra sitt första anrop utan att behöva kontakta Flowbase för att få fram dessa uppgifter.",
+          "category": "desirability",
+          "importance": "high",
+          "evidence": "weak",
+          "rationale": "Importance=high (krävs ändå kontakt för att få fram uppgifterna rör lösningen inte utfallet); evidence=weak (att färdiga credentials och kodexempel tar bort kontaktbehovet är obevisat)."
+        },
+        {
+          "id": "asm-sol-r1-ux-2-010",
+          "solution_id": "sol-r1-ux-2",
+          "text": "Konfigurationsförvirring kring credentials och bas-URL är den primära anledningen till att kunder kontaktar Flowbase under aktivering - inte frågor om datakvalitet, dataformat, licensvillkor eller andra tekniska hinder.",
+          "category": "desirability",
+          "importance": "high",
+          "evidence": "weak",
+          "rationale": "Importance=high (är orsaken något annat än konfigurationsförvirring rör lösningen inte utfallet); evidence=weak (endast partiellt intervjustöd för orsakshypotesen)."
+        }
+      ]
+    },
+    "experiments": {
+      "ratified": "2026-05-29",
+      "test_cards": [
+        {
+          "assumption_id": "asm-sol-r1-pm-1-004",
+          "solution_id": "sol-r1-pm-1",
+          "test_type": "Paper or click-through prototype",
+          "hypothesis": "We believe that en steg-för-steg-guide kan vara tillräckligt tydlig och heltäckande för att kunder ska genomföra integrationen på egen hand utan att kontakta Flowbase.",
+          "metric": "And measure andelen testdeltagare som når ett lyckat anrop utan att be om hjälp, samt antalet och typen av blockeringspunkter.",
+          "success_criteria": "We are right if minst 6 av 8 deltagare når ett lyckat anrop utan extern hjälp.",
+          "estimated_cost": "low",
+          "estimated_time": "days"
+        },
+        {
+          "assumption_id": "asm-sol-r1-pm-1-005",
+          "solution_id": "sol-r1-pm-1",
+          "test_type": "Technical spike or proof-of-concept",
+          "hypothesis": "We believe that testmiljön liknar produktionsmiljön tillräckligt för att ett lyckat testanrop direkt översätts till ett lyckat produktionsanrop utan ytterligare felsökning.",
+          "metric": "And measure andelen testade anropsscenarier där test- och produktionsutfallet är identiskt utan extra konfiguration.",
+          "success_criteria": "We are right if minst 90% av de testade anropsscenarierna ger identiskt utfall i test och produktion.",
+          "estimated_cost": "low",
+          "estimated_time": "days"
+        },
+        {
+          "assumption_id": "asm-sol-r1-pm-1-006",
+          "solution_id": "sol-r1-pm-1",
+          "test_type": "Concierge",
+          "hypothesis": "We believe that guiden kan täcka hela vägen från testmiljö till produktionsmiljö, inklusive konfigurationsskillnader, så att kunden klarar det sista steget utan extern hjälp.",
+          "metric": "And measure andelen kunder som når ett lyckat produktionsanrop med enbart guiden, och antalet gånger teamet behövde ingripa.",
+          "success_criteria": "We are right if minst 4 av 5 kunder når ett lyckat produktionsanrop utan att teamet behöver ingripa.",
+          "estimated_cost": "medium",
+          "estimated_time": "days"
+        },
+        {
+          "assumption_id": "asm-sol-r1-pm-1-009",
+          "solution_id": "sol-r1-pm-1",
+          "test_type": "Customer interview",
+          "hypothesis": "We believe that kunden vet vem internt som ska genomföra den tekniska integrationen och att rätt person får tillgång till onboarding-portalen från dag ett.",
+          "metric": "And measure andelen kunder där den tekniska integratören var samma person som fick portalåtkomst dag ett.",
+          "success_criteria": "We are right if minst 6 av 8 intervjuade kunder bekräftar att rätt teknisk person hade portalåtkomst från dag ett.",
+          "estimated_cost": "low",
+          "estimated_time": "days"
+        },
+        {
+          "assumption_id": "asm-sol-r1-pm-1-010",
+          "solution_id": "sol-r1-pm-1",
+          "test_type": "Customer interview",
+          "hypothesis": "We believe that avsaknad av självbetjäning är den primära orsaken till dagens kundinitierade interaktioner, så att omedelbar tillgång till credentials och guidad dokumentation minskar antalet interaktioner.",
+          "metric": "And measure andelen rapporterade kontakter som kunderna bedömer skulle ha undvikits med omedelbar tillgång till credentials och guide.",
+          "success_criteria": "We are right if minst 70% av de rapporterade kontakterna bedöms ha kunnat undvikas med omedelbar självbetjäning.",
+          "estimated_cost": "low",
+          "estimated_time": "days"
+        },
+        {
+          "assumption_id": "asm-sol-r1-ux-1-004",
+          "solution_id": "sol-r1-ux-1",
+          "test_type": "Paper or click-through prototype",
+          "hypothesis": "We believe that guiden kan täcka de konfigurationssteg, miljöer, autentiseringsmetoder och programmeringsspråk som kunderna faktiskt använder, så att ingen fastnar på ett steg guiden inte adresserar.",
+          "metric": "And measure antalet unika steg eller miljöer där minst en deltagare fastnar för att guiden inte adresserar dem.",
+          "success_criteria": "We are right if högst 2 oadresserade blockeringssteg upptäcks över alla 8 deltagare.",
+          "estimated_cost": "low",
+          "estimated_time": "days"
+        },
+        {
+          "assumption_id": "asm-sol-r1-ux-1-005",
+          "solution_id": "sol-r1-ux-1",
+          "test_type": "Technical spike or proof-of-concept",
+          "hypothesis": "We believe that portalen tekniskt kan detektera om ett anrop mot produktionsmiljön lyckades och ge korrekt feedback per steg utan fördröjning.",
+          "metric": "And measure andelen anrop där detektorn ger korrekt status inom acceptabel fördröjning.",
+          "success_criteria": "We are right if detektorn ger korrekt status för minst 95% av anropen inom 5 sekunder.",
+          "estimated_cost": "medium",
+          "estimated_time": "days"
+        },
+        {
+          "assumption_id": "asm-sol-r1-ux-1-008",
+          "solution_id": "sol-r1-ux-1",
+          "test_type": "Paper or click-through prototype",
+          "hypothesis": "We believe that den direkta feedbacken per steg är tillräckligt tydlig för att kunden ska förstå om ett anrop lyckades eller om felet ligger i deras egen integration, utan att kontakta Flowbase.",
+          "metric": "And measure andelen scenarier där deltagaren korrekt avgör om felet ligger hos dem själva eller hos Flowbase.",
+          "success_criteria": "We are right if minst 7 av 8 deltagare tolkar feedbacken korrekt utan att vilja kontakta Flowbase för verifiering.",
+          "estimated_cost": "low",
+          "estimated_time": "days"
+        },
+        {
+          "assumption_id": "asm-sol-r1-ux-1-009",
+          "solution_id": "sol-r1-ux-1",
+          "test_type": "Concierge",
+          "hypothesis": "We believe that kunderna väljer att följa guiden i stället för att falla tillbaka på gamla kontaktmönster när de stöter på motstånd.",
+          "metric": "And measure andelen kunder som fortsätter i guiden vid första hindret i stället för att kontakta Flowbase.",
+          "success_criteria": "We are right if minst 6 av 8 kunder fortsätter i guiden vid första hindret utan att kontakta Flowbase.",
+          "estimated_cost": "medium",
+          "estimated_time": "days"
+        },
+        {
+          "assumption_id": "asm-sol-r1-ux-1-010",
+          "solution_id": "sol-r1-ux-1",
+          "test_type": "Technical spike or proof-of-concept",
+          "hypothesis": "We believe that Flowbase kan hålla guiden uppdaterad i takt med förändringar i API:et, så att instruktionerna inte leder kunden fel vid nästa release.",
+          "metric": "And measure andelen senaste releaser som hade kunnat speglas i guiden före release med nuvarande bemanning och rutin.",
+          "success_criteria": "We are right if minst 4 av de 5 senaste releaserna hade kunnat reflekteras i guiden före release.",
+          "estimated_cost": "low",
+          "estimated_time": "days"
+        },
+        {
+          "assumption_id": "asm-sol-r1-ux-1-012",
+          "solution_id": "sol-r1-ux-1",
+          "test_type": "Paper or click-through prototype",
+          "hypothesis": "We believe that en steg-för-steg-guide i portalen räcker som enda informationskälla för att kunden ska ta sig från API-nyckel till första lyckade anrop, utan extern dokumentation, support eller kollegor.",
+          "metric": "And measure andelen deltagare som når ett lyckat anrop med enbart guiden, samt antalet försök att söka extern hjälp.",
+          "success_criteria": "We are right if minst 6 av 8 deltagare når ett lyckat anrop utan att söka information utanför guiden.",
+          "estimated_cost": "low",
+          "estimated_time": "days"
+        },
+        {
+          "assumption_id": "asm-sol-r1-ux-1-013",
+          "solution_id": "sol-r1-ux-1",
+          "test_type": "Customer interview",
+          "hypothesis": "We believe that de vanligaste skälen till att kunder kontaktar Flowbase under aktivering är informationsbrist och osäkerhet om nästa steg, inte tekniska blockerare som kräver mänsklig hjälp.",
+          "metric": "And measure andelen kontakter som klassificeras som informationsbrist eller osäkerhet snarare än tekniska blockerare.",
+          "success_criteria": "We are right if minst 60% av de klassificerade kontakterna beror på informationsbrist snarare än tekniska blockerare.",
+          "estimated_cost": "low",
+          "estimated_time": "days"
+        },
+        {
+          "assumption_id": "asm-sol-r1-ux-2-001",
+          "solution_id": "sol-r1-ux-2",
+          "test_type": "Technical spike or proof-of-concept",
+          "hypothesis": "We believe that Flowbases system kan känna till exakt när en kund aktiveras och automatiskt trigga utskicket av välkomstpåsen i rätt tid i förhållande till när kunden är redo att testa.",
+          "metric": "And measure andelen aktiveringar som korrekt triggar ett utskick, och fördröjningen från aktivering till utskick.",
+          "success_criteria": "We are right if minst 95% av aktiveringarna triggar ett korrekt utskick inom 10 minuter.",
+          "estimated_cost": "low",
+          "estimated_time": "days"
+        },
+        {
+          "assumption_id": "asm-sol-r1-ux-2-002",
+          "solution_id": "sol-r1-ux-2",
+          "test_type": "Technical spike or proof-of-concept",
+          "hypothesis": "We believe that alla uppgifter som behövs för att personalisera paketet - API-nyckel, bas-URL och kundens föredragna programmeringsspråk - finns tillgängliga, korrekta och giltiga i Flowbases system vid aktiveringstillfället.",
+          "metric": "And measure andelen kunder där samtliga personaliseringsfält fanns och var korrekta vid aktivering.",
+          "success_criteria": "We are right if samtliga fält fanns och var korrekta för minst 90% av de 30 granskade kunderna.",
+          "estimated_cost": "low",
+          "estimated_time": "days"
+        },
+        {
+          "assumption_id": "asm-sol-r1-ux-2-003",
+          "solution_id": "sol-r1-ux-2",
+          "test_type": "Concierge",
+          "hypothesis": "We believe that välkomstpåsen når rätt teknisk kontaktperson hos kunden i rätt tid och inte hamnar hos en icke-teknisk mottagare eller i ett spamfilter.",
+          "metric": "And measure andelen utskick som nådde och öppnades av den person som faktiskt utför integrationen.",
+          "success_criteria": "We are right if minst 7 av 10 utskick nådde och öppnades av rätt teknisk person.",
+          "estimated_cost": "low",
+          "estimated_time": "days"
+        },
+        {
+          "assumption_id": "asm-sol-r1-ux-2-004",
+          "solution_id": "sol-r1-ux-2",
+          "test_type": "Customer interview",
+          "hypothesis": "We believe that mottagaren av välkomstpåsen är samma person som utför den tekniska integrationen, inte bara den som skrivit under avtalet.",
+          "metric": "And measure andelen kunder där mottagaren av materialet var samma person som utförde integrationen.",
+          "success_criteria": "We are right if mottagaren var integratören i minst 6 av 8 fall.",
+          "estimated_cost": "low",
+          "estimated_time": "days"
+        },
+        {
+          "assumption_id": "asm-sol-r1-ux-2-005",
+          "solution_id": "sol-r1-ux-2",
+          "test_type": "Concierge",
+          "hypothesis": "We believe that kunden läser och agerar på välkomstpåsen vid rätt tidpunkt i sin onboarding, så att paketet inte missas, arkiveras eller återfinns för sent.",
+          "metric": "And measure andelen mottagare som öppnar paketet och gör ett första anrop inom 7 dagar utan påminnelse.",
+          "success_criteria": "We are right if minst 6 av 10 mottagare gör ett första anrop inom 7 dagar utan påminnelse.",
+          "estimated_cost": "low",
+          "estimated_time": "days"
+        },
+        {
+          "assumption_id": "asm-sol-r1-ux-2-006",
+          "solution_id": "sol-r1-ux-2",
+          "test_type": "Survey",
+          "hypothesis": "We believe that de vanligaste språken Python, JavaScript och cURL täcker det programmeringsspråk eller format som merparten av kundernas utvecklare faktiskt använder.",
+          "metric": "And measure andelen svarande vars språk eller format täcks av Python, JavaScript eller cURL.",
+          "success_criteria": "We are right if minst 80% av de svarande täcks av Python, JavaScript eller cURL.",
+          "estimated_cost": "low",
+          "estimated_time": "days"
+        },
+        {
+          "assumption_id": "asm-sol-r1-ux-2-007",
+          "solution_id": "sol-r1-ux-2",
+          "test_type": "Technical spike or proof-of-concept",
+          "hypothesis": "We believe that de förifyllda credentials och kodexemplen är syntaktiskt korrekta, körbara utan ändring och pekar mot rätt miljö, så att ett lyckat testanrop bekräftar att integrationen är klar.",
+          "metric": "And measure andelen genererade kodexempel som körs utan ändring och returnerar ett lyckat anrop.",
+          "success_criteria": "We are right if minst 95% av de genererade kodexemplen körs utan ändring och returnerar ett lyckat anrop.",
+          "estimated_cost": "low",
+          "estimated_time": "days"
+        },
+        {
+          "assumption_id": "asm-sol-r1-ux-2-009",
+          "solution_id": "sol-r1-ux-2",
+          "test_type": "Concierge",
+          "hypothesis": "We believe that kunder som får API-nyckel, bas-URL och färdiga kodexempel direkt vid aktivering kan genomföra sitt första anrop utan att kontakta Flowbase för att få fram dessa uppgifter.",
+          "metric": "And measure andelen kunder som når ett första lyckat anrop utan att kontakta Flowbase för uppgifterna.",
+          "success_criteria": "We are right if minst 8 av 10 kunder når ett första lyckat anrop utan att kontakta Flowbase för uppgifterna.",
+          "estimated_cost": "low",
+          "estimated_time": "days"
+        },
+        {
+          "assumption_id": "asm-sol-r1-ux-2-010",
+          "solution_id": "sol-r1-ux-2",
+          "test_type": "Customer interview",
+          "hypothesis": "We believe that konfigurationsförvirring kring credentials och bas-URL är den primära anledningen till att kunder kontaktar Flowbase under aktivering, inte datakvalitet, dataformat, licensvillkor eller andra tekniska hinder.",
+          "metric": "And measure andelen kontakter som beror på konfigurationsförvirring kring credentials eller bas-URL.",
+          "success_criteria": "We are right if minst 50% av de klassificerade kontakterna beror på konfigurationsförvirring kring credentials eller bas-URL.",
+          "estimated_cost": "low",
+          "estimated_time": "days"
+        }
+      ]
+    }
+  }
+}

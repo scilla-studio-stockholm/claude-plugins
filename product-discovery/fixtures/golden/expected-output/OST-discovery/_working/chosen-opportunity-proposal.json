@@ -1,0 +1,107 @@
+{
+  "schema_version": "0.1",
+  "team": "Aurora",
+  "title": "Licenstilldelning",
+  "product_outcome": "Öka andelen nya kunder som på egen hand når sitt första lyckade produktionsanrop mot API:et utan att kontakta Flowbase, från 40% till 80% inom 60 dagar från avtalstecknande.",
+  "source_comparison_matrix": "comparison-matrix.json",
+  "chosen_opportunity": {
+    "id": "opp-7-1",
+    "phase_id": "fas-7",
+    "quote": "jag har inte haft någon guide eller information, och ni har ju också sagt att ni inte jobbar med att hjälpa till att implementera - det får kunden göra själv",
+    "source": "David, intervju-4-aurora-apr-13, ~rad 58"
+  },
+  "chosen_opportunity_scores": [
+    { "criterion_id": "outcome-alignment", "score": "strong" },
+    { "criterion_id": "customer-importance", "score": "strong" },
+    { "criterion_id": "market-size", "score": "strong" },
+    { "criterion_id": "strategic-fit", "score": "strong" },
+    { "criterion_id": "competitive-landscape", "score": "medium" }
+  ],
+  "decision_signals": {
+    "outcome_alignment_score_for_chosen": "strong",
+    "profile_summary": "4 strong, 1 medium, 0 weak, 0 unknown",
+    "tie_with": ["opp-5-1"]
+  },
+  "rationale": "opp-7-1 och opp-5-1 delar den starkaste profilen i kandidatpoolen med 3 strong vardera på de fyra övriga kriterierna och 0 weak. Tiebreak i steg 3 avgörs av opp-7-1:s 0 unknown-celler över samtliga fem kriterier, jämfört med opp-5-1:s 1 unknown på competitive-landscape. Den valda opportunity - avsaknad av guide och implementeringsstöd i fas 7 (Aktivering & leverans) - är korsbekräftad av både intern (Lina, stödjande opp-7-3) och extern (David) källa och drabbar varje ny API-kund universellt.",
+  "alternatives_considered": [
+    {
+      "id": "opp-5-1",
+      "phase_id": "fas-5",
+      "quote": "det blev ofta fel när vi lade upp nya kunder - de fick inte alla behörigheter de behövde, vilket ledde till en hel del fram-och-tillbaka innan en kund var igång.",
+      "source": "Lina, intervju-3-aurora-apr-13, ~rad 42",
+      "reason_not_picked": "Lika stark som opp-7-1 med 3 strong på de fyra övriga kriterierna och 0 weak, men faller på steg 3-tiebreak: 1 unknown på competitive-landscape mot opp-7-1:s 0."
+    },
+    {
+      "id": "opp-5-5",
+      "phase_id": "fas-5",
+      "quote": "sen när vi väl ska byta så måste vi göra det i samförstånd med kunden så att dom vet att ingenting bara slutar fungera [...] det tar alltid några timmar och kan de bara göra det själv så är det mycket smidigare",
+      "source": "Niklas, intervju-2-aurora-apr-09, ~rad 211",
+      "reason_not_picked": "Svagare profil än opp-7-1 i steg 2 med 2 strong mot 3 på de fyra övriga kriterierna; market-size scorer medium."
+    },
+    {
+      "id": "opp-5-8",
+      "phase_id": "fas-5",
+      "quote": "jag har obstruerat lite grann mot att storskaligt gå ut och sälja [SSO-]integrationer just för att jag tycker inte att vi riktigt är redo för det",
+      "source": "Niklas, intervju-2-aurora-apr-09, ~rad 239",
+      "reason_not_picked": "Svagare profil än opp-7-1 med 1 strong mot 3 på de fyra övriga kriterierna; customer-importance och market-size scorer medium."
+    },
+    {
+      "id": "opp-5-10",
+      "phase_id": "fas-5",
+      "quote": "vi använder fortfarande gemensamma användare - vilket innebär att vi inte kan använda vissa funktioner i Datahubben, till exempel caching.",
+      "source": "Lina, intervju-3-aurora-apr-13, ~rad 44",
+      "reason_not_picked": "Svagare profil än opp-7-1 med 1 strong mot 3 på de fyra övriga kriterierna; customer-importance och market-size scorer medium."
+    },
+    {
+      "id": "opp-7-6",
+      "phase_id": "fas-7",
+      "quote": "En sak som har varit lite knölig är att det finns tre olika sätt att logga in i Swagger, och man måste veta vilket man ska använda beroende på om det är det gamla eller det nya sättet.",
+      "source": "Lina, intervju-3-aurora-apr-13, ~rad 102",
+      "reason_not_picked": "0 strong på de fyra övriga kriterierna; customer-importance, market-size och strategic-fit scorer alla medium."
+    },
+    {
+      "id": "opp-1-1",
+      "phase_id": "fas-1",
+      "quote": "Jag frågade Robin Sandell - egentligen bara kundtjänst - om det var möjligt att hämta datan via API, istället för via webbsökningen. Och då skickade han de här XML-strängarna som innehåller all data.",
+      "source": "David, intervju-4-aurora-apr-13, ~rad 42",
+      "reason_not_picked": "0 strong och 1 weak (customer-importance) på de fyra övriga kriterierna; market-size är unknown. Svagaste kandidatprofilen i poolen."
+    },
+    {
+      "id": "opp-0-8",
+      "phase_id": "fas-0-unphased",
+      "quote": "det har egentligen inte med API:et eller den tekniska integrationen att göra, utan med kunskapen om själva informationen man får. Där finns fortfarande ett glapp. Vi har ingen riktig domänexpert på data från Datakällan - åtminstone inte någon vi pratar med.",
+      "source": "Lina, intervju-3-aurora-apr-13, ~rad 108",
+      "reason_not_picked": "Deprioriterades i steg 1: scorer weak på outcome-alignment."
+    },
+    {
+      "id": "opp-0-14",
+      "phase_id": "fas-0-unphased",
+      "quote": "vi har ingen direkt övervakning på att integrationen fungerar. Det är en brist. Tyvvärr är det i dag så att kunder ibland är de som upptäcker att något inte fungerar.",
+      "source": "Lina, intervju-3-aurora-apr-13, ~rad 154",
+      "reason_not_picked": "Svagare profil än opp-7-1 med 1 strong mot 3 på de fyra övriga kriterierna; market-size och strategic-fit scorer medium."
+    },
+    {
+      "id": "opp-0-22",
+      "phase_id": "fas-0-unphased",
+      "quote": "Min enda önskan är kostnadsbudget. Jag tyckte det var synd att jag inte kunde sätta ett tak på våra anrop - om någon av min amatörkod fastnar i en loop. [...] det är en systemrisk - antingen att någon använder programmet fel eller att någonting buggar och det jobbas upp ganska höga kostnader.",
+      "source": "David, intervju-4-aurora-apr-13, ~rad 96",
+      "reason_not_picked": "Deprioriterades i steg 1: scorer weak på outcome-alignment."
+    },
+    {
+      "id": "opp-0-3",
+      "phase_id": "fas-0-unphased",
+      "quote": "Jag får ett 200-svar och kanske en fil, så det gick bra. Men jag har ingen aning om det är korrekt eller om det används rätt. Hur skulle jag kunna veta det?",
+      "source": "Anders, intervju-1-aurora-apr-08, ~rad 133",
+      "reason_not_picked": "Deprioriterades i steg 1: scorer weak på outcome-alignment."
+    },
+    {
+      "id": "opp-0-1",
+      "phase_id": "fas-0-unphased",
+      "quote": "Vi gjorde allt på eget. Ingen hjälp.",
+      "source": "Anders, intervju-1-aurora-apr-08, ~rad 45",
+      "reason_not_picked": "0 strong på de fyra övriga kriterierna; svagare profil än opp-7-1 på samtliga kriterier utom outcome-alignment."
+    }
+  ],
+  "evidence_gaps_carried": [],
+  "evidence_gaps_excluded": []
+}

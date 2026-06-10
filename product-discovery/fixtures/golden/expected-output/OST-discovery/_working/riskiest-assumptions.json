@@ -1,0 +1,392 @@
+{
+  "schema_version": "0.2",
+  "method": "assumption-risk-mapping",
+  "method_source": "David Bland, Testing Business Ideas (2019)",
+  "team": "Aurora",
+  "title": "Assumptions: opp-7-1 - jag har inte haft någon guide eller information",
+  "product_outcome": "Öka andelen nya kunder som på egen hand når sitt första lyckade produktionsanrop mot API:et utan att kontakta Flowbase, från 40% till 80% inom 60 dagar från avtalstecknande.",
+  "chosen_opportunity": {
+    "id": "opp-7-1",
+    "phase_id": "fas-7",
+    "quote": "jag har inte haft någon guide eller information, och ni har ju också sagt att ni inte jobbar med att hjälpa till att implementera - det får kunden göra själv",
+    "source": "David, intervju-4-aurora-apr-13, ~rad 58"
+  },
+  "source_assumptions_categorized": "assumptions-categorized.json",
+  "source_assumptions": "assumptions.json",
+  "source_top_three_solutions": "OST-discovery/_working/top-three-solutions.json",
+  "source_experience_map": "experience-map-extracted.json",
+  "categorization_summary": {
+    "categories": ["desirability", "usability", "feasibility", "viability", "other"],
+    "rule": "single-category per assumption, risk-falls tiebreaker",
+    "total_assumptions": 33
+  },
+  "risk_summary": {
+    "framework": "2x2 importance x evidence (David Bland)",
+    "evidence_rule": "soft: domain norms and industry conventions count",
+    "rationale_format": "single sentence; importance-then-evidence",
+    "total_assumptions": 33,
+    "total_riskiest": 21
+  },
+  "assumptions_per_solution": [
+    {
+      "pick_position": 1,
+      "solution_id": "sol-r1-pm-1",
+      "solution_title": "Automatiserad onboarding-portal med självbetjäning från dag ett",
+      "solution_description": "När kunden signerar avtalet aktiveras automatiskt en personaliserad onboarding-portal med steg-för-steg-guide, API-nycklar och testmiljö - allt utan att Flowbase behöver agera. Kunden kan göra sitt första lyckade API-anrop helt på egen hand, vilket direkt mäter sig mot målet om 80% självbetjänade kunder.",
+      "generating_role": "product-manager",
+      "round_number": 1,
+      "assumptions": [
+        {
+          "id": "asm-sol-r1-pm-1-001",
+          "text": "Avtalssigneringen sker i ett system som kan generera en maskinläsbar händelse som tillförlitligt triggar automatisk aktivering av onboarding-portalen utan manuell handpåläggning.",
+          "source_methods": ["storymap", "pre-mortem"],
+          "category": "feasibility",
+          "importance": "high",
+          "evidence": "strong",
+          "is_riskiest": false,
+          "rationale": "Importance=high (utan automatisk trigger krävs manuell aktivering och självbetjäningen faller); evidence=strong (webhook-baserad aktivering vid e-signering är ett etablerat integrationsmönster)."
+        },
+        {
+          "id": "asm-sol-r1-pm-1-002",
+          "text": "Aktiveringen provisionerar korrekt kundspecifika API-nycklar, behörigheter och testmiljöåtkomst direkt vid trigger - utan manuella steg i Flowbases interna system.",
+          "source_methods": ["storymap", "outcome-impact"],
+          "category": "feasibility",
+          "importance": "high",
+          "evidence": "strong",
+          "is_riskiest": false,
+          "rationale": "Importance=high (manuell provisionering återinför den interaktion lösningen ska ta bort); evidence=strong (automatiserad nyckel- och behörighetsprovisionering är branschstandard för API-plattformar)."
+        },
+        {
+          "id": "asm-sol-r1-pm-1-003",
+          "text": "Kunden tar emot portalinbjudan, uppfattar den som nästa steg i onboardingen och loggar in utan att behöva kontakta Flowbase för hjälp.",
+          "source_methods": ["storymap"],
+          "category": "usability",
+          "importance": "high",
+          "evidence": "strong",
+          "is_riskiest": false,
+          "rationale": "Importance=high (loggar kunden inte in självmant uteblir hela självbetjäningen); evidence=strong (portalinbjudan som nästa steg är ett väletablerat onboarding-mönster)."
+        },
+        {
+          "id": "asm-sol-r1-pm-1-004",
+          "text": "Steg-för-steg-guiden är tillräckligt tydlig och heltäckande för att kunden ska kunna följa den helt på egen hand, och täcker de vanligaste tekniska miljöerna, integrationsmönstren och hindren som Flowbases kunder faktiskt stöter på.",
+          "source_methods": ["storymap", "pre-mortem", "outcome-impact"],
+          "category": "usability",
+          "importance": "high",
+          "evidence": "weak",
+          "is_riskiest": true,
+          "rationale": "Importance=high (en otydlig eller ofullständig guide leder direkt till kontakt med Flowbase); evidence=weak (att en guide täcker alla vanliga miljöer och hinder är obevisat)."
+        },
+        {
+          "id": "asm-sol-r1-pm-1-005",
+          "text": "Testmiljön liknar produktionsmiljön tillräckligt för att ett lyckat testanrop ger kunden tillräcklig tillit och direkt översätts till ett lyckat produktionsanrop utan ytterligare felsökning.",
+          "source_methods": ["storymap", "pre-mortem"],
+          "category": "feasibility",
+          "importance": "high",
+          "evidence": "weak",
+          "is_riskiest": true,
+          "rationale": "Importance=high (utfallet mäts på produktionsanrop, inte testanrop); evidence=weak (paritet mellan test- och produktionsmiljö är ett känt svårt problem)."
+        },
+        {
+          "id": "asm-sol-r1-pm-1-006",
+          "text": "Guiden täcker hela vägen från testmiljö till produktionsmiljö, inklusive eventuella konfigurationsskillnader, så att kunden klarar det sista steget utan extern hjälp.",
+          "source_methods": ["storymap"],
+          "category": "usability",
+          "importance": "high",
+          "evidence": "weak",
+          "is_riskiest": true,
+          "rationale": "Importance=high (sista steget till produktion är just där utfallet avgörs); evidence=weak (att guiden täcker konfigurationsskillnaderna hela vägen är obevisat)."
+        },
+        {
+          "id": "asm-sol-r1-pm-1-007",
+          "text": "Kunden har tillräcklig teknisk kompetens för att genomföra API-integrationen självständigt utan mänskligt stöd från Flowbase.",
+          "source_methods": ["pre-mortem", "outcome-impact"],
+          "category": "usability",
+          "importance": "high",
+          "evidence": "strong",
+          "is_riskiest": false,
+          "rationale": "Importance=high (saknar kunden teknisk kompetens uteblir det självständiga genomförandet); evidence=strong (API-konsumenter är typiskt utvecklare med grundläggande integrationsvana)."
+        },
+        {
+          "id": "asm-sol-r1-pm-1-008",
+          "text": "Kunden är motiverad att sätta igång direkt efter signering och avvaktar inte till ett senare tillfälle när momentum har tappats.",
+          "source_methods": ["pre-mortem", "outcome-impact"],
+          "category": "desirability",
+          "importance": "low",
+          "evidence": "weak",
+          "is_riskiest": false,
+          "rationale": "Importance=low (fördröjd start bryter inte lösningen, kunden kan självbetjäna senare); evidence=weak (kundens motivationstajming är ett spekulativt beteendeantagande)."
+        },
+        {
+          "id": "asm-sol-r1-pm-1-009",
+          "text": "Kunden vet vem internt som ska genomföra den tekniska integrationen och att rätt person får tillgång till onboarding-portalen från dag ett.",
+          "source_methods": ["pre-mortem", "outcome-impact"],
+          "category": "usability",
+          "importance": "high",
+          "evidence": "weak",
+          "is_riskiest": true,
+          "rationale": "Importance=high (når åtkomsten fel person stannar integrationen och kontakt uppstår); evidence=weak (vem internt som äger integrationen är ett oprövat organisationsantagande)."
+        },
+        {
+          "id": "asm-sol-r1-pm-1-010",
+          "text": "Antalet kundinitierade interaktioner med Flowbase minskar när tillgång till credentials och guidad dokumentation ges omedelbart - det vill säga att avsaknad av självbetjäning är den primära orsaken till dagens interaktioner, inte andra faktorer.",
+          "source_methods": ["outcome-impact"],
+          "category": "desirability",
+          "importance": "high",
+          "evidence": "weak",
+          "is_riskiest": true,
+          "rationale": "Importance=high (är självbetjäning inte den primära orsaken rör lösningen inte utfallet); evidence=weak (endast en intervju stödjer orsakshypotesen)."
+        }
+      ]
+    },
+    {
+      "pick_position": 2,
+      "solution_id": "sol-r1-ux-1",
+      "solution_title": "Interaktiv kom-igång-guide direkt efter avtalssignering",
+      "solution_description": "Kunden möts av en steg-för-steg-guide i portalen så fort avtalet är signerat - guiden leder dem från API-nyckel till första lyckade anrop i produktionsmiljö utan att behöva kontakta Flowbase. Varje steg bekräftas med direkt feedback (grönt bock = lyckat anrop) så att kunden vet exakt var de befinner sig i processen och vad som återstår.",
+      "generating_role": "ux-designer",
+      "round_number": 1,
+      "assumptions": [
+        {
+          "id": "asm-sol-r1-ux-1-001",
+          "text": "Kunden har tillgång till portalen och guiden omedelbart efter avtalssignering, utan manuella mellansteg från Flowbases sida som försenar åtkomsten.",
+          "source_methods": ["storymap", "pre-mortem"],
+          "category": "feasibility",
+          "importance": "high",
+          "evidence": "strong",
+          "is_riskiest": false,
+          "rationale": "Importance=high (manuella mellansteg återinför fördröjning och kontakt); evidence=strong (omedelbar portalåtkomst efter signering är ett etablerat onboarding-mönster)."
+        },
+        {
+          "id": "asm-sol-r1-ux-1-002",
+          "text": "Kunden förstår guidens startpunkt och syfte vid första mötet med den, utan behov av förklarande kommunikation utanför portalen.",
+          "source_methods": ["storymap"],
+          "category": "usability",
+          "importance": "high",
+          "evidence": "strong",
+          "is_riskiest": false,
+          "rationale": "Importance=high (förstår kunden inte guidens start uppstår kontakt direkt); evidence=strong (självförklarande startpunkt är en designbar och konventionell guide-praxis)."
+        },
+        {
+          "id": "asm-sol-r1-ux-1-003",
+          "text": "Kunden kan självständigt generera och hämta sin API-nyckel direkt i portalen, utan att behöva invänta manuell provisionering från Flowbase.",
+          "source_methods": ["storymap"],
+          "category": "feasibility",
+          "importance": "high",
+          "evidence": "strong",
+          "is_riskiest": false,
+          "rationale": "Importance=high (utan egen nyckel kan inget anrop göras); evidence=strong (självbetjänad nyckelgenerering är standardfunktion i utvecklarportaler)."
+        },
+        {
+          "id": "asm-sol-r1-ux-1-004",
+          "text": "Guiden täcker de tekniska konfigurationssteg, miljöer, autentiseringsmetoder och programmeringsspråk som kunderna faktiskt använder, så att ingen fastnar på ett steg som guiden inte adresserar.",
+          "source_methods": ["storymap", "pre-mortem", "outcome-impact"],
+          "category": "usability",
+          "importance": "high",
+          "evidence": "weak",
+          "is_riskiest": true,
+          "rationale": "Importance=high (ett steg guiden inte adresserar gör att kunden fastnar och kontaktar Flowbase); evidence=weak (att guiden täcker alla språk, miljöer och autentiseringsmetoder är obevisat)."
+        },
+        {
+          "id": "asm-sol-r1-ux-1-005",
+          "text": "Portalen kan detektera om ett anrop mot produktionsmiljön lyckades och ge kunden omedelbar, korrekt feedback per steg utan fördröjning.",
+          "source_methods": ["storymap"],
+          "category": "feasibility",
+          "importance": "high",
+          "evidence": "weak",
+          "is_riskiest": true,
+          "rationale": "Importance=high (utan korrekt feedback per steg uteblir lösningens kärndifferentiator); evidence=weak (realtidsdetektering av kundens produktionsanrop per steg är tekniskt oprövat)."
+        },
+        {
+          "id": "asm-sol-r1-ux-1-006",
+          "text": "Kunden har tekniska förutsättningar att följa guiden självständigt: tillgång till en teknisk person med rätt befogenheter, grundläggande API-kunskaper och tillgång till en testmiljö.",
+          "source_methods": ["storymap", "outcome-impact"],
+          "category": "usability",
+          "importance": "high",
+          "evidence": "strong",
+          "is_riskiest": false,
+          "rationale": "Importance=high (saknas tekniska förutsättningar kan guiden inte följas självständigt); evidence=strong (API-kunder har typiskt en teknisk person och testmiljötillgång)."
+        },
+        {
+          "id": "asm-sol-r1-ux-1-007",
+          "text": "Kunder med tillräcklig teknisk kompetens för att konsumera ett API klarar också att följa en steg-för-steg-guide i en portal utan extern hjälp.",
+          "source_methods": ["pre-mortem"],
+          "category": "usability",
+          "importance": "high",
+          "evidence": "strong",
+          "is_riskiest": false,
+          "rationale": "Importance=high (klarar inte kompetenta kunder guiden faller självbetjäningen); evidence=strong (kan man konsumera ett API kan man rimligen följa en stegvis guide)."
+        },
+        {
+          "id": "asm-sol-r1-ux-1-008",
+          "text": "Den direkta feedbacken per steg (t.ex. grönt bock) är tillräckligt tydlig för att kunden ska förstå om ett anrop lyckades eller om felet ligger i deras egen integration, och inte initiera kontakt med Flowbase för verifiering.",
+          "source_methods": ["pre-mortem", "outcome-impact"],
+          "category": "usability",
+          "importance": "high",
+          "evidence": "weak",
+          "is_riskiest": true,
+          "rationale": "Importance=high (oklar feedback utlöser verifieringskontakter som ska elimineras); evidence=weak (att feedbacken särskiljer lyckat anrop från eget integrationsfel är spekulativt)."
+        },
+        {
+          "id": "asm-sol-r1-ux-1-009",
+          "text": "Kunderna väljer att följa guiden i stället för att falla tillbaka på gamla kontaktmönster när de stöter på motstånd.",
+          "source_methods": ["pre-mortem"],
+          "category": "desirability",
+          "importance": "high",
+          "evidence": "weak",
+          "is_riskiest": true,
+          "rationale": "Importance=high (faller kunden tillbaka på gamla kontaktmönster bryts utfallet); evidence=weak (att kunder väljer guiden framför invant kontaktbeteende är ett oprövat beteendeantagande)."
+        },
+        {
+          "id": "asm-sol-r1-ux-1-010",
+          "text": "Flowbase kan hålla guiden uppdaterad i takt med förändringar i API:et, så att steg-för-steg-instruktionerna inte leder kunden fel vid nästa release.",
+          "source_methods": ["pre-mortem"],
+          "category": "viability",
+          "importance": "high",
+          "evidence": "weak",
+          "is_riskiest": true,
+          "rationale": "Importance=high (en inaktuell guide leder kunden fel och utlöser kontakt); evidence=weak (att Flowbase orkar hålla guiden synkad med varje release är obevisat)."
+        },
+        {
+          "id": "asm-sol-r1-ux-1-011",
+          "text": "Kunder som precis signerat ett avtal är motiverade att komma igång omedelbart och söker aktivt upp guiden i portalen utan att behöva påminnas.",
+          "source_methods": ["outcome-impact"],
+          "category": "desirability",
+          "importance": "low",
+          "evidence": "weak",
+          "is_riskiest": false,
+          "rationale": "Importance=low (uteblir omedelbar start kan kunden söka guiden senare utan att lösningen bryts); evidence=weak (kundens motivation att agera direkt är ett spekulativt beteendeantagande)."
+        },
+        {
+          "id": "asm-sol-r1-ux-1-012",
+          "text": "En steg-för-steg-guide i portalen räcker som enda informationskälla - kunden behöver inte komplettera med extern dokumentation, support eller kollegors hjälp för att ta sig från API-nyckel till första lyckade anrop.",
+          "source_methods": ["outcome-impact"],
+          "category": "usability",
+          "importance": "high",
+          "evidence": "weak",
+          "is_riskiest": true,
+          "rationale": "Importance=high (räcker inte guiden ensam söker kunden extern hjälp eller support); evidence=weak (att en enda guide ersätter all annan informationskälla är obevisat)."
+        },
+        {
+          "id": "asm-sol-r1-ux-1-013",
+          "text": "De vanligaste skälen till att kunder kontaktar Flowbase under aktivering är informationsbrist och osäkerhet om nästa steg - inte tekniska blockerare som kräver mänsklig hjälp från Flowbase.",
+          "source_methods": ["outcome-impact"],
+          "category": "desirability",
+          "importance": "high",
+          "evidence": "weak",
+          "is_riskiest": true,
+          "rationale": "Importance=high (är orsaken tekniska blockerare rör en informationsguide inte utfallet); evidence=weak (endast en intervju stödjer orsakshypotesen)."
+        }
+      ]
+    },
+    {
+      "pick_position": 3,
+      "solution_id": "sol-r1-ux-2",
+      "solution_title": "Automatisk välkomstpåse med konfigurerade kodexempel för kundens miljö",
+      "solution_description": "Direkt vid aktivering skickas ett personaliserat paket - med API-nyckel, bas-URL och färdiga kodexempel i de vanligaste språken (Python, JavaScript, cURL) - där variablerna redan är ifyllda med kundens faktiska uppgifter. Kunden kopierar och kör, inget att konfigurera eller slå upp, vilket eliminerar det vanligaste skälet till att höra av sig till Flowbase under onboarding.",
+      "generating_role": "ux-designer",
+      "round_number": 1,
+      "assumptions": [
+        {
+          "id": "asm-sol-r1-ux-2-001",
+          "text": "Flowbases system känner till exakt när en kund aktiveras och kan automatiskt trigga utskicket av välkomstpåsen utan manuellt steg, och levererar uppgifterna snabbt nog för att välkomstpåsen ska skickas i rätt tid i förhållande till när kunden är redo att testa.",
+          "source_methods": ["storymap", "outcome-impact"],
+          "category": "feasibility",
+          "importance": "high",
+          "evidence": "weak",
+          "is_riskiest": true,
+          "rationale": "Importance=high (uteblir automatiskt och rättidigt utskick återinförs manuell hantering); evidence=weak (att systemet skickar i rätt tid relativt kundens faktiska redo-läge är oprövat)."
+        },
+        {
+          "id": "asm-sol-r1-ux-2-002",
+          "text": "Alla uppgifter som behövs för att personalisera paketet - API-nyckel, bas-URL och kundens föredragna programmeringsspråk - finns tillgängliga i Flowbases system vid aktiveringstillfället, och är korrekta och giltiga när kunden faktiskt försöker använda dem.",
+          "source_methods": ["storymap", "pre-mortem"],
+          "category": "feasibility",
+          "importance": "high",
+          "evidence": "weak",
+          "is_riskiest": true,
+          "rationale": "Importance=high (saknas eller felar persondatan blir paketet obrukbart och kontakt uppstår); evidence=weak (kundens föredragna programmeringsspråk finns sällan i Flowbases system)."
+        },
+        {
+          "id": "asm-sol-r1-ux-2-003",
+          "text": "Välkomstpåsen når rätt teknisk kontaktperson hos kunden i rätt tid, och hamnar inte hos en icke-teknisk mottagare eller i ett spamfilter.",
+          "source_methods": ["storymap"],
+          "category": "usability",
+          "importance": "high",
+          "evidence": "weak",
+          "is_riskiest": true,
+          "rationale": "Importance=high (når paketet fel mottagare eller spam agerar ingen och kontakt uppstår); evidence=weak (att B2B-utskick når rätt teknisk kontakt och undviker spamfilter är osäkert)."
+        },
+        {
+          "id": "asm-sol-r1-ux-2-004",
+          "text": "Mottagaren av välkomstpåsen är samma person som utför den tekniska integrationen - paketet hamnar hos den som faktiskt ska använda kodexemplen, inte bara hos den som skrivit under avtalet.",
+          "source_methods": ["pre-mortem"],
+          "category": "usability",
+          "importance": "high",
+          "evidence": "weak",
+          "is_riskiest": true,
+          "rationale": "Importance=high (hamnar paketet inte hos integratören används kodexemplen aldrig); evidence=weak (att mottagaren är samma person som integrerar är ett oprövat organisationsantagande)."
+        },
+        {
+          "id": "asm-sol-r1-ux-2-005",
+          "text": "Kunden läser och agerar på välkomstpåsen vid rätt tidpunkt i sin onboarding - paketet missas inte, arkiveras inte eller återfinns inte för sent.",
+          "source_methods": ["pre-mortem", "outcome-impact"],
+          "category": "desirability",
+          "importance": "high",
+          "evidence": "weak",
+          "is_riskiest": true,
+          "rationale": "Importance=high (missas eller arkiveras paketet kringgås hela mekanismen); evidence=weak (att ett pushat paket faktiskt konsumeras i rätt tid är ett spekulativt beteendeantagande)."
+        },
+        {
+          "id": "asm-sol-r1-ux-2-006",
+          "text": "Kodexemplen täcker det programmeringsspråk eller det tekniska format som kundens utvecklare faktiskt använder, och de vanligaste språken Python, JavaScript och cURL räcker för att täcka merparten av fallen - kunder med andra stackar utgör inte en tillräckligt stor grupp för att ge upphov till supportkontakter.",
+          "source_methods": ["storymap", "pre-mortem", "outcome-impact"],
+          "category": "usability",
+          "importance": "high",
+          "evidence": "weak",
+          "is_riskiest": true,
+          "rationale": "Importance=high (saknas kundens språk fastnar utvecklaren och kontaktar Flowbase); evidence=weak (att Python, JavaScript och cURL täcker merparten av kundernas stackar är obevisat)."
+        },
+        {
+          "id": "asm-sol-r1-ux-2-007",
+          "text": "De förifyllda credentials och kodexemplen är syntaktiskt korrekta, körbara utan att kunden behöver ändra något, och pekar mot rätt miljö så att ett lyckat testanrop bekräftar att integrationen är klar.",
+          "source_methods": ["storymap", "outcome-impact"],
+          "category": "feasibility",
+          "importance": "high",
+          "evidence": "weak",
+          "is_riskiest": true,
+          "rationale": "Importance=high (felaktiga eller icke-körbara exempel utlöser direkt kontakt); evidence=weak (per-kund-genererad, körbar och rätt-riktad kod utan ändring är tekniskt oprövat)."
+        },
+        {
+          "id": "asm-sol-r1-ux-2-008",
+          "text": "Kunden kan tolka och använda API-svaret utan stöd - det räcker att det första anropet exekverar utan fel för att kunden ska kunna gå vidare på egen hand.",
+          "source_methods": ["pre-mortem"],
+          "category": "usability",
+          "importance": "high",
+          "evidence": "strong",
+          "is_riskiest": false,
+          "rationale": "Importance=high (kan kunden inte tolka API-svaret uppstår kontakt); evidence=strong (utvecklare som konsumerar ett API kan typiskt tolka ett API-svar)."
+        },
+        {
+          "id": "asm-sol-r1-ux-2-009",
+          "text": "Kunder som får API-nyckel, bas-URL och färdiga kodexempel direkt vid aktivering kan genomföra sitt första anrop utan att behöva kontakta Flowbase för att få fram dessa uppgifter.",
+          "source_methods": ["outcome-impact"],
+          "category": "desirability",
+          "importance": "high",
+          "evidence": "weak",
+          "is_riskiest": true,
+          "rationale": "Importance=high (krävs ändå kontakt för att få fram uppgifterna rör lösningen inte utfallet); evidence=weak (att färdiga credentials och kodexempel tar bort kontaktbehovet är obevisat)."
+        },
+        {
+          "id": "asm-sol-r1-ux-2-010",
+          "text": "Konfigurationsförvirring kring credentials och bas-URL är den primära anledningen till att kunder kontaktar Flowbase under aktivering - inte frågor om datakvalitet, dataformat, licensvillkor eller andra tekniska hinder.",
+          "source_methods": ["pre-mortem", "outcome-impact"],
+          "category": "desirability",
+          "importance": "high",
+          "evidence": "weak",
+          "is_riskiest": true,
+          "rationale": "Importance=high (är orsaken något annat än konfigurationsförvirring rör lösningen inte utfallet); evidence=weak (endast partiellt intervjustöd för orsakshypotesen)."
+        }
+      ]
+    }
+  ]
+}
