@@ -14,10 +14,11 @@ export const meta = {
 
 // args: { pluginRoot, scope, transcripts: [absolute paths], date: "YYYY-MM-DD" }
 // pluginRoot = product-discovery plugin root (contains skills/), scope = OST-discovery/ path.
-if (!args || !args.pluginRoot || !args.scope || !Array.isArray(args.transcripts) || !args.transcripts.length || !args.date) {
+const input = typeof args === 'string' ? JSON.parse(args) : args
+if (!input || !input.pluginRoot || !input.scope || !Array.isArray(input.transcripts) || !input.transcripts.length || !input.date) {
   throw new Error('args must be { pluginRoot, scope, transcripts: [paths], date: "YYYY-MM-DD" } — transcripts non-empty')
 }
-const { pluginRoot, scope, transcripts, date } = args
+const { pluginRoot, scope, transcripts, date } = input
 const skill = (dir) => `${pluginRoot}/skills/${dir}/SKILL.md`
 
 // Shared rules so SKILL.md execution stays faithful but non-interactive inside a workflow.
