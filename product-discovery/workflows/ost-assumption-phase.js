@@ -83,6 +83,7 @@ ${j.method === 'storymap' ? `Storymap only: read the experience map at ${pre.exp
 Chosen opportunity: ${JSON.stringify(pre.chosen_opportunity)}
 Product outcome: ${pre.product_outcome}
 The solution you reason about: ${JSON.stringify(j.pick)}
+If ${scope}/tree.json exists (cross-round living tree), read it: assumptions already validated in prior rounds count as evidence (you may still list one if it remains load-bearing — note it has prior support); invalidated ones must not silently reappear as fresh assumptions. Absence of tree.json is fine.
 Produce exactly 6 assumptions per the skill's task wording (1-2 sentences each, no categorization, no effort vocabulary, language of the solution description).`,
     { label: `${j.method}:${j.pick.id}`, phase: 'Generate', schema: GEN_SCHEMA })
 ))
