@@ -1248,7 +1248,7 @@
   }
   .n-opp{
     background:var(--ost-node-opp-bg);border:2px solid var(--ost-node-opp-bd);
-    max-width:210px;color:var(--sc-grey-900);
+    max-width:210px;color:var(--sc-grey-900);border-radius:var(--r-md);
   }
   .n-opp.sub{max-width:188px;font-size:.74rem;padding:.5rem .85rem;}
   .n-opp.muted{opacity:.62;}
@@ -1792,6 +1792,7 @@
     var data = await loadTreeData(roundData);
     container.innerHTML =
       '<div class="ost-tree-tab">' +
+        '<aside class="view-guide"><h3>How to read this</h3><p>The Opportunity Solution Tree. <b>Opportunity space</b> shows every opportunity branching off the outcome (the chosen one is marked “Vald”). <b>Chosen branch</b> drills the chosen opportunity down through the top‑3 solutions to the assumptions that must hold. Switch with the toggle.</p></aside>' +
         '<div class="ost-seg" id="ost-seg"></div>' +
         '<div class="board" id="ost-board">' +
           '<div class="bandbg"></div><div class="gutter"></div>' +
