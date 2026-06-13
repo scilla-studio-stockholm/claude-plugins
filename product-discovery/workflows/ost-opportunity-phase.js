@@ -83,13 +83,15 @@ The per-transcript extraction is already done. Compose ${scope}/_working/opportu
 
 Pre-extracted data (JSON):
 ${JSON.stringify(ok, null, 2)}`,
-  { label: 'merge:opportunities-extracted', phase: 'Merge' })
+  { label: 'merge:opportunities-extracted', phase: 'Merge', model: 'haiku' })
 if (typeof mergeResult === 'string' && mergeResult.startsWith('ERROR')) return { stopped_at: 'merge', error: mergeResult }
 
 // ---- Phases 3-6: Validate → Cluster → Compare → Select, sequential ----
+// Per-stage model (SCI-230): mechanical stages pinned cheaper; judgment stages
+// (Validate/Compare/Select) left on the inherited session model. Omitted = inherit.
 const STAGES = [
   { title: 'Validate', dir: '03-OST-validate-opportunities' },
-  { title: 'Cluster', dir: '04-OST-cluster-opportunities' },
+  { title: 'Cluster', dir: '04-OST-cluster-opportunities', model: 'sonnet' },
   { title: 'Compare', dir: '05-OST-compare-opportunities' },
   { title: 'Select', dir: '06-OST-select-opportunity' },
 ]
@@ -100,7 +102,7 @@ for (const s of STAGES) {
 
 Execute the skill at: ${skill(s.dir)}
 All upstream files for this round already exist under ${scope}. Default input paths apply.`,
-    { label: s.title.toLowerCase(), phase: s.title })
+    { label: s.title.toLowerCase(), phase: s.title, ...(s.model ? { model: s.model } : {}) })
   results[s.title.toLowerCase()] = r
   if (typeof r === 'string' && r.startsWith('ERROR')) {
     log(`${s.title} hard-exited — stopping the pipeline (no downstream writes)`)

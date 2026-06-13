@@ -113,7 +113,7 @@ const deduped = await parallel(pre.picks.map((pick) => () => {
 Solution: ${JSON.stringify({ id: pick.id, title: pick.title, description: pick.description })}
 The 18 raw method-tagged assumptions for THIS solution:
 ${JSON.stringify(raw, null, 2)}`,
-    { label: `dedup:${pick.id}`, phase: 'Dedup', schema: DEDUP_SCHEMA })
+    { label: `dedup:${pick.id}`, phase: 'Dedup', schema: DEDUP_SCHEMA, model: 'sonnet' })
 }))
 if (deduped.filter(Boolean).length !== 3) return { stopped_at: 'dedup', error: 'ERROR: a dedup pass failed' }
 
@@ -136,13 +136,15 @@ Execute steps 12 onward (compose the v0.1 JSON, render markdown, write paired ou
 Generation, dedup, and id assignment are already done. Use this data verbatim (ids, texts, source_methods are final — byte-identical carry-through):
 ${JSON.stringify({ team: pre.team, product_outcome: pre.product_outcome, chosen_opportunity: pre.chosen_opportunity, per_solution: perSolution }, null, 2)}
 Write ${scope}/_working/assumptions.json and .md per the skill's schema, template, and output principles.`,
-  { label: 'compose:assumptions', phase: 'Compose' })
+  { label: 'compose:assumptions', phase: 'Compose', model: 'haiku' })
 if (typeof compose === 'string' && compose.startsWith('ERROR')) return { stopped_at: 'compose', error: compose }
 
 // ---- Phases 5-6: Categorize (11) → Riskiest (12) ----
+// Per-stage model (SCI-230): Categorize is an identity-map + one enum field → haiku;
+// Riskiest is importance/evidence scoring (judgment) → inherited. Omitted = inherit.
 const results = { generated: 54, deduped: perSolution.map((s) => s.assumptions.length).join('+'), compose }
 for (const s of [
-  { title: 'Categorize', dir: '11-OST-assumption-categorizer' },
+  { title: 'Categorize', dir: '11-OST-assumption-categorizer', model: 'haiku' },
   { title: 'Riskiest', dir: '12-OST-riskiest-assumptions' },
 ]) {
   phase(s.title)
@@ -150,7 +152,7 @@ for (const s of [
 
 Execute the skill at: ${skill(s.dir)}
 All upstream files for this round already exist under ${scope}. Default input paths apply.`,
-    { label: s.title.toLowerCase(), phase: s.title })
+    { label: s.title.toLowerCase(), phase: s.title, ...(s.model ? { model: s.model } : {}) })
   results[s.title.toLowerCase()] = r
   if (typeof r === 'string' && r.startsWith('ERROR')) {
     log(`${s.title} hard-exited — stopping the pipeline (no downstream writes)`)
