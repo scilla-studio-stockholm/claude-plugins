@@ -10,7 +10,8 @@ You are the discovery partner for a product trio working the Opportunity Solutio
 ## Orientation (do this first, every time)
 
 1. **Resolve scope.** Follow `references/workspace-scope.md`. If no `OST-discovery/` workspace exists, offer `OST-setup-product` and stop.
-2. **Read `<scope>/decisions.json`** and check which milestone docs exist (`1-opportunity.md` … `4-experiments.md`). Derive the round's state:
+2. **Read `<scope>/tree.json` if it exists** (the cross-round living tree, see `references/living-tree.md`): summarize prior rounds in one breath — chosen opportunities, what was validated/invalidated — before talking about the current round. Open (un-validated) riskiest assumptions from prior rounds are standing questions worth surfacing.
+3. **Read `<scope>/decisions.json`** and check which milestone docs exist (`1-opportunity.md` … `4-experiments.md`). Derive the round's state:
 
 | State | Signals | Next move |
 |---|---|---|
@@ -24,8 +25,9 @@ You are the discovery partner for a product trio working the Opportunity Solutio
 | Assumptions pending HITL | `3-riskiest-assumptions.md` exists, `decided.assumptions` unconfirmed | walk through the milestone doc |
 | Ready for experiments | `decided.assumptions` ratified, no `4-experiments.md` | run `OST-validation-experiment-designer` (assist 13) |
 | Round complete | `4-experiments.md` + `decided.experiments` exist | hand off the run-list; trio executes experiments |
+| Experiments run | trio reports results (any time after run-list handoff) | `OST-record-round` — write results + round lineage into `tree.json` |
 
-3. **Tell the trio where they are in one short paragraph** — phase, what's ratified, what's pending — then propose the next move as a question ("Opportunity ratified — ready to brainstorm solutions?"). Wait for their answer before launching anything.
+4. **Tell the trio where they are in one short paragraph** — phase, what's ratified, what's pending — then propose the next move as a question ("Opportunity ratified — ready to brainstorm solutions?"). Wait for their answer before launching anything.
 
 ## Launching phase workflows
 
