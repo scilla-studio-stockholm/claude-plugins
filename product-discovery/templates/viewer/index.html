@@ -1561,9 +1561,29 @@
     var base = roundData.basePath + '/_working/';
     var clustered = await loadJSON(base + 'experience-map-clustered.json');
     var top3 = await loadJSON(base + 'top-three-solutions.json');
-    var assum = await loadJSON(base + 'validation-experiments.json')
-             || await loadJSON(base + 'riskiest-assumptions.json')
-             || await loadJSON(base + 'assumptions-categorized.json');
+    // Assumptions: riskiest-assumptions.json carries ALL assumptions with risk axes
+    // (importance/evidence/is_riskiest); validation-experiments.json carries test cards
+    // for the riskiest subset only. Use the fullest row set as the base and merge in the
+    // test cards by assumption id, so the table shows every assumption with Testmetod/
+    // Framgångskriterier sparse (present on riskiest rows only).
+    var riskiest = await loadJSON(base + 'riskiest-assumptions.json');
+    var validation = await loadJSON(base + 'validation-experiments.json');
+    var categorized = await loadJSON(base + 'assumptions-categorized.json');
+    var rowsSource = riskiest || validation || categorized;
+    var testById = {};
+    if (validation) {
+      (validation.assumptions_per_solution || []).forEach(function (s) {
+        (s.assumptions || []).forEach(function (a) {
+          if (a.recommended_test) testById[a.id] = a.recommended_test;
+        });
+      });
+    }
+    var assumBlocks = rowsSource ? (rowsSource.assumptions_per_solution || []) : [];
+    assumBlocks.forEach(function (s) {
+      (s.assumptions || []).forEach(function (a) {
+        if (!a.recommended_test && testById[a.id]) a.recommended_test = testById[a.id];
+      });
+    });
     var d = roundData.decisions || {};
     var chosenId = d.decided && d.decided.opportunity ? d.decided.opportunity.id : null;
     var picks = (top3 && top3.picks) || (d.decided && d.decided.solutions && d.decided.solutions.picks) || [];
@@ -1572,7 +1592,7 @@
       oppRoots: clustered ? buildOpportunityTree(clustered, chosenId) : [],
       chosenId: chosenId,
       solutions: picks,
-      assumBlocks: assum ? assum.assumptions_per_solution || [] : [],
+      assumBlocks: assumBlocks,
       hasOpp: !!chosenId
     };
   }
