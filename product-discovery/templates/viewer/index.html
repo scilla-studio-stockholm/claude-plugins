@@ -1650,7 +1650,73 @@
       '<button data-cut="v" class="' + (cut==='v'?'active':'') + '"><span class="dir">↧</span> Chosen branch</button>';
   }
 
-  function ostRenderTable(data, mount){ mount.innerHTML = ''; }
+  var OST_CAT = { desirability:['Önskvärdhet','ons'], usability:['Användbarhet','anv'],
+    feasibility:['Genomförbarhet','gen'], viability:['Lönsamhet','lon'], other:['Övrigt','ovr'] };
+  function ostCatChip(c){ var m = OST_CAT[c] || ['—','ovr'];
+    return '<span class="chip chip-typ ' + m[1] + '">' + esc(m[0]) + '</span>'; }
+  function ostAxisChip(val, hiWord){
+    if(!val) return '<span class="chip chip-axis lo">—</span>';
+    var hi = (val === hiWord);
+    var sv = ({high:'Hög',low:'Låg',strong:'Starkt',weak:'Svagt'})[val] || val;
+    return '<span class="chip chip-axis ' + (hi?'hi':'lo') + '">' + sv + '</span>';
+  }
+
+  function buildAssumptionRows(blocks){
+    return (blocks||[]).map(function(b){
+      return { solId: b.solution_id, solTitle: b.solution_title,
+        rows: (b.assumptions||[]).map(function(a){
+          return { text:a.text, category:a.category,
+            importance:a.importance||null, evidence:a.evidence||null,
+            riskiest:!!a.is_riskiest,
+            test:a.recommended_test ? a.recommended_test.test_type : null,
+            success:a.recommended_test ? a.recommended_test.success_criteria : null };
+        }) };
+    });
+  }
+
+  function ostRenderTable(data, mount){
+    var groups = buildAssumptionRows(data.assumBlocks);
+    var SOON = ['Status','Issue ID','Insikter'];
+    var COLS = ['Antagande','Lösning','Betydelse','Bevis','Riskigast','Typ av antagande','Testmetod','Framgångskriterier'];
+    if(!groups.length){
+      mount.innerHTML = '<div class="tbl-head"><span class="title">Antaganden</span></div>' +
+        '<div class="tbl-card"><div class="tbl-empty">Inga antaganden ännu — kör fas 3.</div></div>';
+      return;
+    }
+    var solIndex = {};
+    data.solutions.forEach(function(s,i){ solIndex[s.id] = 'S' + (i+1); });
+    var head = '<thead><tr><th class="idx"></th>' +
+      COLS.map(function(h){ return '<th>' + esc(h) + '</th>'; }).join('') +
+      SOON.map(function(h){ return '<th class="soon">' + esc(h) + '<span class="tag">(coming soon)</span></th>'; }).join('') +
+      '</tr></thead>';
+    var n = 0, body = '';
+    groups.forEach(function(g){
+      body += '<tr class="grp"><td colspan="' + (1+COLS.length+SOON.length) + '">' +
+        '<div class="grp-label"><span class="node-tag">' + esc(solIndex[g.solId]||'') + '</span>' + esc(g.solTitle) +
+        '<span class="grp-count">' + g.rows.length + ' antaganden</span></div></td></tr>';
+      if(!g.rows.length){
+        body += '<tr><td class="idx"></td><td colspan="' + (COLS.length+SOON.length) + '" style="color:var(--sc-grey-400);font-style:italic;">Inga antaganden ännu för den här lösningen.</td></tr>';
+        return;
+      }
+      g.rows.forEach(function(r){
+        n++;
+        body += '<tr class="' + (r.riskiest?'risky':'') + '">' +
+          '<td class="idx">' + n + '</td>' +
+          '<td class="assum-txt">' + esc(r.text) + '</td>' +
+          '<td><span class="chip chip-sol">' + esc(solIndex[g.solId]||'') + '</span></td>' +
+          '<td>' + ostAxisChip(r.importance,'high') + '</td>' +
+          '<td>' + ostAxisChip(r.evidence,'strong') + '</td>' +
+          '<td>' + (r.riskiest ? '<span class="flag-riskiest">Riskigast</span>' : '') + '</td>' +
+          '<td>' + ostCatChip(r.category) + '</td>' +
+          '<td class="test">' + (r.test ? esc(r.test) : '—') + '</td>' +
+          '<td class="succ">' + (r.success ? esc(r.success) : '—') + '</td>' +
+          '<td class="soon">—</td><td class="soon">—</td><td class="soon">—</td>' +
+        '</tr>';
+      });
+    });
+    mount.innerHTML = '<div class="tbl-head"><span class="title">Antaganden</span></div>' +
+      '<div class="tbl-card"><div class="tbl-scroll"><table class="assum">' + head + '<tbody>' + body + '</tbody></table></div></div>';
+  }
 
   function ostSetCut(container, cut){
     var data = container.__ostData;
