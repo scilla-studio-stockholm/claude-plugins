@@ -1342,11 +1342,6 @@
     html += '</ul></div>';
 
     container.innerHTML = html;
-
-    container.addEventListener('click', function (e) {
-      var b = e.target.closest('.link-tab');
-      if (b && b.dataset.goto) switchView(b.dataset.goto);
-    });
   }
 
   // === Header ===
@@ -2300,6 +2295,13 @@
     }
 
     buildTabs(roundData.files);
+
+    // One-time delegated handler for Overview's tab-guide links (avoids
+    // re-attaching a listener on every Overview render).
+    document.getElementById('view-container').addEventListener('click', function (e) {
+      var b = e.target.closest('.link-tab');
+      if (b && b.dataset.goto) switchView(b.dataset.goto);
+    });
 
     switchView('overview');
   }
