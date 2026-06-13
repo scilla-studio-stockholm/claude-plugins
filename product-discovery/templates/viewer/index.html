@@ -9,6 +9,44 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <style>
+  /* === OST tokens + shorthand variables (not in tokens.css) === */
+  :root {
+    --font-mono: ui-monospace,'SF Mono','Menlo','Consolas',monospace;
+    --r-sm: .5rem; --r-md: 1rem; --r-lg: 1.5rem; --r-pill: 9999px;
+    --shadow-sm: 0 1px 2px 0 rgba(0,0,0,.05);
+    --shadow-md: 0 2px 4px 0 rgba(40,40,40,.15);
+    --shadow-lg: 0 4px 7px 0 rgba(40,40,40,.2);
+    --brutal-sm: 2px 2px 0 var(--sc-blue-monday);
+    --brutal-md: 4px 4px 0 var(--sc-blue-monday);
+    --t-fast: .15s ease;
+
+    /* ---- OST-specific, remappable color tokens ---- */
+    --ost-connector: var(--sc-purple-rain);     /* orthogonal edge ink */
+    --ost-line-w: 2px;                           /* edge stroke width   */
+    --ost-conn-zone: 30px;                       /* vertical connector gutter */
+    --ost-sib-gap: 18px;                         /* gap between siblings */
+
+    --ost-band-outcome: #FFF6D6;                 /* PRODUCT OUTCOME band */
+    --ost-band-opp: #E2F4EE;                     /* MÖJLIGHETER band     */
+    --ost-band-sol: #FBF4DF;                     /* LÖSNINGAR band       */
+
+    --ost-node-outcome-bg: #F4DB6B;              /* filled yellow lozenge */
+    --ost-node-outcome-bd: #DCBE3F;
+    --ost-node-opp-bg: #EAF8F3;                  /* outlined teal pill    */
+    --ost-node-opp-bd: #5FBBA6;
+    --ost-node-sol-bg: #FBEFC9;                  /* cream solution pill   */
+    --ost-node-sol-bd: #E0CB8A;
+    --ost-chosen: var(--sc-blue-monday);         /* "chosen path" accent  */
+
+    --ost-typ-anv: #E6DEF7;   /* Användbarhet  — purple */
+    --ost-typ-gen: #D7E2FF;   /* Genomförbarhet — blue  */
+    --ost-typ-lon: #C9ECE0;   /* Lönsamhet     — green  */
+    --ost-typ-ons: #FBEBB0;   /* Önskvärdhet   — yellow */
+    --ost-typ-ovr: #E2E2E2;   /* Övrigt        — grey   */
+
+    --ost-gutter: 172px;
+  }
+
   /* === Base === */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1125,6 +1163,225 @@
     .swim-col-head { position: static; }
     .swim-grid { grid-template-columns: repeat(var(--col-count), minmax(0, 1fr)); }
   }
+
+  /* ===== OST Tree view ===== */
+
+  /* Board + bands */
+  .board{
+    position:relative;display:flex;align-items:stretch;
+    background:var(--sc-grey-0);
+    border:1px solid var(--sc-purple-mountains);
+    border-radius:var(--r-lg);
+    box-shadow:var(--shadow-md);
+    overflow:hidden;
+  }
+  .bandbg{position:absolute;inset:0;z-index:0;pointer-events:none;}
+  .bandbg .stripe{position:absolute;left:0;right:0;}
+  .bandbg .stripe + .stripe{border-top:1px dashed rgba(46,44,134,.18);}
+
+  .gutter{
+    position:relative;z-index:2;flex:0 0 var(--ost-gutter);
+    border-right:1px dashed rgba(46,44,134,.18);
+  }
+  .bandlabel{
+    position:absolute;left:clamp(.9rem,2vw,1.4rem);
+    font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+    font-style:italic;color:var(--sc-purple-rain);max-width:calc(var(--ost-gutter) - 1.6rem);
+    line-height:1.25;
+  }
+  .bandlabel small{display:block;font-style:normal;font-weight:500;letter-spacing:0;
+    text-transform:none;color:var(--sc-grey-500);font-size:.66rem;margin-top:.15rem;}
+
+  .canvas{
+    position:relative;z-index:1;flex:1 1 auto;min-width:0;
+    overflow-x:auto;overflow-y:hidden;
+    display:flex;justify-content:safe center;
+  }
+  .tree-wrap{padding:30px 44px 44px;flex:0 0 auto;}
+
+  /* Pure-CSS tree */
+  .tree,.tree ul{position:relative;display:flex;justify-content:center;margin:0;padding:0;list-style:none;}
+  .tree ul{padding-top:var(--ost-conn-zone);}
+  /* down-stem from a parent into its children's bus */
+  .tree ul::before{
+    content:"";position:absolute;top:0;left:50%;width:0;height:var(--ost-conn-zone);
+    border-left:var(--ost-line-w) solid var(--ost-connector);
+  }
+  .tree li{
+    position:relative;display:flex;flex-direction:column;align-items:center;
+    padding:var(--ost-conn-zone) var(--ost-sib-gap) 0;
+  }
+  /* the horizontal bus over each sibling */
+  .tree li::before,.tree li::after{
+    content:"";position:absolute;top:0;width:50%;height:var(--ost-conn-zone);
+    border-top:var(--ost-line-w) solid var(--ost-connector);
+  }
+  .tree li::before{right:50%;}
+  .tree li::after{left:50%;}
+  .tree li:first-child::before,.tree li:last-child::after{border:0;}
+  .tree li:last-child::before{border-right:var(--ost-line-w) solid var(--ost-connector);}
+  .tree li:first-child::after{border-left:var(--ost-line-w) solid var(--ost-connector);}
+  /* single child → straight vertical line, no bus */
+  .tree li:only-child{padding-top:var(--ost-conn-zone);}
+  .tree li:only-child::before,.tree li:only-child::after{display:none;}
+  /* the root node carries no incoming edge */
+  .tree>li{padding-top:0;}
+  .tree>li::before,.tree>li::after{display:none;}
+
+  /* Nodes */
+  .node{
+    position:relative;box-sizing:border-box;text-align:center;
+    font-size:.8rem;font-weight:600;line-height:1.32;color:var(--sc-grey-900);
+    background:var(--sc-grey-0);border-radius:var(--r-pill);
+    padding:.6rem 1.05rem;
+  }
+  /* arrowhead pointing into a node */
+  .node.arr::before{
+    content:"";position:absolute;left:50%;top:-9px;transform:translateX(-50%);
+    width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;
+    border-top:8px solid var(--ost-connector);
+  }
+  .n-outcome{
+    background:var(--ost-node-outcome-bg);border:2px solid var(--ost-node-outcome-bd);
+    border-radius:var(--r-lg);max-width:340px;font-weight:700;padding:.95rem 1.35rem;
+    font-size:.86rem;color:var(--sc-grey-900);box-shadow:var(--shadow-sm);
+  }
+  .n-opp{
+    background:var(--ost-node-opp-bg);border:2px solid var(--ost-node-opp-bd);
+    max-width:210px;color:var(--sc-grey-900);border-radius:var(--r-md);
+  }
+  .n-opp.sub{max-width:188px;font-size:.74rem;padding:.5rem .85rem;}
+  .n-opp.muted{opacity:.62;}
+  .n-opp.muted .node-tag{opacity:.7;}
+  .n-opp.chosen{
+    border-color:var(--ost-chosen);box-shadow:var(--brutal-md);
+    background:#E6F6FF;
+  }
+  .n-sol{
+    background:var(--ost-node-sol-bg);border:1.5px solid var(--ost-node-sol-bd);
+    max-width:198px;font-size:.78rem;padding:.55rem .9rem;
+  }
+  .node-tag{
+    display:inline-block;font-family:var(--font-mono);font-weight:700;font-size:.72em;
+    margin-right:.35em;color:var(--sc-purple-rain);
+  }
+  .n-sol .node-tag{color:#9A7B1E;}
+  /* chosen badge */
+  .badge{
+    position:absolute;top:-10px;right:-8px;
+    font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--sc-pink-moon);background:var(--ost-chosen);
+    padding:.12rem .45rem;border-radius:var(--r-pill);box-shadow:var(--shadow-sm);
+  }
+  /* dashed placeholder (empty state) */
+  .n-empty{
+    background:transparent;border:2px dashed var(--sc-grey-300);color:var(--sc-grey-500);
+    font-weight:500;font-size:.78rem;max-width:210px;font-style:italic;
+  }
+  .tree li.empty-stub::before,.tree li.empty-stub::after{border-style:dashed;opacity:.6;}
+  .tree li.empty-stub > ul::before{border-style:dashed;}
+
+  /* Assumption table */
+  .antaganden{margin-top:1.6rem;}
+  .antaganden.hidden{display:none;}
+  .tbl-head{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:.75rem;}
+  .tbl-head .title{
+    font-size:1.05rem;font-weight:700;font-style:italic;letter-spacing:.04em;
+    text-transform:uppercase;color:var(--sc-purple-rain);
+  }
+  .legend{display:flex;gap:.4rem;flex-wrap:wrap;margin-left:auto;}
+  .legend .chip-typ{font-size:.66rem;}
+
+  .tbl-card{
+    background:var(--sc-grey-0);border:1px solid var(--sc-purple-mountains);
+    border-radius:var(--r-lg);box-shadow:var(--shadow-md);overflow:hidden;
+  }
+  .tbl-scroll{overflow-x:auto;}
+  table.assum{border-collapse:collapse;width:100%;min-width:1120px;font-size:.8rem;}
+  table.assum thead th{
+    text-align:left;font-weight:600;font-size:.7rem;letter-spacing:.04em;
+    color:var(--sc-grey-700);background:var(--sc-grey-50);
+    padding:.7rem .8rem;border-bottom:2px solid var(--sc-purple-mountains);
+    white-space:nowrap;vertical-align:bottom;position:sticky;top:0;
+  }
+  table.assum thead th .ico{color:var(--sc-grey-400);font-weight:700;margin-right:.3em;}
+  th.soon,td.soon{background:repeating-linear-gradient(45deg,var(--sc-grey-50),var(--sc-grey-50) 6px,#F0F0F0 6px,#F0F0F0 12px);color:var(--sc-grey-400);}
+  th.soon{color:var(--sc-grey-400);}
+  th.soon .tag{
+    display:block;font-style:italic;font-weight:500;letter-spacing:0;text-transform:none;
+    font-size:.62rem;color:var(--sc-grey-400);margin-top:.15rem;
+  }
+  td.soon{font-style:italic;text-align:center;}
+
+  table.assum tbody td{
+    padding:.7rem .8rem;border-bottom:1px solid var(--sc-grey-100);vertical-align:top;
+    line-height:1.4;color:var(--sc-grey-800);
+  }
+  td.idx{color:var(--sc-grey-400);font-variant-numeric:tabular-nums;width:34px;text-align:right;padding-right:.6rem;}
+  td.assum-txt{min-width:240px;font-weight:500;color:var(--sc-grey-900);}
+  td.test,td.succ{min-width:190px;color:var(--sc-grey-700);font-size:.78rem;}
+
+  tr.grp td{
+    background:var(--sc-grey-50);border-bottom:1px solid var(--sc-purple-mountains);
+    padding:.55rem .8rem;
+  }
+  .grp-label{display:flex;align-items:center;gap:.55rem;font-weight:600;color:var(--sc-grey-800);font-size:.8rem;}
+  .grp-label .node-tag{font-size:.78rem;color:#9A7B1E;}
+  .grp-count{margin-left:auto;font-size:.68rem;font-weight:500;color:var(--sc-grey-500);letter-spacing:.02em;}
+
+  tr.risky td{background:rgba(255,64,64,.05);}
+  tr.risky td.idx{position:relative;}
+  tr.risky td.idx::before{
+    content:"";position:absolute;left:0;top:6px;bottom:6px;width:3px;
+    background:var(--sc-red-right-hand);border-radius:2px;
+  }
+
+  /* chips */
+  .chip{display:inline-flex;align-items:center;gap:.3rem;border-radius:var(--r-pill);
+    font-size:.72rem;font-weight:600;padding:.18rem .55rem;white-space:nowrap;}
+  .chip-sol{font-family:var(--font-mono);background:rgba(0,34,255,.08);color:var(--sc-blue-monday);font-weight:700;font-size:.74rem;}
+  .chip-risk.high{background:var(--sc-coral-bracelet);color:#5A1410;}
+  .chip-risk.low{background:var(--sc-grey-100);color:var(--sc-grey-600);}
+  .chip-risk .dot{width:6px;height:6px;border-radius:50%;}
+  .chip-risk.high .dot{background:#B3261E;}
+  .chip-typ{font-weight:500;color:var(--sc-grey-800);}
+  .chip-typ.anv{background:var(--ost-typ-anv);}
+  .chip-typ.gen{background:var(--ost-typ-gen);}
+  .chip-typ.lon{background:var(--ost-typ-lon);}
+  .chip-typ.ons{background:var(--ost-typ-ons);}
+  .chip-typ.ovr{background:var(--ost-typ-ovr);}
+
+  .tbl-empty{padding:2.4rem 1rem;text-align:center;color:var(--sc-grey-500);font-style:italic;font-size:.88rem;}
+  .tbl-empty .ic{font-size:1.4rem;display:block;margin-bottom:.4rem;opacity:.5;}
+
+  /* Segmented toggle (renamed .seg → .ost-seg to avoid chrome collisions) */
+  .ost-seg{
+    display:inline-flex;gap:0;
+    background:var(--sc-grey-0);
+    border:var(--ost-line-w) solid var(--sc-blue-monday);
+    border-radius:var(--r-pill);
+    padding:4px;
+    box-shadow:var(--brutal-sm);
+  }
+  .ost-seg button{
+    font-family:inherit;font-size:.82rem;font-weight:600;
+    border:none;background:transparent;color:var(--sc-blue-monday);
+    padding:.5rem 1.1rem;border-radius:var(--r-pill);cursor:pointer;
+    display:inline-flex;align-items:center;gap:.45rem;
+    transition:background var(--t-fast),color var(--t-fast);white-space:nowrap;
+  }
+  .ost-seg button .dir{font-family:var(--font-mono);opacity:.55;font-weight:700;}
+  .ost-seg button:hover:not(.active){background:rgba(0,34,255,.06);}
+  .ost-seg button.active{background:var(--sc-blue-monday);color:var(--sc-pink-moon);}
+  .ost-seg button.active .dir{opacity:.8;color:var(--sc-pink-moon);}
+
+  /* Two-axis risk chips */
+  .chip-axis{font-weight:600;font-size:.72rem;}
+  .chip-axis.hi{background:var(--ost-typ-ons);color:#6b5800;}
+  .chip-axis.lo{background:var(--sc-grey-100);color:var(--sc-grey-600);}
+  .flag-riskiest{display:inline-flex;align-items:center;gap:.3rem;font-size:.66rem;font-weight:700;
+    text-transform:uppercase;letter-spacing:.04em;color:#B3261E;}
+  .flag-riskiest::before{content:"⚑";}
 </style>
 </head>
 <body>
@@ -1161,6 +1418,7 @@
   // === View registry ===
 
   var views = {
+    'tree':                        { label: 'Tree', render: renderTree, synthetic: true },
     'overview':                    { label: 'Overview',           render: renderOverview, synthetic: true },
     'decisions.json':              { label: 'Decisions',          render: renderDecisions },
     'comparison-matrix.json':      { label: 'Comparison Matrix',  render: renderComparisonMatrix },
@@ -1218,6 +1476,11 @@
       return;
     }
 
+    if (filename === 'tree') {
+      await entry.render(roundData, container);
+      return;
+    }
+
     if (filename === 'decisions.json') {
       entry.render(roundData.decisions, container);
       injectGuide(filename, container);
@@ -1271,6 +1534,289 @@
     if (!g) return;
     var banner = '<aside class="view-guide"><h3>' + esc(g.title) + '</h3><p>' + g.body + '</p></aside>';
     container.insertAdjacentHTML('afterbegin', banner);
+  }
+
+  // === Tree data layer ===
+
+  function buildOpportunityTree(clustered, chosenId) {
+    var flat = [];
+    (clustered.phases || []).forEach(function (ph) {
+      (ph.opportunities || []).forEach(function (o) { flat.push(o); });
+    });
+    var keep = flat.filter(function (o) { return o.verdict === 'approved' || o.id === chosenId; });
+    var byId = {};
+    keep.forEach(function (o) {
+      byId[o.id] = { id: o.id, text: o.quote, chosen: o.id === chosenId, children: [] };
+    });
+    var roots = [];
+    keep.forEach(function (o) {
+      var node = byId[o.id];
+      if (o.parent_id && byId[o.parent_id]) byId[o.parent_id].children.push(node);
+      else roots.push(node);
+    });
+    return roots;
+  }
+
+  async function loadTreeData(roundData) {
+    var base = roundData.basePath + '/_working/';
+    var clustered = await loadJSON(base + 'experience-map-clustered.json');
+    var top3 = await loadJSON(base + 'top-three-solutions.json');
+    // Assumptions: riskiest-assumptions.json carries ALL assumptions with risk axes
+    // (importance/evidence/is_riskiest); validation-experiments.json carries test cards
+    // for the riskiest subset only. Use the fullest row set as the base and merge in the
+    // test cards by assumption id, so the table shows every assumption with Testmetod/
+    // Framgångskriterier sparse (present on riskiest rows only).
+    var riskiest = await loadJSON(base + 'riskiest-assumptions.json');
+    var validation = await loadJSON(base + 'validation-experiments.json');
+    var categorized = await loadJSON(base + 'assumptions-categorized.json');
+    var rowsSource = riskiest || validation || categorized;
+    var testById = {};
+    if (validation) {
+      (validation.assumptions_per_solution || []).forEach(function (s) {
+        (s.assumptions || []).forEach(function (a) {
+          if (a.recommended_test) testById[a.id] = a.recommended_test;
+        });
+      });
+    }
+    var assumBlocks = rowsSource ? (rowsSource.assumptions_per_solution || []) : [];
+    assumBlocks.forEach(function (s) {
+      (s.assumptions || []).forEach(function (a) {
+        if (!a.recommended_test && testById[a.id]) a.recommended_test = testById[a.id];
+      });
+    });
+    var d = roundData.decisions || {};
+    var chosenId = d.decided && d.decided.opportunity ? d.decided.opportunity.id : null;
+    var picks = (top3 && top3.picks) || (d.decided && d.decided.solutions && d.decided.solutions.picks) || [];
+    return {
+      outcome: d.product_outcome || (clustered && clustered.product_outcome) || '',
+      oppRoots: clustered ? buildOpportunityTree(clustered, chosenId) : [],
+      chosenId: chosenId,
+      solutions: picks,
+      assumBlocks: assumBlocks,
+      hasOpp: !!chosenId
+    };
+  }
+
+  // === Tree (synthetic landing view) ===
+
+  function ostOutcomeNode(text){ return '<div class="node n-outcome">' + esc(text) + '</div>'; }
+  function ostOppNode(o, variant){
+    var cls = ['node','n-opp','arr'];
+    if (variant === 'sub') cls.push('sub');
+    if (o.chosen) cls.push('chosen'); else if (variant !== 'solo') cls.push('muted');
+    var badge = o.chosen ? '<span class="badge">Vald</span>' : '';
+    return '<div class="' + cls.join(' ') + '">' + badge + esc(o.text) + '</div>';
+  }
+  function ostSolNode(s, i){
+    return '<div class="node n-sol arr"><span class="node-tag">S' + (i+1) + '</span>' + esc(s.title) + '</div>';
+  }
+
+  function ostOppLi(node){
+    var subs = (node.children || []).map(function (c){
+      return '<li data-band="opp">' + ostOppNode(c, 'sub') + '</li>';
+    }).join('');
+    var subUl = subs ? '<ul>' + subs + '</ul>' : '';
+    return '<li data-band="opp">' + ostOppNode(node) + subUl + '</li>';
+  }
+
+  function ostCenterRoot(canvas){
+    if(!canvas) return;
+    var node = canvas.querySelector('.n-outcome');
+    if(!node || canvas.scrollWidth <= canvas.clientWidth) return;
+    var cr = canvas.getBoundingClientRect(), nr = node.getBoundingClientRect();
+    canvas.scrollLeft = (nr.left - cr.left) + canvas.scrollLeft + nr.width/2 - canvas.clientWidth/2;
+  }
+
+  function ostLayoutBands(board, bands){
+    var br = board.getBoundingClientRect();
+    var groups = {};
+    board.querySelectorAll('[data-band]').forEach(function(el){
+      var node = el.querySelector(':scope > .node');
+      if(!node) return;
+      var r = node.getBoundingClientRect();
+      var top = r.top - br.top, bot = r.bottom - br.top;
+      var k = el.getAttribute('data-band');
+      if(!groups[k]) groups[k] = {min:Infinity, max:-Infinity};
+      groups[k].min = Math.min(groups[k].min, top);
+      groups[k].max = Math.max(groups[k].max, bot);
+    });
+
+    var present = bands.filter(function(b){ return groups[b.key]; });
+    if(!present.length) return;
+    var boardH = board.clientHeight;
+    var bounds = [0];
+    for(var i=0; i<present.length-1; i++){
+      var a = groups[present[i].key].max;
+      var b = groups[present[i+1].key].min;
+      bounds.push((a+b)/2);
+    }
+    bounds.push(boardH);
+
+    var bg = board.querySelector('.bandbg');
+    var colors = {outcome:'var(--ost-band-outcome)', opp:'var(--ost-band-opp)', sol:'var(--ost-band-sol)'};
+    bg.innerHTML = present.map(function(b,i){
+      return '<div class="stripe" style="top:'+bounds[i]+'px;height:'+(bounds[i+1]-bounds[i])+'px;background:'+colors[b.key]+'"></div>';
+    }).join('');
+
+    var gutter = board.querySelector('.gutter');
+    gutter.innerHTML = present.map(function(b,i){
+      return '<div class="bandlabel" style="top:'+(bounds[i]+16)+'px">'+esc(b.label)+(b.sub?'<small>'+esc(b.sub)+'</small>':'')+'</div>';
+    }).join('');
+  }
+
+  function ostRenderSeg(cut){
+    document.getElementById('ost-seg').innerHTML =
+      '<button data-cut="h" class="' + (cut==='h'?'active':'') + '">Opportunity space</button>' +
+      '<button data-cut="v" class="' + (cut==='v'?'active':'') + '"><span class="dir">↧</span> Chosen branch</button>';
+  }
+
+  var OST_CAT = { desirability:['Önskvärdhet','ons'], usability:['Användbarhet','anv'],
+    feasibility:['Genomförbarhet','gen'], viability:['Lönsamhet','lon'], other:['Övrigt','ovr'] };
+  function ostCatChip(c){ var m = OST_CAT[c] || ['—','ovr'];
+    return '<span class="chip chip-typ ' + m[1] + '">' + esc(m[0]) + '</span>'; }
+  function ostAxisChip(val, hiWord){
+    if(!val) return '<span class="chip chip-axis lo">—</span>';
+    var hi = (val === hiWord);
+    var sv = ({high:'Hög',low:'Låg',strong:'Starkt',weak:'Svagt'})[val] || val;
+    return '<span class="chip chip-axis ' + (hi?'hi':'lo') + '">' + sv + '</span>';
+  }
+
+  function buildAssumptionRows(blocks){
+    return (blocks||[]).map(function(b){
+      return { solId: b.solution_id, solTitle: b.solution_title,
+        rows: (b.assumptions||[]).map(function(a){
+          return { text:a.text, category:a.category,
+            importance:a.importance||null, evidence:a.evidence||null,
+            riskiest:!!a.is_riskiest,
+            test:a.recommended_test ? a.recommended_test.test_type : null,
+            success:a.recommended_test ? a.recommended_test.success_criteria : null };
+        }) };
+    });
+  }
+
+  function ostRenderTable(data, mount){
+    var groups = buildAssumptionRows(data.assumBlocks);
+    var SOON = ['Status','Issue ID','Insikter'];
+    var COLS = ['Antagande','Lösning','Betydelse','Bevis','Riskigast','Typ av antagande','Testmetod','Framgångskriterier'];
+    if(!groups.length){
+      mount.innerHTML = '<div class="tbl-head"><span class="title">Antaganden</span></div>' +
+        '<div class="tbl-card"><div class="tbl-empty">Inga antaganden ännu — kör fas 3.</div></div>';
+      return;
+    }
+    var solIndex = {};
+    data.solutions.forEach(function(s,i){ solIndex[s.id] = 'S' + (i+1); });
+    var head = '<thead><tr><th class="idx"></th>' +
+      COLS.map(function(h){ return '<th>' + esc(h) + '</th>'; }).join('') +
+      SOON.map(function(h){ return '<th class="soon">' + esc(h) + '<span class="tag">(coming soon)</span></th>'; }).join('') +
+      '</tr></thead>';
+    var n = 0, body = '';
+    groups.forEach(function(g){
+      body += '<tr class="grp"><td colspan="' + (1+COLS.length+SOON.length) + '">' +
+        '<div class="grp-label"><span class="node-tag">' + esc(solIndex[g.solId]||'') + '</span>' + esc(g.solTitle) +
+        '<span class="grp-count">' + g.rows.length + ' antaganden</span></div></td></tr>';
+      if(!g.rows.length){
+        body += '<tr><td class="idx"></td><td colspan="' + (COLS.length+SOON.length) + '" style="color:var(--sc-grey-400);font-style:italic;">Inga antaganden ännu för den här lösningen.</td></tr>';
+        return;
+      }
+      g.rows.forEach(function(r){
+        n++;
+        body += '<tr class="' + (r.riskiest?'risky':'') + '">' +
+          '<td class="idx">' + n + '</td>' +
+          '<td class="assum-txt">' + esc(r.text) + '</td>' +
+          '<td><span class="chip chip-sol">' + esc(solIndex[g.solId]||'') + '</span></td>' +
+          '<td>' + ostAxisChip(r.importance,'high') + '</td>' +
+          '<td>' + ostAxisChip(r.evidence,'strong') + '</td>' +
+          '<td>' + (r.riskiest ? '<span class="flag-riskiest">Riskigast</span>' : '') + '</td>' +
+          '<td>' + ostCatChip(r.category) + '</td>' +
+          '<td class="test">' + (r.test ? esc(r.test) : '—') + '</td>' +
+          '<td class="succ">' + (r.success ? esc(r.success) : '—') + '</td>' +
+          '<td class="soon">—</td><td class="soon">—</td><td class="soon">—</td>' +
+        '</tr>';
+      });
+    });
+    mount.innerHTML = '<div class="tbl-head"><span class="title">Antaganden</span></div>' +
+      '<div class="tbl-card"><div class="tbl-scroll"><table class="assum">' + head + '<tbody>' + body + '</tbody></table></div></div>';
+  }
+
+  function ostSetCut(container, cut){
+    var data = container.__ostData;
+    ostRenderSeg(cut);
+    var wrap = document.getElementById('ost-treewrap');
+    var board = document.getElementById('ost-board');
+    var bands;
+    if(cut==='h'){
+      ostRenderHorizontal(data, wrap);
+      bands = [{key:'outcome',label:'Product outcome'},{key:'opp',label:'Möjligheter',sub:'opportunities'}];
+      document.getElementById('ost-antaganden').classList.add('hidden');
+    } else {
+      ostRenderVertical(data, wrap);
+      bands = [{key:'outcome',label:'Product outcome'},{key:'opp',label:'Möjligheter',sub:'opportunity'},{key:'sol',label:'Lösningar',sub:'solutions'}];
+      ostRenderTable(data, document.getElementById('ost-antaganden'));
+      document.getElementById('ost-antaganden').classList.remove('hidden');
+    }
+    ostLayoutBands(board, bands);
+    ostCenterRoot(board.querySelector('.canvas'));
+    container.__ostCut = cut;
+  }
+
+  function ostRenderHorizontal(data, mount){
+    var childLis = data.oppRoots.map(ostOppLi).join('');
+    mount.innerHTML =
+      '<ul class="tree"><li data-band="outcome">' + ostOutcomeNode(data.outcome) +
+      '<ul>' + childLis + '</ul></li></ul>';
+  }
+
+  function ostRenderVertical(data, mount){
+    var chosen = null;
+    (function find(ns){ (ns||[]).forEach(function(n){ if(n.chosen) chosen = n; find(n.children); }); })(data.oppRoots);
+    var chosenNode = chosen
+      ? ostOppNode(chosen, 'solo')
+      : '<div class="node n-empty arr">Ingen opportunity vald ännu</div>';
+
+    var leaves;
+    if (data.solutions.length){
+      leaves = '<ul>' + data.solutions.map(function(s,i){
+        return '<li data-band="sol">' + ostSolNode(s, i) + '</li>';
+      }).join('') + '</ul>';
+    } else {
+      leaves = '<ul><li class="empty-stub" data-band="sol">' +
+        '<div class="node n-empty arr">Inga lösningar ännu — välj top-3 för att gå vidare</div></li></ul>';
+    }
+
+    mount.innerHTML =
+      '<ul class="tree"><li data-band="outcome">' + ostOutcomeNode(data.outcome) +
+      '<ul><li data-band="opp">' + chosenNode + leaves + '</li></ul></li></ul>';
+  }
+
+  async function renderTree(roundData, container){
+    var data = await loadTreeData(roundData);
+    container.innerHTML =
+      '<div class="ost-tree-tab">' +
+        '<aside class="view-guide"><h3>How to read this</h3><p>The Opportunity Solution Tree. <b>Opportunity space</b> shows every opportunity branching off the outcome (the chosen one is marked “Vald”). <b>Chosen branch</b> drills the chosen opportunity down through the top‑3 solutions to the assumptions that must hold. Switch with the toggle.</p></aside>' +
+        '<div class="ost-seg" id="ost-seg"></div>' +
+        '<div class="board" id="ost-board">' +
+          '<div class="bandbg"></div><div class="gutter"></div>' +
+          '<div class="canvas"><div class="tree-wrap" id="ost-treewrap"></div></div>' +
+        '</div>' +
+        '<div class="antaganden" id="ost-antaganden"></div>' +
+      '</div>';
+    container.__ostData = data;
+    var defaultCut = data.hasOpp ? 'v' : 'h';
+    document.getElementById('ost-seg').addEventListener('click', function(e){
+      var b = e.target.closest('[data-cut]');
+      if(b) ostSetCut(container, b.dataset.cut);
+    });
+    if(!window.__ostResizeBound){
+      window.__ostResizeBound = true;
+      window.addEventListener('resize', function(){
+        clearTimeout(window.__ostT);
+        window.__ostT = setTimeout(function(){
+          var c = document.querySelector('.ost-tree-tab');
+          if(c && c.parentElement && c.parentElement.__ostData) ostSetCut(c.parentElement, c.parentElement.__ostCut || 'h');
+        }, 120);
+      });
+    }
+    ostSetCut(container, defaultCut);
   }
 
   // === Overview (synthetic landing view) ===
@@ -1625,7 +2171,22 @@
   }
 
   function renderRiskiest(json, container) {
-    var assumptions = json.assumptions || [];
+    // v0.2 nests assumptions under assumptions_per_solution[]; fall back to the
+    // older flat top-level `assumptions` array if that's all that's present.
+    var assumptions = [];
+    if (json.assumptions_per_solution) {
+      json.assumptions_per_solution.forEach(function (s) {
+        (s.assumptions || []).forEach(function (a) {
+          assumptions.push({
+            id: a.id, text: a.text, category: a.category,
+            importance: a.importance, evidence: a.evidence,
+            solution_id: s.solution_id
+          });
+        });
+      });
+    } else {
+      assumptions = json.assumptions || [];
+    }
     var html = '<div class="view-section"><h2>Riskiest Assumptions</h2>';
 
     var highWeak = [], highStrong = [], lowWeak = [], lowStrong = [];
@@ -1666,14 +2227,32 @@
   }
 
   function renderExperiments(json, container) {
+    // v0.2 nests one recommended_test per riskiest assumption under
+    // assumptions_per_solution[].assumptions[]; fall back to a flat top-level
+    // `test_cards` array if that's the shape present.
     var cards = json.test_cards || [];
+    if (!cards.length && json.assumptions_per_solution) {
+      json.assumptions_per_solution.forEach(function (s) {
+        (s.assumptions || []).forEach(function (a) {
+          var rt = a.recommended_test;
+          if (rt) {
+            cards.push({
+              test_type: rt.test_type, assumption_id: a.id, assumption_text: a.text,
+              solution_id: s.solution_id, hypothesis: rt.hypothesis, metric: rt.metric,
+              success_criteria: rt.success_criteria,
+              estimated_cost: rt.estimated_cost, estimated_time: rt.estimated_time
+            });
+          }
+        });
+      });
+    }
     var html = '<div class="view-section"><h2>Validation Experiments (' + cards.length + ')</h2>';
 
     cards.forEach(function (tc) {
       html += '<div class="test-card">';
       html += '<h3>' + esc(tc.test_type || 'Test') + '</h3>';
       html += '<dl>';
-      html += '<dt>Assumption</dt><dd>' + esc(tc.assumption_id || '') + '</dd>';
+      html += '<dt>Assumption</dt><dd>' + esc(tc.assumption_text || tc.assumption_id || '') + '</dd>';
       html += '<dt>Hypothesis</dt><dd>' + esc(tc.hypothesis || '') + '</dd>';
       html += '<dt>Metric</dt><dd>' + esc(tc.metric || '') + '</dd>';
       html += '<dt>Success criteria</dt><dd>' + esc(tc.success_criteria || '') + '</dd>';
@@ -2303,7 +2882,7 @@
       if (b && b.dataset.goto) switchView(b.dataset.goto);
     });
 
-    switchView('overview');
+    switchView('tree');
   }
 
   main();
