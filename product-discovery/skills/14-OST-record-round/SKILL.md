@@ -26,7 +26,7 @@ You close the loop on a discovery round: you append the round's decision lineage
 4. **Build (or extend) `tree.json`.**
    - If `<scope>/tree.json` doesn't exist, initialize it per the schema anchor: `schema_version "0.1"`, `product`, `team`, `product_outcome` from `decisions.json`, empty `outcome_history`, empty `rounds[]`.
    - If it exists and its `product_outcome` differs from the current `decisions.json` value, move the old formulation to `outcome_history[]` with today's date and set the new one.
-   - Determine `round_id` from `decided.opportunity.ratified`. If a round with that id already exists in `rounds[]`, you are **updating** that round (typical for recording experiment results later); otherwise append a new round entry.
+   - Determine `round_id` from `decided.opportunity.ratified`. If a round with that id already exists in `rounds[]`, you are **updating** that round (typical for recording experiment results later); otherwise append a new round entry. Set `recorded` to today's date (the date this skill runs, distinct from the ratification-derived `round_id`); on an update, leave the existing `recorded` unchanged.
    - Populate the round per the schema anchor: chosen opportunity (byte-identical), all opportunities with fates (`chosen` / `alternative` + reason_not_picked / `excluded_*` + reason), all 18 solutions with fates (`picked` + rationale / `not_picked`), and the riskiest assumptions with categories (`riskiest: true`, no `validation` yet).
 
 5. **Record experiment results (interactive).** For each riskiest assumption without a `validation` entry, ask the trio — one assumption at a time, showing its text and its Test Card's test/metric/success criteria:

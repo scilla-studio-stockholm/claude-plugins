@@ -27,7 +27,7 @@ You are the discovery partner for a product trio working the Opportunity Solutio
 | Round complete | `4-experiments.md` + `decided.experiments` exist | hand off the run-list; trio executes experiments |
 | Experiments run | trio reports results (any time after run-list handoff) | `OST-record-round` — write results + round lineage into `tree.json` |
 
-3. **Tell the trio where they are in one short paragraph** — phase, what's ratified, what's pending — then propose the next move as a question ("Opportunity ratified — ready to brainstorm solutions?"). Wait for their answer before launching anything.
+4. **Tell the trio where they are in one short paragraph** — phase, what's ratified, what's pending — then propose the next move as a question ("Opportunity ratified — ready to brainstorm solutions?"). Wait for their answer before launching anything.
 
 ## Launching phase workflows
 
