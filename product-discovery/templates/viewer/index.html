@@ -2171,7 +2171,22 @@
   }
 
   function renderRiskiest(json, container) {
-    var assumptions = json.assumptions || [];
+    // v0.2 nests assumptions under assumptions_per_solution[]; fall back to the
+    // older flat top-level `assumptions` array if that's all that's present.
+    var assumptions = [];
+    if (json.assumptions_per_solution) {
+      json.assumptions_per_solution.forEach(function (s) {
+        (s.assumptions || []).forEach(function (a) {
+          assumptions.push({
+            id: a.id, text: a.text, category: a.category,
+            importance: a.importance, evidence: a.evidence,
+            solution_id: s.solution_id
+          });
+        });
+      });
+    } else {
+      assumptions = json.assumptions || [];
+    }
     var html = '<div class="view-section"><h2>Riskiest Assumptions</h2>';
 
     var highWeak = [], highStrong = [], lowWeak = [], lowStrong = [];
@@ -2212,14 +2227,32 @@
   }
 
   function renderExperiments(json, container) {
+    // v0.2 nests one recommended_test per riskiest assumption under
+    // assumptions_per_solution[].assumptions[]; fall back to a flat top-level
+    // `test_cards` array if that's the shape present.
     var cards = json.test_cards || [];
+    if (!cards.length && json.assumptions_per_solution) {
+      json.assumptions_per_solution.forEach(function (s) {
+        (s.assumptions || []).forEach(function (a) {
+          var rt = a.recommended_test;
+          if (rt) {
+            cards.push({
+              test_type: rt.test_type, assumption_id: a.id, assumption_text: a.text,
+              solution_id: s.solution_id, hypothesis: rt.hypothesis, metric: rt.metric,
+              success_criteria: rt.success_criteria,
+              estimated_cost: rt.estimated_cost, estimated_time: rt.estimated_time
+            });
+          }
+        });
+      });
+    }
     var html = '<div class="view-section"><h2>Validation Experiments (' + cards.length + ')</h2>';
 
     cards.forEach(function (tc) {
       html += '<div class="test-card">';
       html += '<h3>' + esc(tc.test_type || 'Test') + '</h3>';
       html += '<dl>';
-      html += '<dt>Assumption</dt><dd>' + esc(tc.assumption_id || '') + '</dd>';
+      html += '<dt>Assumption</dt><dd>' + esc(tc.assumption_text || tc.assumption_id || '') + '</dd>';
       html += '<dt>Hypothesis</dt><dd>' + esc(tc.hypothesis || '') + '</dd>';
       html += '<dt>Metric</dt><dd>' + esc(tc.metric || '') + '</dd>';
       html += '<dt>Success criteria</dt><dd>' + esc(tc.success_criteria || '') + '</dd>';
