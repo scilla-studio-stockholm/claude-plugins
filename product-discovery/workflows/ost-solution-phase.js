@@ -90,13 +90,15 @@ Execute steps 12-15 (compose v0.1 JSON, render markdown, write paired output) of
 The three brainstorm rounds are already done. Use this collected pool verbatim (ids, roles, rounds, titles, descriptions are final — byte-identical carry-through):
 ${JSON.stringify(pool, null, 2)}
 Pull chosen_opportunity, product_outcome, and team from ${scope}/decisions.json per the skill's steps 6-7. Write ${scope}/_working/solution-candidates.json and .md per the skill's template and output principles.`,
-  { label: 'compose:solution-candidates', phase: 'Compose' })
+  { label: 'compose:solution-candidates', phase: 'Compose', model: 'haiku' })
 if (typeof compose === 'string' && compose.startsWith('ERROR')) return { stopped_at: 'compose', error: compose }
 
 // ---- Phases 3-4: Cluster (08) → Select top 3 (09) ----
+// Per-stage model (SCI-230): Cluster is mechanical grouping → sonnet; Select is
+// judgment (top-3 ranking) → inherited. Omitted model = inherit.
 const results = { brainstorm: `18 ideas (3 rounds × 3 roles × 2)`, compose }
 for (const s of [
-  { title: 'Cluster', dir: '08-OST-cluster-solutions' },
+  { title: 'Cluster', dir: '08-OST-cluster-solutions', model: 'sonnet' },
   { title: 'Select', dir: '09-OST-select-top-three-solutions' },
 ]) {
   phase(s.title)
@@ -104,7 +106,7 @@ for (const s of [
 
 Execute the skill at: ${skill(s.dir)}
 All upstream files for this round already exist under ${scope}. Default input paths apply.`,
-    { label: s.title.toLowerCase(), phase: s.title })
+    { label: s.title.toLowerCase(), phase: s.title, ...(s.model ? { model: s.model } : {}) })
   results[s.title.toLowerCase()] = r
   if (typeof r === 'string' && r.startsWith('ERROR')) {
     log(`${s.title} hard-exited — stopping the pipeline (no downstream writes)`)
