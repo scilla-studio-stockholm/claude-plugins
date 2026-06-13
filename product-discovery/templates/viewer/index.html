@@ -115,6 +115,112 @@
     margin-top: var(--sc-spacing-xs);
   }
 
+  /* === Reading-guidance banner === */
+  .view-guide {
+    background: var(--sc-blue-nile, #eef2fb);
+    border: var(--sc-border-width-subtle) solid var(--sc-blue-monday);
+    border-left-width: 3px;
+    border-radius: var(--sc-radius-sm);
+    padding: var(--sc-spacing-xs) var(--sc-spacing-md);
+    margin-bottom: var(--sc-spacing-md);
+  }
+
+  .view-guide h3 {
+    font-size: var(--sc-font-size-xs);
+    font-weight: var(--sc-font-weight-semi);
+    text-transform: uppercase;
+    letter-spacing: var(--sc-letter-spacing-wide);
+    color: var(--sc-blue-monday);
+    margin-bottom: 4px;
+  }
+
+  .view-guide p {
+    font-size: var(--sc-font-size-sm);
+    color: var(--sc-grey-800);
+    line-height: var(--sc-line-height-relaxed);
+  }
+
+  .view-guide code {
+    font-size: var(--sc-font-size-xs);
+    background: var(--sc-grey-0);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  .view-guide .score-pill { vertical-align: baseline; }
+
+  /* === Overview === */
+  .overview-lead {
+    font-size: var(--sc-font-size-body);
+    color: var(--sc-grey-800);
+    max-width: 70ch;
+    margin-bottom: var(--sc-spacing-sm);
+  }
+
+  .overview-next {
+    font-size: var(--sc-font-size-sm);
+    color: var(--sc-grey-700);
+    margin-top: var(--sc-spacing-sm);
+    padding: var(--sc-spacing-xs) var(--sc-spacing-sm);
+    background: var(--sc-grey-0);
+    border-radius: var(--sc-radius-sm);
+    border-left: 3px solid var(--sc-blue-monday);
+  }
+
+  .phase-tracker {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sc-spacing-xs);
+  }
+
+  .phase-step {
+    flex: 1 1 180px;
+    display: flex;
+    gap: var(--sc-spacing-xs);
+    align-items: flex-start;
+    padding: var(--sc-spacing-sm);
+    background: var(--sc-grey-0);
+    border: var(--sc-border-width-subtle) solid var(--sc-grey-200);
+    border-radius: var(--sc-radius-sm);
+  }
+
+  .phase-step.done { border-left: 3px solid var(--sc-essex-green, #1a5c2a); }
+  .phase-step.current { border-left: 3px solid var(--sc-blue-monday); background: var(--sc-blue-nile, #eef2fb); }
+  .phase-step.pending { opacity: 0.7; }
+
+  .phase-mark {
+    font-weight: var(--sc-font-weight-bold);
+    font-size: var(--sc-font-size-body);
+    line-height: 1.2;
+  }
+  .phase-step.done .phase-mark { color: var(--sc-essex-green, #1a5c2a); }
+  .phase-step.current .phase-mark { color: var(--sc-blue-monday); }
+  .phase-step.pending .phase-mark { color: var(--sc-grey-400); }
+
+  .phase-body { display: flex; flex-direction: column; gap: 2px; }
+  .phase-label { font-weight: var(--sc-font-weight-semi); font-size: var(--sc-font-size-sm); }
+  .phase-note { font-size: var(--sc-font-size-xs); color: var(--sc-grey-600); }
+
+  .tab-guide { list-style: none; padding: 0; }
+  .tab-guide li {
+    font-size: var(--sc-font-size-sm);
+    padding: 4px 0;
+    border-bottom: var(--sc-border-width-subtle) solid var(--sc-grey-100);
+  }
+
+  .link-tab {
+    font-family: var(--sc-font-family);
+    font-size: var(--sc-font-size-sm);
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--sc-blue-monday);
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
   /* === Common view styles === */
   .view-section {
     margin-bottom: var(--sc-spacing-lg);
@@ -1055,6 +1161,7 @@
   // === View registry ===
 
   var views = {
+    'overview':                    { label: 'Overview',           render: renderOverview, synthetic: true },
     'decisions.json':              { label: 'Decisions',          render: renderDecisions },
     'comparison-matrix.json':      { label: 'Comparison Matrix',  render: renderComparisonMatrix },
     'riskiest-assumptions.json':   { label: 'Riskiest Assumptions', render: renderRiskiest },
@@ -1074,7 +1181,7 @@
     tabBar.innerHTML = '';
     var order = Object.keys(views);
     order.forEach(function (filename) {
-      if (availableFiles.indexOf(filename) === -1) return;
+      if (!views[filename].synthetic && availableFiles.indexOf(filename) === -1) return;
       var btn = document.createElement('button');
       btn.className = 'viewer-tab';
       btn.textContent = views[filename].label;
@@ -1106,8 +1213,14 @@
     var entry = views[filename];
     if (!entry) return;
 
+    if (filename === 'overview') {
+      entry.render(roundData, container);
+      return;
+    }
+
     if (filename === 'decisions.json') {
       entry.render(roundData.decisions, container);
+      injectGuide(filename, container);
       return;
     }
 
@@ -1117,6 +1230,123 @@
       return;
     }
     entry.render(json, container);
+    injectGuide(filename, container);
+  }
+
+  // === Reading guidance (per-view "how to read this" banners) ===
+
+  var VIEW_GUIDE = {
+    'decisions.json': {
+      title: 'What this is',
+      body: 'The ratified spine of the round — the opportunity, solutions, and assumptions the trio has committed to at each gate. Everything else in this viewer is the reasoning that led here. If you disagree with a decision, this is what you edit (in <code>decisions.json</code>).'
+    },
+    'experience-map-extracted.json': {
+      title: 'How to read the journey map',
+      body: 'Each column is a phase of the customer journey, left to right; cards are steps. A blue-bordered <b>Beslut</b> card is a decision point — solid arrows follow its branches, a dashed red path is a rejection/exit, and a pill chip (e.g. “Nej → …”) marks a branch that leaves this map. This is the raw journey; opportunities get attached to it in the Experience Map tab.'
+    },
+    'experience-map-clustered.json': {
+      title: 'How to read the experience map',
+      body: 'The same journey, now with the interview-sourced <b>opportunities</b> clustered under the phase (and step) where they surface. Verdict pills: <span class="score-pill score-strong">approved</span> is well-formed, <span class="score-pill score-medium">needs_tweak</span> needs rewording, <span class="score-pill score-weak">solution_in_disguise</span> describes a fix rather than a need. Only approved ones are scored in the Comparison Matrix.'
+    },
+    'comparison-matrix.json': {
+      title: 'How to read the comparison matrix',
+      body: 'Approved opportunities scored against five Torres criteria, grouped by journey phase. Expand a card for the per-criterion rationale. Scores are qualitative, not summed: <span class="score-pill score-strong">strong</span> <span class="score-pill score-medium">medium</span> <span class="score-pill score-weak">weak</span> <span class="score-pill score-unknown">unknown</span> <span class="score-pill score-na">n/a</span>. Effort is deliberately <i>not</i> judged here. Use the filters to find strong-heavy or evidence-thin opportunities.'
+    },
+    'solution-candidates.json': {
+      title: 'How to read the solutions',
+      body: 'The divergent set for the chosen opportunity — 18 candidates from three role lenses (PM, UX, Tech Lead) over three rounds. This is breadth on purpose: no ranking yet. The trio narrows to a top 3 (see the Decisions tab) before assumptions.'
+    },
+    'riskiest-assumptions.json': {
+      title: 'How to read the riskiest-assumptions grid',
+      body: 'Every assumption behind the top-3 solutions, placed on importance (does the solution fail if this is false?) × evidence (do we already know?). The <b>red top-left quadrant — high importance, weak evidence — is what to test first</b>; that is the definition of “riskiest”. Category pills are Cagan’s product risks: <b>desirability</b> (do they want it), <b>usability</b> (can they use it), <b>feasibility</b> (can we build it), <b>viability</b> (does the business work).'
+    },
+    'validation-experiments.json': {
+      title: 'How to read the experiments',
+      body: 'One test card per riskiest assumption: the hypothesis, what you measure, and the success threshold. Run the cheapest credible test first; record what you learn back into the round (the <code>OST-record-round</code> skill writes results into the cross-round tree).'
+    }
+  };
+
+  function injectGuide(filename, container) {
+    var g = VIEW_GUIDE[filename];
+    if (!g) return;
+    var banner = '<aside class="view-guide"><h3>' + esc(g.title) + '</h3><p>' + g.body + '</p></aside>';
+    container.insertAdjacentHTML('afterbegin', banner);
+  }
+
+  // === Overview (synthetic landing view) ===
+
+  function renderOverview(round, container) {
+    var d = (round && round.decisions && round.decisions.decided) || {};
+    var files = (round && round.files) || [];
+    var has = function (f) { return files.indexOf(f) !== -1; };
+
+    // Round state, mirroring the OST-facilitator's model: each gate is reached
+    // when its decided.* entry is ratified.
+    var phases = [
+      { key: 'opportunity', label: 'Opportunity', gate: !!d.opportunity, tab: 'comparison-matrix.json',
+        done: 'Chosen opportunity ratified.', pending: 'Comparing opportunities — no opportunity ratified yet.' },
+      { key: 'solutions', label: 'Solutions', gate: !!d.solutions, tab: 'solution-candidates.json',
+        done: 'Top-3 solutions ratified.', pending: 'Brainstorming / narrowing solutions.' },
+      { key: 'assumptions', label: 'Assumptions', gate: !!d.assumptions, tab: 'riskiest-assumptions.json',
+        done: 'Riskiest assumptions ratified.', pending: 'Surfacing and scoring assumptions.' },
+      { key: 'experiments', label: 'Experiments', gate: !!d.experiments, tab: 'validation-experiments.json',
+        done: 'Validation experiments designed.', pending: 'Designing validation experiments.' }
+    ];
+    // Current phase = first whose gate isn't passed.
+    var currentIdx = phases.findIndex(function (p) { return !p.gate; });
+    if (currentIdx === -1) currentIdx = phases.length; // all gates passed
+
+    var html = '<div class="view-section">';
+    html += '<h2>This is an Opportunity Solution Tree</h2>';
+    html += '<p class="overview-lead">A discovery method (Teresa Torres): start from a measurable <b>product outcome</b>, surface customer <b>opportunities</b> from interviews, explore <b>solutions</b> for the most promising one, then de-risk by testing the <b>assumptions</b> each solution depends on. This viewer renders one round of that work. The trio decides at each gate; the AI only proposes.</p>';
+
+    if (round && round.decisions && round.decisions.product_outcome) {
+      html += '<blockquote><b>Outcome:</b> ' + esc(round.decisions.product_outcome) + '</blockquote>';
+    }
+    html += '</div>';
+
+    // Phase tracker
+    html += '<div class="view-section"><h2>Where this round is</h2><ol class="phase-tracker">';
+    phases.forEach(function (p, i) {
+      var state = p.gate ? 'done' : (i === currentIdx ? 'current' : 'pending');
+      var mark = state === 'done' ? '✓' : (state === 'current' ? '▶' : '·');
+      html += '<li class="phase-step ' + state + '">'
+        + '<span class="phase-mark">' + mark + '</span>'
+        + '<span class="phase-body"><span class="phase-label">' + esc(p.label) + '</span>'
+        + '<span class="phase-note">' + esc(p.gate ? p.done : (i === currentIdx ? p.pending : 'Not started.')) + '</span></span>'
+        + '</li>';
+    });
+    html += '</ol>';
+    if (currentIdx < phases.length) {
+      html += '<p class="overview-next">Next decision: the trio reviews and ratifies the <b>' + esc(phases[currentIdx].label.toLowerCase()) + '</b> milestone doc, then the next phase can run.</p>';
+    } else {
+      html += '<p class="overview-next">All four gates passed for this round. Record experiment results to carry learning into the next round.</p>';
+    }
+    html += '</div>';
+
+    // Tab guide
+    html += '<div class="view-section"><h2>The tabs</h2><ul class="tab-guide">';
+    var tabBlurbs = [
+      ['decisions.json', 'Decisions', 'The ratified spine — what the trio committed to.'],
+      ['experience-map-extracted.json', 'Journey Map', 'The raw customer journey: phases, steps, decision points.'],
+      ['experience-map-clustered.json', 'Experience Map', 'The journey with interview opportunities clustered onto it.'],
+      ['comparison-matrix.json', 'Comparison Matrix', 'Approved opportunities scored on five Torres criteria.'],
+      ['solution-candidates.json', 'Solutions', '18 divergent solution ideas for the chosen opportunity.'],
+      ['riskiest-assumptions.json', 'Riskiest Assumptions', 'Assumptions plotted by importance × evidence; red = test first.'],
+      ['validation-experiments.json', 'Experiments', 'A test card per riskiest assumption.']
+    ];
+    tabBlurbs.forEach(function (t) {
+      if (!has(t[0])) return;
+      html += '<li><button class="link-tab" type="button" data-goto="' + t[0] + '"><b>' + esc(t[1]) + '</b></button> — ' + esc(t[2]) + '</li>';
+    });
+    html += '</ul></div>';
+
+    container.innerHTML = html;
+
+    container.addEventListener('click', function (e) {
+      var b = e.target.closest('.link-tab');
+      if (b && b.dataset.goto) switchView(b.dataset.goto);
+    });
   }
 
   // === Header ===
@@ -2071,11 +2301,7 @@
 
     buildTabs(roundData.files);
 
-    var defaultView = roundData.files.indexOf('decisions.json') !== -1
-      ? 'decisions.json'
-      : roundData.files.find(function (f) { return views[f]; });
-
-    if (defaultView) switchView(defaultView);
+    switchView('overview');
   }
 
   main();
