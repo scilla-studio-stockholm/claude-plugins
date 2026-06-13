@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Opportunity Solution Tree</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+/* ============================================================
+   Scilla tokens (subset, inlined for a self-contained file)
+   ============================================================ */
+:root{
+  --sc-blue-monday:#0022FF;
+  --sc-blue-monday-hover:#0018CC;
+  --sc-pink-moon:#FFEBFF;
+  --sc-purple-rain:#2E2C86;
+  --sc-purple-mountains:#D8CEF2;
+  --sc-red-right-hand:#FF4040;
+  --sc-coral-bracelet:#FF8A80;
+  --sc-yellow-submarine:#FFDF49;
+  --sc-blue-christmas:#0082FC;
+  --sc-blue-nile:#D5DEFF;
+  --sc-essex-green:#44D362;
+  --sc-green-river:#B2E0D5;
+  --sc-mint-car:#E0F8EB;
+  --sc-grey-900:#282828;
+  --sc-grey-800:#404040;
+  --sc-grey-700:#585858;
+  --sc-grey-600:#707070;
+  --sc-grey-500:#888888;
+  --sc-grey-400:#A0A0A0;
+  --sc-grey-300:#B8B8B8;
+  --sc-grey-200:#D0D0D0;
+  --sc-grey-100:#F4F4F4;
+  --sc-grey-50:#FAFAFA;
+  --sc-grey-0:#FFFFFF;
+
+  --font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --font-mono:ui-monospace,'SF Mono','Menlo','Consolas',monospace;
+
+  --r-sm:.5rem; --r-md:1rem; --r-lg:1.5rem; --r-pill:9999px;
+  --shadow-sm:0 1px 2px 0 rgba(0,0,0,.05);
+  --shadow-md:0 2px 4px 0 rgba(40,40,40,.15);
+  --shadow-lg:0 4px 7px 0 rgba(40,40,40,.2);
+  --brutal-sm:2px 2px 0 var(--sc-blue-monday);
+  --brutal-md:4px 4px 0 var(--sc-blue-monday);
+  --t-fast:.15s ease;
+  --ease-expo:cubic-bezier(.16,1,.3,1);
+
+  /* ---- OST-specific, remappable color tokens ---- */
+  --ost-connector:var(--sc-purple-rain);     /* orthogonal edge ink */
+  --ost-line-w:2px;                           /* edge stroke width   */
+  --ost-conn-zone:30px;                       /* vertical connector gutter */
+  --ost-sib-gap:18px;                         /* gap between siblings */
+
+  --ost-band-outcome:#FFF6D6;                 /* PRODUCT OUTCOME band */
+  --ost-band-opp:#E2F4EE;                     /* MÖJLIGHETER band     */
+  --ost-band-sol:#FBF4DF;                     /* LÖSNINGAR band       */
+
+  --ost-node-outcome-bg:#F4DB6B;              /* filled yellow lozenge */
+  --ost-node-outcome-bd:#DCBE3F;
+  --ost-node-opp-bg:#EAF8F3;                  /* outlined teal pill    */
+  --ost-node-opp-bd:#5FBBA6;
+  --ost-node-sol-bg:#FBEFC9;                  /* cream solution pill   */
+  --ost-node-sol-bd:#E0CB8A;
+  --ost-chosen:var(--sc-blue-monday);         /* "chosen path" accent  */
+
+  --ost-typ-anv:#E6DEF7;   /* Användbarhet  — purple */
+  --ost-typ-gen:#D7E2FF;   /* Genomförbarhet — blue  */
+  --ost-typ-lon:#C9ECE0;   /* Lönsamhet     — green  */
+  --ost-typ-ons:#FBEBB0;   /* Önskvärdhet   — yellow */
+  --ost-typ-ovr:#E2E2E2;   /* Övrigt        — grey   */
+
+  --ost-gutter:172px;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:var(--font-sans);
+  background:var(--sc-pink-moon);
+  color:var(--sc-grey-900);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  min-height:100vh;
+}
+
+/* ============================================================
+   Top bar
+   ============================================================ */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;gap:1.5rem;
+  flex-wrap:wrap;
+  padding:1.15rem clamp(1rem,4vw,2.5rem);
+  border-bottom:var(--ost-line-w) solid var(--sc-blue-monday);
+  background:var(--sc-pink-moon);
+}
+.brand{display:flex;align-items:center;gap:.9rem;min-width:0;}
+.kaomoji{
+  font-family:var(--font-mono);font-size:1.05rem;font-weight:700;
+  color:var(--sc-blue-monday);
+  background:var(--sc-grey-0);
+  border:var(--ost-line-w) solid var(--sc-blue-monday);
+  box-shadow:var(--brutal-sm);
+  padding:.4rem .6rem;border-radius:var(--r-sm);white-space:nowrap;
+}
+.eyebrow{
+  font-size:.66rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--sc-purple-rain);font-style:italic;
+}
+.topbar h1{font-size:1.32rem;line-height:1.1;letter-spacing:-.02em;color:var(--sc-blue-monday);font-weight:700;margin:.1rem 0 0;}
+
+/* segmented toggle */
+.seg{
+  display:inline-flex;gap:0;
+  background:var(--sc-grey-0);
+  border:var(--ost-line-w) solid var(--sc-blue-monday);
+  border-radius:var(--r-pill);
+  padding:4px;
+  box-shadow:var(--brutal-sm);
+}
+.seg button{
+  font-family:inherit;font-size:.82rem;font-weight:600;
+  border:none;background:transparent;color:var(--sc-blue-monday);
+  padding:.5rem 1.1rem;border-radius:var(--r-pill);cursor:pointer;
+  display:inline-flex;align-items:center;gap:.45rem;
+  transition:background var(--t-fast),color var(--t-fast);white-space:nowrap;
+}
+.seg button .dir{font-family:var(--font-mono);opacity:.55;font-weight:700;}
+.seg button:hover:not(.active){background:rgba(0,34,255,.06);}
+.seg button.active{background:var(--sc-blue-monday);color:var(--sc-pink-moon);}
+.seg button.active .dir{opacity:.8;color:var(--sc-pink-moon);}
+
+/* ============================================================
+   Main + cut caption
+   ============================================================ */
+main{padding:clamp(1rem,3vw,2rem) clamp(1rem,4vw,2.5rem) 1rem;}
+.cut-meta{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;
+  flex-wrap:wrap;margin-bottom:1rem;
+}
+.cut-meta .lede{max-width:60ch;}
+.cut-meta .lede strong{color:var(--sc-blue-monday);}
+.cut-meta .lede p{margin:0;font-size:.92rem;line-height:1.5;color:var(--sc-grey-700);}
+.cut-meta .lede .kicker{
+  font-size:.68rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--sc-purple-rain);font-style:italic;margin-bottom:.25rem;display:block;
+}
+
+/* data-state demo control (vertical cut only) */
+.demo{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;}
+.demo .lbl{font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--sc-grey-500);}
+.demo button{
+  font-family:inherit;font-size:.76rem;font-weight:500;cursor:pointer;
+  border:1.5px solid var(--sc-purple-mountains);background:var(--sc-grey-0);color:var(--sc-grey-700);
+  padding:.34rem .7rem;border-radius:var(--r-pill);transition:all var(--t-fast);
+}
+.demo button:hover{border-color:var(--sc-blue-monday);color:var(--sc-blue-monday);}
+.demo button.active{border-color:var(--sc-blue-monday);background:rgba(0,34,255,.07);color:var(--sc-blue-monday);font-weight:600;}
+
+/* ============================================================
+   Board (white card holding the swimlane tree)
+   ============================================================ */
+.board{
+  position:relative;display:flex;align-items:stretch;
+  background:var(--sc-grey-0);
+  border:1px solid var(--sc-purple-mountains);
+  border-radius:var(--r-lg);
+  box-shadow:var(--shadow-md);
+  overflow:hidden;
+}
+.bandbg{position:absolute;inset:0;z-index:0;pointer-events:none;}
+.bandbg .stripe{position:absolute;left:0;right:0;}
+.bandbg .stripe + .stripe{border-top:1px dashed rgba(46,44,134,.18);}
+
+.gutter{
+  position:relative;z-index:2;flex:0 0 var(--ost-gutter);
+  border-right:1px dashed rgba(46,44,134,.18);
+}
+.bandlabel{
+  position:absolute;left:clamp(.9rem,2vw,1.4rem);
+  font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  font-style:italic;color:var(--sc-purple-rain);max-width:calc(var(--ost-gutter) - 1.6rem);
+  line-height:1.25;
+}
+.bandlabel small{display:block;font-style:normal;font-weight:500;letter-spacing:0;
+  text-transform:none;color:var(--sc-grey-500);font-size:.66rem;margin-top:.15rem;}
+
+.canvas{
+  position:relative;z-index:1;flex:1 1 auto;min-width:0;
+  overflow-x:auto;overflow-y:hidden;
+  display:flex;justify-content:safe center;
+}
+.tree-wrap{padding:30px 44px 44px;flex:0 0 auto;}
+
+/* ============================================================
+   Orthogonal CSS tree (no libraries) — canonical technique
+   ============================================================ */
+.tree,.tree ul{position:relative;display:flex;justify-content:center;margin:0;padding:0;list-style:none;}
+.tree ul{padding-top:var(--ost-conn-zone);}
+/* down-stem from a parent into its children's bus */
+.tree ul::before{
+  content:"";position:absolute;top:0;left:50%;width:0;height:var(--ost-conn-zone);
+  border-left:var(--ost-line-w) solid var(--ost-connector);
+}
+.tree li{
+  position:relative;display:flex;flex-direction:column;align-items:center;
+  padding:var(--ost-conn-zone) var(--ost-sib-gap) 0;
+}
+/* the horizontal bus over each sibling */
+.tree li::before,.tree li::after{
+  content:"";position:absolute;top:0;width:50%;height:var(--ost-conn-zone);
+  border-top:var(--ost-line-w) solid var(--ost-connector);
+}
+.tree li::before{right:50%;}
+.tree li::after{left:50%;}
+.tree li:first-child::before,.tree li:last-child::after{border:0;}
+.tree li:last-child::before{border-right:var(--ost-line-w) solid var(--ost-connector);}
+.tree li:first-child::after{border-left:var(--ost-line-w) solid var(--ost-connector);}
+/* single child → straight vertical line, no bus */
+.tree li:only-child{padding-top:var(--ost-conn-zone);}
+.tree li:only-child::before,.tree li:only-child::after{display:none;}
+/* the root node carries no incoming edge */
+.tree>li{padding-top:0;}
+.tree>li::before,.tree>li::after{display:none;}
+
+/* ============================================================
+   Nodes
+   ============================================================ */
+.node{
+  position:relative;box-sizing:border-box;text-align:center;
+  font-size:.8rem;font-weight:600;line-height:1.32;color:var(--sc-grey-900);
+  background:var(--sc-grey-0);border-radius:var(--r-pill);
+  padding:.6rem 1.05rem;
+}
+/* arrowhead pointing into a node */
+.node.arr::before{
+  content:"";position:absolute;left:50%;top:-9px;transform:translateX(-50%);
+  width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;
+  border-top:8px solid var(--ost-connector);
+}
+.n-outcome{
+  background:var(--ost-node-outcome-bg);border:2px solid var(--ost-node-outcome-bd);
+  border-radius:var(--r-lg);max-width:340px;font-weight:700;padding:.95rem 1.35rem;
+  font-size:.86rem;color:var(--sc-grey-900);box-shadow:var(--shadow-sm);
+}
+.n-opp{
+  background:var(--ost-node-opp-bg);border:2px solid var(--ost-node-opp-bd);
+  max-width:210px;color:var(--sc-grey-900);
+}
+.n-opp.sub{max-width:188px;font-size:.74rem;padding:.5rem .85rem;}
+.n-opp.muted{opacity:.62;}
+.n-opp.muted .node-tag{opacity:.7;}
+.n-opp.chosen{
+  border-color:var(--ost-chosen);box-shadow:var(--brutal-md);
+  background:#E6F6FF;
+}
+.n-sol{
+  background:var(--ost-node-sol-bg);border:1.5px solid var(--ost-node-sol-bd);
+  max-width:198px;font-size:.78rem;padding:.55rem .9rem;
+}
+.node-tag{
+  display:inline-block;font-family:var(--font-mono);font-weight:700;font-size:.72em;
+  margin-right:.35em;color:var(--sc-purple-rain);
+}
+.n-sol .node-tag{color:#9A7B1E;}
+/* chosen badge */
+.badge{
+  position:absolute;top:-10px;right:-8px;
+  font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--sc-pink-moon);background:var(--ost-chosen);
+  padding:.12rem .45rem;border-radius:var(--r-pill);box-shadow:var(--shadow-sm);
+}
+/* dashed placeholder (empty state) */
+.n-empty{
+  background:transparent;border:2px dashed var(--sc-grey-300);color:var(--sc-grey-500);
+  font-weight:500;font-size:.78rem;max-width:210px;font-style:italic;
+}
+.tree li.empty-stub::before,.tree li.empty-stub::after{border-style:dashed;opacity:.6;}
+.tree li.empty-stub > ul::before{border-style:dashed;}
+
+/* ============================================================
+   ANTAGANDEN (assumption table)
+   ============================================================ */
+.antaganden{margin-top:1.6rem;}
+.antaganden.hidden{display:none;}
+.tbl-head{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:.75rem;}
+.tbl-head .title{
+  font-size:1.05rem;font-weight:700;font-style:italic;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--sc-purple-rain);
+}
+.legend{display:flex;gap:.4rem;flex-wrap:wrap;margin-left:auto;}
+.legend .chip-typ{font-size:.66rem;}
+
+.tbl-card{
+  background:var(--sc-grey-0);border:1px solid var(--sc-purple-mountains);
+  border-radius:var(--r-lg);box-shadow:var(--shadow-md);overflow:hidden;
+}
+.tbl-scroll{overflow-x:auto;}
+table.assum{border-collapse:collapse;width:100%;min-width:1120px;font-size:.8rem;}
+table.assum thead th{
+  text-align:left;font-weight:600;font-size:.7rem;letter-spacing:.04em;
+  color:var(--sc-grey-700);background:var(--sc-grey-50);
+  padding:.7rem .8rem;border-bottom:2px solid var(--sc-purple-mountains);
+  white-space:nowrap;vertical-align:bottom;position:sticky;top:0;
+}
+table.assum thead th .ico{color:var(--sc-grey-400);font-weight:700;margin-right:.3em;}
+th.soon,td.soon{background:repeating-linear-gradient(45deg,var(--sc-grey-50),var(--sc-grey-50) 6px,#F0F0F0 6px,#F0F0F0 12px);color:var(--sc-grey-400);}
+th.soon{color:var(--sc-grey-400);}
+th.soon .tag{
+  display:block;font-style:italic;font-weight:500;letter-spacing:0;text-transform:none;
+  font-size:.62rem;color:var(--sc-grey-400);margin-top:.15rem;
+}
+td.soon{font-style:italic;text-align:center;}
+
+table.assum tbody td{
+  padding:.7rem .8rem;border-bottom:1px solid var(--sc-grey-100);vertical-align:top;
+  line-height:1.4;color:var(--sc-grey-800);
+}
+td.idx{color:var(--sc-grey-400);font-variant-numeric:tabular-nums;width:34px;text-align:right;padding-right:.6rem;}
+td.assum-txt{min-width:240px;font-weight:500;color:var(--sc-grey-900);}
+td.test,td.succ{min-width:190px;color:var(--sc-grey-700);font-size:.78rem;}
+
+tr.grp td{
+  background:var(--sc-grey-50);border-bottom:1px solid var(--sc-purple-mountains);
+  padding:.55rem .8rem;
+}
+.grp-label{display:flex;align-items:center;gap:.55rem;font-weight:600;color:var(--sc-grey-800);font-size:.8rem;}
+.grp-label .node-tag{font-size:.78rem;color:#9A7B1E;}
+.grp-count{margin-left:auto;font-size:.68rem;font-weight:500;color:var(--sc-grey-500);letter-spacing:.02em;}
+
+tr.risky td{background:rgba(255,64,64,.05);}
+tr.risky td.idx{position:relative;}
+tr.risky td.idx::before{
+  content:"";position:absolute;left:0;top:6px;bottom:6px;width:3px;
+  background:var(--sc-red-right-hand);border-radius:2px;
+}
+
+/* chips */
+.chip{display:inline-flex;align-items:center;gap:.3rem;border-radius:var(--r-pill);
+  font-size:.72rem;font-weight:600;padding:.18rem .55rem;white-space:nowrap;}
+.chip-sol{font-family:var(--font-mono);background:rgba(0,34,255,.08);color:var(--sc-blue-monday);font-weight:700;font-size:.74rem;}
+.chip-risk.high{background:var(--sc-coral-bracelet);color:#5A1410;}
+.chip-risk.low{background:var(--sc-grey-100);color:var(--sc-grey-600);}
+.chip-risk .dot{width:6px;height:6px;border-radius:50%;}
+.chip-risk.high .dot{background:#B3261E;}
+.chip-typ{font-weight:500;color:var(--sc-grey-800);}
+.chip-typ.anv{background:var(--ost-typ-anv);}
+.chip-typ.gen{background:var(--ost-typ-gen);}
+.chip-typ.lon{background:var(--ost-typ-lon);}
+.chip-typ.ons{background:var(--ost-typ-ons);}
+.chip-typ.ovr{background:var(--ost-typ-ovr);}
+
+.tbl-empty{padding:2.4rem 1rem;text-align:center;color:var(--sc-grey-500);font-style:italic;font-size:.88rem;}
+.tbl-empty .ic{font-size:1.4rem;display:block;margin-bottom:.4rem;opacity:.5;}
+
+/* ============================================================
+   Footer
+   ============================================================ */
+footer{
+  padding:1.6rem clamp(1rem,4vw,2.5rem) 2.4rem;
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+  color:var(--sc-grey-500);font-size:.74rem;
+}
+footer .kao{font-family:var(--font-mono);color:var(--sc-purple-mountains);letter-spacing:.1em;}
+footer code{font-family:var(--font-mono);background:rgba(0,34,255,.07);color:var(--sc-blue-monday);
+  padding:.08em .35em;border-radius:.25rem;font-size:.92em;}
+
+/* hide inactive cut */
+[data-view]{display:none;}
+[data-view].on{display:block;}
+
+@media (max-width:640px){
+  :root{--ost-gutter:118px;}
+  .topbar h1{font-size:1.1rem;}
+  .bandlabel small{display:none;}
+}
+@media (prefers-reduced-motion:no-preference){
+  .node{transition:box-shadow var(--t-fast);}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="kaomoji">( ■_■)</div>
+    <div>
+      <span class="eyebrow">Discovery · scilla.studio</span>
+      <h1>Opportunity Solution Tree</h1>
+    </div>
+  </div>
+  <div class="seg" role="tablist" aria-label="Tree view">
+    <button id="seg-h" class="active" role="tab" aria-selected="true" onclick="setCut('h')">Opportunity space</button>
+    <button id="seg-v" role="tab" aria-selected="false" onclick="setCut('v')"><span class="dir">↧</span>Chosen branch</button>
+  </div>
+</header>
+
+<main>
+  <!-- ============ HORIZONTAL CUT ============ -->
+  <section data-view="h" class="on">
+    <div class="cut-meta">
+      <div class="lede">
+        <span class="kicker">Breadth · the space</span>
+        <p>The whole <strong>opportunity space</strong> beneath the outcome — broad to narrow, up to two levels. Stops at the opportunity layer. The chosen opportunity is marked; the rest read as the space not taken. Scrolls horizontally when wide.</p>
+      </div>
+    </div>
+    <div class="board" id="board-h">
+      <div class="bandbg"></div>
+      <div class="gutter"></div>
+      <div class="canvas"><div class="tree-wrap" id="tree-h"></div></div>
+    </div>
+  </section>
+
+  <!-- ============ VERTICAL CUT ============ -->
+  <section data-view="v">
+    <div class="cut-meta">
+      <div class="lede">
+        <span class="kicker">Depth · the chosen branch</span>
+        <p>A deep, narrow slice of the chosen opportunity: outcome → opportunity → top-3 solutions → the assumptions that must hold. Renders whatever layers have data.</p>
+      </div>
+      <div class="demo" role="group" aria-label="Demo data state">
+        <span class="lbl">Data state</span>
+        <button class="active" data-state="full" onclick="setState('full')">Full</button>
+        <button data-state="no-assum" onclick="setState('no-assum')">No assumptions</button>
+        <button data-state="no-sol" onclick="setState('no-sol')">No solutions</button>
+      </div>
+    </div>
+    <div class="board" id="board-v">
+      <div class="bandbg"></div>
+      <div class="gutter"></div>
+      <div class="canvas"><div class="tree-wrap" id="tree-v"></div></div>
+    </div>
+
+    <div class="antaganden" id="antaganden">
+      <div class="tbl-head">
+        <span class="title">Antaganden</span>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="tbl-card">
+        <div class="tbl-scroll" id="tbl-scroll"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div>Vanilla HTML · CSS grid/flex · inline-SVG-style arrowheads — no frameworks, no graph libraries. Colors are <code>--ost-*</code> tokens at <code>:root</code>.</div>
+  <div class="kao">( '–') (˘_•̑ ) (^_^) (•..•)</div>
+</footer>
+
+<script>
+/* ============================================================
+   Sample data (neutral — NOT the client content from the refs)
+   ============================================================ */
+const DATA = {
+  outcome:{ label:"Reduce the number of manual steps needed to onboard a new team to the workspace" },
+  opportunities:[
+    { id:"O1", tag:"1", chosen:true, label:"New admins can't tell which setup steps are required vs optional",
+      children:[
+        { id:"O1a", label:"No single place shows onboarding progress" },
+        { id:"O1b", label:"Required steps aren't visually distinct from optional ones" },
+      ]},
+    { id:"O2", label:"Invited teammates wait on an admin to assign roles" },
+    { id:"O3", label:"Teams re-enter data they already gave during signup" },
+    { id:"O4", label:"Admins can't preview what a teammate will see before inviting" },
+  ],
+  solutions:[
+    { id:"1.1", label:"Guided setup checklist with required / optional grouping" },
+    { id:"1.2", label:"Onboarding progress dashboard" },
+    { id:"1.3", label:"Smart defaults that pre-complete optional steps" },
+  ],
+  assumptions:[
+    { t:"Admins will follow a checklist if shown one", sol:"1.1", risk:"High", typ:"Användbarhet",
+      test:"Prototype walkthrough", succ:"4/5 admins complete setup unaided" },
+    { t:"We can detect step completion server-side", sol:"1.1", risk:"High", typ:"Genomförbarhet",
+      test:"Spike on event tracking", succ:"Completion event fires reliably" },
+    { t:"A progress dashboard increases day-1 activation", sol:"1.2", risk:"Low", typ:"Önskvärdhet",
+      test:"Fake-door test", succ:">20% click into dashboard" },
+  ],
+};
+
+const TYP = {
+  "Användbarhet":{cls:"anv", en:"usability"},
+  "Genomförbarhet":{cls:"gen", en:"feasibility"},
+  "Lönsamhet":{cls:"lon", en:"viability"},
+  "Önskvärdhet":{cls:"ons", en:"desirability"},
+  "Övrigt":{cls:"ovr", en:"other"},
+};
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ============================================================
+   Node builders
+   ============================================================ */
+function outcomeNode(){
+  return `<div class="node n-outcome">${esc(DATA.outcome.label)}</div>`;
+}
+function oppNode(o, variant){
+  const cls = ["node","n-opp","arr"];
+  if(variant==="sub") cls.push("sub");
+  if(o.chosen) cls.push("chosen"); else if(variant!=="solo") cls.push("muted");
+  const tag = o.tag ? `<span class="node-tag">${esc(o.tag)}</span>` : "";
+  const badge = o.chosen ? `<span class="badge">Vald</span>` : "";
+  return `<div class="${cls.join(" ")}">${badge}${tag}${esc(o.label)}</div>`;
+}
+function solNode(s){
+  return `<div class="node n-sol arr"><span class="node-tag">${esc(s.id)}</span>${esc(s.label)}</div>`;
+}
+
+/* ============================================================
+   HORIZONTAL CUT — outcome → opportunity space
+   ============================================================ */
+function renderHorizontal(){
+  const childLis = DATA.opportunities.map(o=>{
+    const subs = (o.children||[]).map(c =>
+      `<li>${oppNode({...c}, "sub")}</li>`).join("");
+    const subUl = subs ? `<ul>${subs}</ul>` : "";
+    return `<li>${oppNode(o)}${subUl}</li>`;
+  }).join("");
+  const html = `<ul class="tree">
+      <li data-band="outcome">${outcomeNode()}
+        <ul>${childLis}</ul>
+      </li>
+    </ul>`;
+  // tag opp nodes for band measurement
+  document.getElementById("tree-h").innerHTML = html;
+  document.querySelectorAll("#tree-h .n-opp").forEach(n=>{
+    n.closest("li").setAttribute("data-band","opp");
+  });
+  layoutBands("h", document.getElementById("board-h"), [
+    {key:"outcome", label:"Product outcome"},
+    {key:"opp",     label:"Möjligheter", sub:"opportunities"},
+  ]);
+  centerOnRoot(document.querySelector("#board-h .canvas"));
+}
+
+/* ============================================================
+   VERTICAL CUT — outcome → chosen opp → top-3 solutions
+   ============================================================ */
+let STATE = "full";
+function renderVertical(){
+  const chosen = DATA.opportunities.find(o=>o.chosen);
+  const hasSol = STATE!=="no-sol" && DATA.solutions.length>0;
+
+  let leaves;
+  if(hasSol){
+    leaves = `<ul>${DATA.solutions.map(s=>`<li data-band="sol">${solNode(s)}</li>`).join("")}</ul>`;
+  } else {
+    leaves = `<ul><li class="empty-stub" data-band="sol">
+        <div class="node n-empty arr">Inga lösningar ännu — välj en lösning för att gå vidare</div>
+      </li></ul>`;
+  }
+
+  const html = `<ul class="tree">
+      <li data-band="outcome">${outcomeNode()}
+        <ul><li data-band="opp">${oppNode(chosen,"solo")}
+          ${leaves}
+        </li></ul>
+      </li>
+    </ul>`;
+  document.getElementById("tree-v").innerHTML = html;
+
+  layoutBands("v", document.getElementById("board-v"), [
+    {key:"outcome", label:"Product outcome"},
+    {key:"opp",     label:"Möjligheter", sub:"opportunity"},
+    {key:"sol",     label:"Lösningar", sub:"solutions"},
+  ]);
+
+  renderTable(hasSol);
+  centerOnRoot(document.querySelector("#board-v .canvas"));
+}
+
+/* scroll a canvas so the root outcome node is horizontally centred */
+function centerOnRoot(canvas){
+  if(!canvas) return;
+  const node = canvas.querySelector(".n-outcome");
+  if(!node || canvas.scrollWidth <= canvas.clientWidth) return;
+  const cr = canvas.getBoundingClientRect(), nr = node.getBoundingClientRect();
+  const nodeCenter = (nr.left - cr.left) + canvas.scrollLeft + nr.width/2;
+  canvas.scrollLeft = nodeCenter - canvas.clientWidth/2;
+}
+
+/* ============================================================
+   Band background + sticky left labels (measured from the DOM)
+   ============================================================ */
+function layoutBands(cut, board, bands){
+  const br = board.getBoundingClientRect();
+  const groups = {};
+  board.querySelectorAll("[data-band]").forEach(el=>{
+    // measure the node inside, not the whole li (which includes children)
+    const node = el.querySelector(":scope > .node");
+    if(!node) return;
+    const r = node.getBoundingClientRect();
+    const top = r.top - br.top, bot = r.bottom - br.top;
+    const k = el.getAttribute("data-band");
+    if(!groups[k]) groups[k] = {min:Infinity, max:-Infinity};
+    groups[k].min = Math.min(groups[k].min, top);
+    groups[k].max = Math.max(groups[k].max, bot);
+  });
+
+  const present = bands.filter(b=>groups[b.key]);
+  if(!present.length) return;
+  const boardH = board.clientHeight;
+  const bounds = [0];
+  for(let i=0;i<present.length-1;i++){
+    const a = groups[present[i].key].max;
+    const b = groups[present[i+1].key].min;
+    bounds.push((a+b)/2);
+  }
+  bounds.push(boardH);
+
+  const bg = board.querySelector(".bandbg");
+  const colors = {outcome:"var(--ost-band-outcome)", opp:"var(--ost-band-opp)", sol:"var(--ost-band-sol)"};
+  bg.innerHTML = present.map((b,i)=>
+    `<div class="stripe" style="top:${bounds[i]}px;height:${bounds[i+1]-bounds[i]}px;background:${colors[b.key]}"></div>`
+  ).join("");
+
+  const gutter = board.querySelector(".gutter");
+  gutter.innerHTML = present.map((b,i)=>
+    `<div class="bandlabel" style="top:${bounds[i]+16}px">${esc(b.label)}${b.sub?`<small>${esc(b.sub)}</small>`:""}</div>`
+  ).join("");
+}
+
+/* ============================================================
+   ANTAGANDEN table
+   ============================================================ */
+function legendHtml(){
+  return Object.entries(TYP).map(([k,v])=>
+    `<span class="chip chip-typ ${v.cls}">${esc(k)}</span>`).join("");
+}
+function riskChip(r){
+  if(r==="High") return `<span class="chip chip-risk high"><span class="dot"></span>High</span>`;
+  return `<span class="chip chip-risk low">Low</span>`;
+}
+function typChip(t){
+  const v = TYP[t] || {cls:"ovr"};
+  return `<span class="chip chip-typ ${v.cls}">${esc(t)}</span>`;
+}
+
+const COLS = [
+  {h:"Antagande", ico:"▭"},
+  {h:"Lösning", ico:"≡"},
+  {h:"Risknivå", ico:"◷"},
+  {h:"Typ av antagande", ico:"≡"},
+  {h:"Testmetod", ico:"≡"},
+  {h:"Framgångskriterier", ico:"≡"},
+];
+const SOON = [
+  {h:"Status", ico:"◌"},
+  {h:"Issue ID", ico:"≡"},
+  {h:"Insikter", ico:"≡"},
+];
+
+function renderTable(hasSol){
+  document.getElementById("legend").innerHTML = legendHtml();
+  const scroll = document.getElementById("tbl-scroll");
+
+  const noAssum = STATE==="no-assum" || DATA.assumptions.length===0 || !hasSol;
+
+  const head = `<thead><tr>
+    <th class="idx"></th>
+    ${COLS.map(c=>`<th><span class="ico">${c.ico}</span>${esc(c.h)}</th>`).join("")}
+    ${SOON.map(c=>`<th class="soon"><span class="ico">${c.ico}</span>${esc(c.h)}<span class="tag">(coming soon)</span></th>`).join("")}
+  </tr></thead>`;
+
+  if(noAssum){
+    const msg = !hasSol
+      ? "Choose a solution first — assumptions are mapped per solution."
+      : "Inga antaganden registrerade ännu.";
+    scroll.innerHTML = `<table class="assum">${head}<tbody>
+      <tr><td colspan="${1+COLS.length+SOON.length}">
+        <div class="tbl-empty"><span class="ic">( ˘_•̑ )</span>${esc(msg)}</div>
+      </td></tr></tbody></table>`;
+    return;
+  }
+
+  // group by solution, preserving solution order
+  let rows = "", n = 0;
+  DATA.solutions.forEach(s=>{
+    const items = DATA.assumptions.filter(a=>a.sol===s.id);
+    rows += `<tr class="grp"><td colspan="${1+COLS.length+SOON.length}">
+      <div class="grp-label"><span class="node-tag">${esc(s.id)}</span>${esc(s.label)}
+        <span class="grp-count">${items.length} ${items.length===1?"antagande":"antaganden"}</span>
+      </div></td></tr>`;
+    if(!items.length){
+      rows += `<tr><td class="idx"></td><td colspan="${COLS.length+SOON.length}" style="color:var(--sc-grey-400);font-style:italic;font-size:.78rem;">Inga antaganden ännu för den här lösningen.</td></tr>`;
+      return;
+    }
+    items.forEach(a=>{
+      n++;
+      const risky = a.risk==="High";
+      rows += `<tr class="${risky?"risky":""}">
+        <td class="idx">${n}</td>
+        <td class="assum-txt">${esc(a.t)}</td>
+        <td><span class="chip chip-sol">${esc(a.sol)}</span></td>
+        <td>${riskChip(a.risk)}</td>
+        <td>${typChip(a.typ)}</td>
+        <td class="test">${esc(a.test)}</td>
+        <td class="succ">${esc(a.succ)}</td>
+        <td class="soon">—</td>
+        <td class="soon">—</td>
+        <td class="soon">—</td>
+      </tr>`;
+    });
+  });
+
+  scroll.innerHTML = `<table class="assum">${head}<tbody>${rows}</tbody></table>`;
+}
+
+/* ============================================================
+   View / state switching
+   ============================================================ */
+let CUT = "h";
+function setCut(c){
+  CUT = c;
+  document.querySelectorAll("[data-view]").forEach(s=>s.classList.toggle("on", s.getAttribute("data-view")===c));
+  document.getElementById("seg-h").classList.toggle("active", c==="h");
+  document.getElementById("seg-v").classList.toggle("active", c==="v");
+  document.getElementById("seg-h").setAttribute("aria-selected", c==="h");
+  document.getElementById("seg-v").setAttribute("aria-selected", c==="v");
+  // re-measure the now-visible cut (layout can't measure hidden boards)
+  if(c==="h") renderHorizontal(); else renderVertical();
+  try{ localStorage.setItem("ost_cut", c); }catch(e){}
+}
+function setState(st){
+  STATE = st;
+  document.querySelectorAll(".demo button").forEach(b=>b.classList.toggle("active", b.dataset.state===st));
+  renderVertical();
+}
+
+function rerenderActive(){ if(CUT==="h") renderHorizontal(); else renderVertical(); }
+
+window.addEventListener("resize", () => {
+  clearTimeout(window.__t); window.__t = setTimeout(rerenderActive, 120);
+});
+
+// init
+(function(){
+  let saved = "h";
+  try{ saved = localStorage.getItem("ost_cut") || "h"; }catch(e){}
+  renderHorizontal();           // build both so measurements are warm
+  renderVertical();
+  setCut(saved);
+})();
+</script>
+</body>
+</html>

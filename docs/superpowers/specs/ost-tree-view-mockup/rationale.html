@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OST Tree View — Rationale</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --sc-blue-monday:#0022FF; --sc-purple-rain:#2E2C86; --sc-pink-moon:#FFEBFF;
+  --sc-purple-mountains:#D8CEF2; --sc-grey-900:#282828; --sc-grey-700:#585858;
+  --sc-grey-500:#888888; --sc-grey-100:#F4F4F4; --sc-grey-0:#FFFFFF;
+  --sc-coral-bracelet:#FF8A80; --sc-red-right-hand:#FF4040; --sc-yellow-submarine:#FFDF49;
+  --font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --font-mono:ui-monospace,'SF Mono','Menlo','Consolas',monospace;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:var(--font-sans);background:var(--sc-pink-moon);color:var(--sc-grey-900);
+  -webkit-font-smoothing:antialiased;line-height:1.55;
+}
+.sheet{
+  max-width:920px;margin:0 auto;padding:clamp(1.5rem,4vw,3rem);
+}
+.eyebrow{font-size:.72rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+  font-style:italic;color:var(--sc-purple-rain);}
+h1{font-size:clamp(1.7rem,4vw,2.3rem);line-height:1.1;letter-spacing:-.02em;color:var(--sc-blue-monday);
+  font-weight:700;margin:.3rem 0 .4rem;}
+.sub{color:var(--sc-grey-700);font-size:1rem;max-width:62ch;margin:0 0 1.6rem;}
+.kao{font-family:var(--font-mono);color:var(--sc-purple-mountains);letter-spacing:.1em;font-size:.85rem;margin-bottom:1.6rem;}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;margin:1.2rem 0;}
+.card{
+  background:var(--sc-grey-0);border:1px solid var(--sc-purple-mountains);
+  border-radius:1rem;padding:1.15rem 1.25rem;box-shadow:0 2px 4px 0 rgba(40,40,40,.12);
+}
+.card.brutal{border:1px 3px 4px 1px solid var(--sc-blue-monday);box-shadow:4px 4px 0 var(--sc-blue-monday);}
+h2{font-size:1.18rem;color:var(--sc-blue-monday);margin:2rem 0 .2rem;font-weight:700;letter-spacing:-.01em;}
+h3{font-size:.95rem;color:var(--sc-purple-rain);margin:0 0 .4rem;font-weight:700;}
+p{margin:0 0 .7rem;}
+ul{margin:.2rem 0 .7rem;padding-left:1.1rem;}
+li{margin:.28rem 0;}
+small,.small{font-size:.84rem;color:var(--sc-grey-700);}
+code{font-family:var(--font-mono);background:rgba(0,34,255,.08);color:var(--sc-blue-monday);
+  padding:.08em .35em;border-radius:.25rem;font-size:.86em;}
+.swatch{display:inline-block;width:.85em;height:.85em;border-radius:3px;vertical-align:-1px;margin-right:.35em;border:1px solid rgba(0,0,0,.15);}
+table.tok{width:100%;border-collapse:collapse;font-size:.84rem;margin:.3rem 0 .4rem;}
+table.tok td{padding:.32rem .3rem;border-bottom:1px solid var(--sc-grey-100);vertical-align:top;}
+table.tok td:first-child{white-space:nowrap;}
+table.tok code{font-size:.82em;}
+.flag{display:inline-block;background:rgba(255,64,64,.12);color:#B3261E;font-weight:600;
+  font-size:.72rem;padding:.1rem .45rem;border-radius:9999px;}
+.q{border-left:3px solid var(--sc-yellow-submarine);padding-left:.85rem;margin:.6rem 0;}
+.q b{color:var(--sc-purple-rain);}
+hr{border:0;border-top:1px solid var(--sc-purple-mountains);margin:2rem 0;}
+a{color:var(--sc-blue-monday);}
+@media print{body{background:#fff;}.card{box-shadow:none;}.card.brutal{box-shadow:none;}}
+</style>
+</head>
+<body>
+<div class="sheet">
+  <span class="eyebrow">Handover · scilla.studio</span>
+  <h1>OST Tree View — design rationale</h1>
+  <p class="sub">One artifact, two cuts of the same tree. A breadth view for choosing an opportunity, a depth view for working the chosen branch. Built to port straight into a dependency-free <code>index.html</code>.</p>
+  <div class="kao">( ■_■) &nbsp; ( '–') &nbsp; (˘_•̑ ) &nbsp; (^_^)</div>
+
+  <h2>1 · Layout &amp; the two cuts</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Opportunity space (breadth)</h3>
+      <p>A top-down tree: outcome at the root, the full opportunity space branching beneath it (up to two levels). It <b>stops at the opportunity layer</b> — no solutions, no table. The chosen opportunity gets the blue ring + <code>Vald</code> badge; the rest are de-emphasised (lower opacity) so they read as "the space not taken."</p>
+      <p class="small">Used while deciding <i>which</i> opportunity to pursue.</p>
+    </div>
+    <div class="card">
+      <h3>Chosen branch (depth)</h3>
+      <p>A narrow vertical slice: outcome → chosen opportunity → top-3 solutions → the assumption table spanning the bottom. We deliberately don't draw every opportunity's sub-tree at once — that's unreadable — so depth lives on one branch.</p>
+      <p class="small">Used once an opportunity is chosen.</p>
+    </div>
+  </div>
+  <p>The two share <b>one tree tab</b>, switched by a segmented toggle (<code>Opportunity space ⇄ Chosen branch</code>) in the Scilla pill style. The toggle re-renders the visible cut from the same data object, so there is a single source of truth.</p>
+
+  <h2>2 · Swimlane bands</h2>
+  <p>Bands are <b>full-width tinted rows</b> behind the tree — <code>PRODUCT OUTCOME</code> (yellow), <code>MÖJLIGHETER</code> (teal), <code>LÖSNINGAR</code> (cream); the breadth cut shows only the first two. Labels are small italic uppercase in a <b>sticky left gutter</b>, so they stay pinned while the tree scrolls horizontally.</p>
+  <p>Crucially, band heights are <b>measured from the DOM after render</b> (each node is tagged <code>data-band</code>; the boundary sits at the mid-point between one band's lowest node and the next band's highest). This means bands always track real content — they don't drift if a node wraps to more lines, and they adapt automatically to empty/partial states. No hard-coded pixel heights.</p>
+
+  <h2>3 · Nodes &amp; edges</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Nodes</h3>
+      <ul>
+        <li><b>Outcome</b> — filled yellow lozenge (rounded-rect), the visual anchor.</li>
+        <li><b>Opportunity</b> — outlined teal pill. Chosen = blue border + brutalist blue shadow + badge.</li>
+        <li><b>Solution</b> — small cream pill, numbered <code>1.1 / 1.2 / 1.3</code> (the same id used in the table's <code>Lösning</code> column, so tree and table cross-reference cleanly).</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Edges</h3>
+      <p>Orthogonal (right-angle) connectors via the <b>canonical pure-CSS tree</b>: each <code>&lt;li&gt;</code> draws its half of the horizontal bus with <code>::before/::after</code> borders; each child <code>&lt;ul&gt;</code> draws the vertical down-stem. A single child collapses to a straight line. <b>Arrowheads</b> are a CSS triangle (<code>border</code>) on each node's top — no SVG file, no measurement, no library.</p>
+    </div>
+  </div>
+
+  <h2>4 · The assumption table (ANTAGANDEN)</h2>
+  <p>A dense, spreadsheet-style table, <b>grouped by solution</b> (each group has a header row + count). Filled columns: <code>Antagande</code>, <code>Lösning</code>, <code>Risknivå</code>, <code>Typ av antagande</code>, <code>Testmetod</code>, <code>Framgångskriterier</code>. The three execution-time fields — <code>Status</code>, <code>Issue ID</code>, <code>Insikter</code> — are rendered as <b>greyed, hatched columns labelled "(coming soon)"</b> so the eventual shape is visible without faking data.</p>
+  <p><b>Riskiest assumptions</b> (High importance + weak evidence → <code>Risknivå: High</code>) are flagged with a red left rule on the row and a coral risk chip. Type chips are colour-coded to the five categories (a legend sits above the table).</p>
+
+  <h2>5 · Empty / partial states</h2>
+  <p>The renderer is data-driven, so missing layers degrade gracefully. A demo control on the depth cut (<code>Full · No assumptions · No solutions</code>) lets you see all three:</p>
+  <ul>
+    <li><b>No solutions</b> → the <code>LÖSNINGAR</code> band shows a dashed placeholder node ("Inga lösningar ännu…") on a dashed stub; the table shows a "choose a solution first" empty state.</li>
+    <li><b>No assumptions</b> → solutions still render; the table shows an empty state with a kaomoji.</li>
+    <li><b>Per-group empty</b> (always on in Full) → solution <code>1.3</code> has no assumptions yet, so its group shows an inline "inga antaganden ännu" row — partial data within an otherwise full table.</li>
+  </ul>
+
+  <h2>6 · Responsive &amp; scroll behaviour</h2>
+  <ul>
+    <li>The tree lives in a horizontally scrollable canvas; a wide opportunity space scrolls rather than shrinking. On load the canvas auto-centres on the root outcome so the tree reads top-down.</li>
+    <li>The band gutter narrows on small screens (<code>172px → 118px</code>) and band sub-labels hide under 640px.</li>
+    <li>The table scrolls horizontally inside its own card (<code>min-width: 1120px</code>) so cells never crush; the page itself stays single-column.</li>
+  </ul>
+
+  <h2>7 · Colour tokens</h2>
+  <p>Everything theme-able is a <code>--ost-*</code> custom property at <code>:root</code>, mapped onto Scilla <code>--sc-*</code> values. Remap these to retheme:</p>
+  <table class="tok">
+    <tr><td><code>--ost-connector</code></td><td><span class="swatch" style="background:#2E2C86"></span>edge ink — <code>sc-purple-rain</code></td></tr>
+    <tr><td><code>--ost-band-outcome</code></td><td><span class="swatch" style="background:#FFF6D6"></span>yellow band</td></tr>
+    <tr><td><code>--ost-band-opp</code></td><td><span class="swatch" style="background:#E2F4EE"></span>teal band</td></tr>
+    <tr><td><code>--ost-band-sol</code></td><td><span class="swatch" style="background:#FBF4DF"></span>cream band</td></tr>
+    <tr><td><code>--ost-node-outcome-bg</code></td><td><span class="swatch" style="background:#F4DB6B"></span>outcome lozenge</td></tr>
+    <tr><td><code>--ost-node-opp-bg</code></td><td><span class="swatch" style="background:#EAF8F3"></span>opportunity pill</td></tr>
+    <tr><td><code>--ost-node-sol-bg</code></td><td><span class="swatch" style="background:#FBEFC9"></span>solution pill</td></tr>
+    <tr><td><code>--ost-chosen</code></td><td><span class="swatch" style="background:#0022FF"></span>chosen accent — <code>sc-blue-monday</code></td></tr>
+    <tr><td><code>--ost-typ-*</code></td><td>five assumption-type chip tints (anv / gen / lon / ons / ovr)</td></tr>
+  </table>
+  <p class="small">Type, weights and spacing follow Scilla: Inter 400–700, the brutalist blue shadow on the toggle, pink page surface, electric-blue ink.</p>
+
+  <hr />
+  <h2>Open questions &amp; trade-offs</h2>
+  <div class="q"><b>How deep can opportunity nesting go?</b> The pure-CSS tree handles arbitrary depth, but the breadth cut gets unreadable past <b>~2 levels</b> (the brief's cap) — beyond that, sibling pills collide horizontally and the row grows very wide. Recommendation: keep the cap at 2 and, for deeper structure, push users into the depth cut. If 3+ levels are ever required, we'd want collapse/expand on opportunity nodes.</div>
+  <div class="q"><b>The table on narrow screens.</b> Today it scrolls horizontally inside its card with a 1120px floor. That preserves the spreadsheet feel but means mobile users scroll sideways. Alternative for true mobile: collapse each row into a stacked card. Worth deciding who actually opens this on a phone.</div>
+  <div class="q"><b>Centring a very wide breadth tree.</b> The root centres over the whole opportunity span, so with many top-level opportunities the outcome sits well right of the first one. We auto-scroll to frame the root on load, but for 6+ opportunities a mini-map or "fit" control would help.</div>
+  <div class="q"><b>Solution numbering.</b> The brief mentioned both <code>1.1…</code> (nodes) and <code>S1…</code> (table). We unified on <code>1.x</code> everywhere so the tree and table share one identifier — flag if you'd rather keep <code>S1</code>.</div>
+  <div class="q"><b>Sub-opportunities in the depth cut.</b> We render outcome → chosen opportunity → solutions directly (solutions hang off the parent opportunity per the data). The chosen opportunity's own sub-opportunities (O1a/O1b) are shown only in the breadth cut to avoid an ambiguous "do solutions attach to the parent or the children?" picture. Easy to add as a context row if wanted.</div>
+
+  <div class="kao" style="margin-top:2rem">(•..•) &nbsp; built buildable-first — plain HTML + CSS + a little inline-style SVG-free arrowhead.</div>
+</div>
+</body>
+</html>
