@@ -1599,6 +1599,80 @@
     return '<li data-band="opp">' + ostOppNode(node) + subUl + '</li>';
   }
 
+  function ostCenterRoot(canvas){
+    if(!canvas) return;
+    var node = canvas.querySelector('.n-outcome');
+    if(!node || canvas.scrollWidth <= canvas.clientWidth) return;
+    var cr = canvas.getBoundingClientRect(), nr = node.getBoundingClientRect();
+    canvas.scrollLeft = (nr.left - cr.left) + canvas.scrollLeft + nr.width/2 - canvas.clientWidth/2;
+  }
+
+  function ostLayoutBands(board, bands){
+    var br = board.getBoundingClientRect();
+    var groups = {};
+    board.querySelectorAll('[data-band]').forEach(function(el){
+      var node = el.querySelector(':scope > .node');
+      if(!node) return;
+      var r = node.getBoundingClientRect();
+      var top = r.top - br.top, bot = r.bottom - br.top;
+      var k = el.getAttribute('data-band');
+      if(!groups[k]) groups[k] = {min:Infinity, max:-Infinity};
+      groups[k].min = Math.min(groups[k].min, top);
+      groups[k].max = Math.max(groups[k].max, bot);
+    });
+
+    var present = bands.filter(function(b){ return groups[b.key]; });
+    if(!present.length) return;
+    var boardH = board.clientHeight;
+    var bounds = [0];
+    for(var i=0; i<present.length-1; i++){
+      var a = groups[present[i].key].max;
+      var b = groups[present[i+1].key].min;
+      bounds.push((a+b)/2);
+    }
+    bounds.push(boardH);
+
+    var bg = board.querySelector('.bandbg');
+    var colors = {outcome:'var(--ost-band-outcome)', opp:'var(--ost-band-opp)', sol:'var(--ost-band-sol)'};
+    bg.innerHTML = present.map(function(b,i){
+      return '<div class="stripe" style="top:'+bounds[i]+'px;height:'+(bounds[i+1]-bounds[i])+'px;background:'+colors[b.key]+'"></div>';
+    }).join('');
+
+    var gutter = board.querySelector('.gutter');
+    gutter.innerHTML = present.map(function(b,i){
+      return '<div class="bandlabel" style="top:'+(bounds[i]+16)+'px">'+esc(b.label)+(b.sub?'<small>'+esc(b.sub)+'</small>':'')+'</div>';
+    }).join('');
+  }
+
+  function ostRenderSeg(cut){
+    document.getElementById('ost-seg').innerHTML =
+      '<button data-cut="h" class="' + (cut==='h'?'active':'') + '">Opportunity space</button>' +
+      '<button data-cut="v" class="' + (cut==='v'?'active':'') + '"><span class="dir">↧</span> Chosen branch</button>';
+  }
+
+  function ostRenderTable(data, mount){ mount.innerHTML = ''; }
+
+  function ostSetCut(container, cut){
+    var data = container.__ostData;
+    ostRenderSeg(cut);
+    var wrap = document.getElementById('ost-treewrap');
+    var board = document.getElementById('ost-board');
+    var bands;
+    if(cut==='h'){
+      ostRenderHorizontal(data, wrap);
+      bands = [{key:'outcome',label:'Product outcome'},{key:'opp',label:'Möjligheter',sub:'opportunities'}];
+      document.getElementById('ost-antaganden').classList.add('hidden');
+    } else {
+      ostRenderVertical(data, wrap);
+      bands = [{key:'outcome',label:'Product outcome'},{key:'opp',label:'Möjligheter',sub:'opportunity'},{key:'sol',label:'Lösningar',sub:'solutions'}];
+      ostRenderTable(data, document.getElementById('ost-antaganden'));
+      document.getElementById('ost-antaganden').classList.remove('hidden');
+    }
+    ostLayoutBands(board, bands);
+    ostCenterRoot(board.querySelector('.canvas'));
+    container.__ostCut = cut;
+  }
+
   function ostRenderHorizontal(data, mount){
     var childLis = data.oppRoots.map(ostOppLi).join('');
     mount.innerHTML =
@@ -1639,8 +1713,23 @@
         '</div>' +
         '<div class="antaganden" id="ost-antaganden"></div>' +
       '</div>';
-    ostRenderHorizontal(data, document.getElementById('ost-treewrap'));
-    container.__ostData = data; // stash for the toggle/resize handlers (later task)
+    container.__ostData = data;
+    var defaultCut = data.hasOpp ? 'v' : 'h';
+    document.getElementById('ost-seg').addEventListener('click', function(e){
+      var b = e.target.closest('[data-cut]');
+      if(b) ostSetCut(container, b.dataset.cut);
+    });
+    if(!window.__ostResizeBound){
+      window.__ostResizeBound = true;
+      window.addEventListener('resize', function(){
+        clearTimeout(window.__ostT);
+        window.__ostT = setTimeout(function(){
+          var c = document.querySelector('.ost-tree-tab');
+          if(c && c.parentElement && c.parentElement.__ostData) ostSetCut(c.parentElement, c.parentElement.__ostCut || 'h');
+        }, 120);
+      });
+    }
+    ostSetCut(container, defaultCut);
   }
 
   // === Overview (synthetic landing view) ===
