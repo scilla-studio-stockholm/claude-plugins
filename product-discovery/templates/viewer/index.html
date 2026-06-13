@@ -1279,6 +1279,47 @@
     container.insertAdjacentHTML('afterbegin', banner);
   }
 
+  // === Tree data layer ===
+
+  function buildOpportunityTree(clustered, chosenId) {
+    var flat = [];
+    (clustered.phases || []).forEach(function (ph) {
+      (ph.opportunities || []).forEach(function (o) { flat.push(o); });
+    });
+    var keep = flat.filter(function (o) { return o.verdict === 'approved' || o.id === chosenId; });
+    var byId = {};
+    keep.forEach(function (o) {
+      byId[o.id] = { id: o.id, text: o.quote, chosen: o.id === chosenId, children: [] };
+    });
+    var roots = [];
+    keep.forEach(function (o) {
+      var node = byId[o.id];
+      if (o.parent_id && byId[o.parent_id]) byId[o.parent_id].children.push(node);
+      else roots.push(node);
+    });
+    return roots;
+  }
+
+  async function loadTreeData(roundData) {
+    var base = roundData.basePath + '/_working/';
+    var clustered = await loadJSON(base + 'experience-map-clustered.json');
+    var top3 = await loadJSON(base + 'top-three-solutions.json');
+    var assum = await loadJSON(base + 'validation-experiments.json')
+             || await loadJSON(base + 'riskiest-assumptions.json')
+             || await loadJSON(base + 'assumptions-categorized.json');
+    var d = roundData.decisions || {};
+    var chosenId = d.decided && d.decided.opportunity ? d.decided.opportunity.id : null;
+    var picks = (top3 && top3.picks) || (d.decided && d.decided.solutions && d.decided.solutions.picks) || [];
+    return {
+      outcome: d.product_outcome || (clustered && clustered.product_outcome) || '',
+      oppRoots: clustered ? buildOpportunityTree(clustered, chosenId) : [],
+      chosenId: chosenId,
+      solutions: picks,
+      assumBlocks: assum ? assum.assumptions_per_solution || [] : [],
+      hasOpp: !!chosenId
+    };
+  }
+
   // === Tree (synthetic landing view) ===
 
   async function renderTree(roundData, container) {
