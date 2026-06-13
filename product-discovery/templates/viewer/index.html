@@ -1579,8 +1579,68 @@
 
   // === Tree (synthetic landing view) ===
 
-  async function renderTree(roundData, container) {
-    container.innerHTML = '<div class="ost-tree-tab"><p style="padding:2rem;color:var(--sc-grey-600);">Tree view — coming in this branch.</p></div>';
+  function ostOutcomeNode(text){ return '<div class="node n-outcome">' + esc(text) + '</div>'; }
+  function ostOppNode(o, variant){
+    var cls = ['node','n-opp','arr'];
+    if (variant === 'sub') cls.push('sub');
+    if (o.chosen) cls.push('chosen'); else if (variant !== 'solo') cls.push('muted');
+    var badge = o.chosen ? '<span class="badge">Vald</span>' : '';
+    return '<div class="' + cls.join(' ') + '">' + badge + esc(o.text) + '</div>';
+  }
+  function ostSolNode(s, i){
+    return '<div class="node n-sol arr"><span class="node-tag">S' + (i+1) + '</span>' + esc(s.title) + '</div>';
+  }
+
+  function ostOppLi(node){
+    var subs = (node.children || []).map(function (c){
+      return '<li data-band="opp">' + ostOppNode(c, 'sub') + '</li>';
+    }).join('');
+    var subUl = subs ? '<ul>' + subs + '</ul>' : '';
+    return '<li data-band="opp">' + ostOppNode(node) + subUl + '</li>';
+  }
+
+  function ostRenderHorizontal(data, mount){
+    var childLis = data.oppRoots.map(ostOppLi).join('');
+    mount.innerHTML =
+      '<ul class="tree"><li data-band="outcome">' + ostOutcomeNode(data.outcome) +
+      '<ul>' + childLis + '</ul></li></ul>';
+  }
+
+  function ostRenderVertical(data, mount){
+    var chosen = null;
+    (function find(ns){ (ns||[]).forEach(function(n){ if(n.chosen) chosen = n; find(n.children); }); })(data.oppRoots);
+    var chosenNode = chosen
+      ? ostOppNode(chosen, 'solo')
+      : '<div class="node n-empty arr">Ingen opportunity vald ännu</div>';
+
+    var leaves;
+    if (data.solutions.length){
+      leaves = '<ul>' + data.solutions.map(function(s,i){
+        return '<li data-band="sol">' + ostSolNode(s, i) + '</li>';
+      }).join('') + '</ul>';
+    } else {
+      leaves = '<ul><li class="empty-stub" data-band="sol">' +
+        '<div class="node n-empty arr">Inga lösningar ännu — välj top-3 för att gå vidare</div></li></ul>';
+    }
+
+    mount.innerHTML =
+      '<ul class="tree"><li data-band="outcome">' + ostOutcomeNode(data.outcome) +
+      '<ul><li data-band="opp">' + chosenNode + leaves + '</li></ul></li></ul>';
+  }
+
+  async function renderTree(roundData, container){
+    var data = await loadTreeData(roundData);
+    container.innerHTML =
+      '<div class="ost-tree-tab">' +
+        '<div class="ost-seg" id="ost-seg"></div>' +
+        '<div class="board" id="ost-board">' +
+          '<div class="bandbg"></div><div class="gutter"></div>' +
+          '<div class="canvas"><div class="tree-wrap" id="ost-treewrap"></div></div>' +
+        '</div>' +
+        '<div class="antaganden" id="ost-antaganden"></div>' +
+      '</div>';
+    ostRenderHorizontal(data, document.getElementById('ost-treewrap'));
+    container.__ostData = data; // stash for the toggle/resize handlers (later task)
   }
 
   // === Overview (synthetic landing view) ===
