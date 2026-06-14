@@ -1382,6 +1382,10 @@
   .flag-riskiest{display:inline-flex;align-items:center;gap:.3rem;font-size:.66rem;font-weight:700;
     text-transform:uppercase;letter-spacing:.04em;color:#B3261E;}
   .flag-riskiest::before{content:"⚑";}
+  .hdr-track{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-top:.6rem;}
+  .hdr-gate{display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--sc-grey-500);}
+  .hdr-gate.done{color:var(--sc-essex-green);} .hdr-gate.current{color:var(--sc-blue-monday);font-weight:600;}
+  .hdr-mark{font-weight:700;} .hdr-sep{color:var(--sc-grey-300);}
 </style>
 </head>
 <body>
@@ -1822,77 +1826,6 @@
     ostSetCut(container, defaultCut);
   }
 
-  // === Overview (synthetic landing view) ===
-
-  function renderOverview(round, container) {
-    var d = (round && round.decisions && round.decisions.decided) || {};
-    var files = (round && round.files) || [];
-    var has = function (f) { return files.indexOf(f) !== -1; };
-
-    // Round state, mirroring the OST-facilitator's model: each gate is reached
-    // when its decided.* entry is ratified.
-    var phases = [
-      { key: 'opportunity', label: 'Opportunity', gate: !!d.opportunity, tab: 'comparison-matrix.json',
-        done: 'Chosen opportunity ratified.', pending: 'Comparing opportunities — no opportunity ratified yet.' },
-      { key: 'solutions', label: 'Solutions', gate: !!d.solutions, tab: 'solution-candidates.json',
-        done: 'Top-3 solutions ratified.', pending: 'Brainstorming / narrowing solutions.' },
-      { key: 'assumptions', label: 'Assumptions', gate: !!d.assumptions, tab: 'riskiest-assumptions.json',
-        done: 'Riskiest assumptions ratified.', pending: 'Surfacing and scoring assumptions.' },
-      { key: 'experiments', label: 'Experiments', gate: !!d.experiments, tab: 'validation-experiments.json',
-        done: 'Validation experiments designed.', pending: 'Designing validation experiments.' }
-    ];
-    // Current phase = first whose gate isn't passed.
-    var currentIdx = phases.findIndex(function (p) { return !p.gate; });
-    if (currentIdx === -1) currentIdx = phases.length; // all gates passed
-
-    var html = '<div class="view-section">';
-    html += '<h2>This is an Opportunity Solution Tree</h2>';
-    html += '<p class="overview-lead">A discovery method (Teresa Torres): start from a measurable <b>product outcome</b>, surface customer <b>opportunities</b> from interviews, explore <b>solutions</b> for the most promising one, then de-risk by testing the <b>assumptions</b> each solution depends on. This viewer renders one round of that work. The trio decides at each gate; the AI only proposes.</p>';
-
-    if (round && round.decisions && round.decisions.product_outcome) {
-      html += '<blockquote><b>Outcome:</b> ' + esc(round.decisions.product_outcome) + '</blockquote>';
-    }
-    html += '</div>';
-
-    // Phase tracker
-    html += '<div class="view-section"><h2>Where this round is</h2><ol class="phase-tracker">';
-    phases.forEach(function (p, i) {
-      var state = p.gate ? 'done' : (i === currentIdx ? 'current' : 'pending');
-      var mark = state === 'done' ? '✓' : (state === 'current' ? '▶' : '·');
-      html += '<li class="phase-step ' + state + '">'
-        + '<span class="phase-mark">' + mark + '</span>'
-        + '<span class="phase-body"><span class="phase-label">' + esc(p.label) + '</span>'
-        + '<span class="phase-note">' + esc(p.gate ? p.done : (i === currentIdx ? p.pending : 'Not started.')) + '</span></span>'
-        + '</li>';
-    });
-    html += '</ol>';
-    if (currentIdx < phases.length) {
-      html += '<p class="overview-next">Next decision: the trio reviews and ratifies the <b>' + esc(phases[currentIdx].label.toLowerCase()) + '</b> milestone doc, then the next phase can run.</p>';
-    } else {
-      html += '<p class="overview-next">All four gates passed for this round. Record experiment results to carry learning into the next round.</p>';
-    }
-    html += '</div>';
-
-    // Tab guide
-    html += '<div class="view-section"><h2>The tabs</h2><ul class="tab-guide">';
-    var tabBlurbs = [
-      ['decisions.json', 'Decisions', 'The ratified spine — what the trio committed to.'],
-      ['experience-map-extracted.json', 'Journey Map', 'The raw customer journey: phases, steps, decision points.'],
-      ['experience-map-clustered.json', 'Experience Map', 'The journey with interview opportunities clustered onto it.'],
-      ['comparison-matrix.json', 'Comparison Matrix', 'Approved opportunities scored on five Torres criteria.'],
-      ['solution-candidates.json', 'Solutions', '18 divergent solution ideas for the chosen opportunity.'],
-      ['riskiest-assumptions.json', 'Riskiest Assumptions', 'Assumptions plotted by importance × evidence; red = test first.'],
-      ['validation-experiments.json', 'Experiments', 'A test card per riskiest assumption.']
-    ];
-    tabBlurbs.forEach(function (t) {
-      if (!has(t[0])) return;
-      html += '<li><button class="link-tab" type="button" data-goto="' + t[0] + '"><b>' + esc(t[1]) + '</b></button> — ' + esc(t[2]) + '</li>';
-    });
-    html += '</ul></div>';
-
-    container.innerHTML = html;
-  }
-
   // === Header ===
 
   function renderHeader(decisions, roundPath) {
@@ -1900,11 +1833,28 @@
     var product = decisions ? (decisions.product || 'Unknown product') : 'Unknown product';
     var team = decisions && decisions.team ? ' (' + decisions.team + ')' : '';
     var outcome = decisions ? (decisions.product_outcome || '') : '';
+    var d = (decisions && decisions.decided) || {};
 
     document.title = 'OST Viewer — ' + product + team;
+
+    var gates = [
+      { label: 'Opportunity', on: !!d.opportunity },
+      { label: 'Solutions',   on: !!d.solutions },
+      { label: 'Assumptions', on: !!d.assumptions },
+      { label: 'Experiments', on: !!d.experiments }
+    ];
+    var curIdx = gates.findIndex(function (g) { return !g.on; });
+    if (curIdx === -1) curIdx = gates.length;
+    var track = gates.map(function (g, i) {
+      var state = g.on ? 'done' : (i === curIdx ? 'current' : 'pending');
+      var mark = state === 'done' ? '✓' : (state === 'current' ? '▶' : '·');
+      return '<span class="hdr-gate ' + state + '"><span class="hdr-mark">' + mark + '</span>' + esc(g.label) + '</span>';
+    }).join('<span class="hdr-sep">→</span>');
+
     header.innerHTML = '<h1>' + esc(product) + esc(team) + '</h1>'
       + '<p class="meta">Round: <code>' + esc(roundPath) + '</code></p>'
-      + (outcome ? '<blockquote>' + esc(outcome) + '</blockquote>' : '');
+      + (outcome ? '<blockquote>' + esc(outcome) + '</blockquote>' : '')
+      + '<div class="hdr-track">' + track + '</div>';
   }
 
   // === Renderers ===
@@ -2877,13 +2827,6 @@
     }
 
     buildTabs(roundData.files);
-
-    // One-time delegated handler for Overview's tab-guide links (avoids
-    // re-attaching a listener on every Overview render).
-    document.getElementById('view-container').addEventListener('click', function (e) {
-      var b = e.target.closest('.link-tab');
-      if (b && b.dataset.goto) switchView(b.dataset.goto);
-    });
 
     switchView('tree');
   }
