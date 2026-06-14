@@ -4,6 +4,16 @@
   "title": "Licenstilldelning",
   "product_outcome": "Öka andelen nya kunder som på egen hand når sitt första lyckade produktionsanrop mot API:et utan att kontakta Flowbase, från 40% till 80% inom 60 dagar från avtalstecknande.",
   "source_clustered_map": "experience-map-clustered.json",
+  "journey_phases": [
+    { "id": "fas-1", "name": "Förfrågan inkommer" },
+    { "id": "fas-2", "name": "Behovsanalys & avtal" },
+    { "id": "fas-3", "name": "Avtalsskrivning" },
+    { "id": "fas-4", "name": "Kreditkontroll & ekonomi" },
+    { "id": "fas-5", "name": "Licens-upplägg" },
+    { "id": "fas-6", "name": "Rabatter" },
+    { "id": "fas-7", "name": "Aktivering & leverans" },
+    { "id": "fas-0-unphased", "name": "Utanför resan" }
+  ],
   "criteria": [
     { "id": "outcome-alignment", "name": "Outcome alignment", "description": "Does solving this opportunity move the trio's product outcome? How directly would the opportunity's pain, when relieved, shift the outcome's metric or behavior?" },
     { "id": "customer-importance", "name": "Customer importance", "description": "How strongly do the customers in the cluster feel this pain? Intensity, recurrence, and cross-customer signal in the source quotes." },

@@ -71,6 +71,12 @@ This is the contract that `OST-compare-opportunities` produces. Downstream skill
   "title": "string (carried from clustered map)",
   "product_outcome": "string (full outcome from <scope>/product-context/product-outcome.md)",
   "source_clustered_map": "string (filename of source experience-map-clustered-*.json)",
+  "journey_phases": [
+    {
+      "id": "string (phase id, e.g. 'fas-5'; snapshot from clustered map phases[] in upstream order)",
+      "name": "string (phase display name, carried verbatim from the clustered map)"
+    }
+  ],
   "criteria": [
     {
       "id": "string (e.g., 'outcome-alignment')",
@@ -83,7 +89,9 @@ This is the contract that `OST-compare-opportunities` produces. Downstream skill
       "id": "string (carried verbatim from cluster JSON, e.g., 'opp-4-1')",
       "phase_id": "string (carried)",
       "quote": "string (carried)",
-      "source": "string (carried)"
+      "source": "string (carried)",
+      "summary_title": "string (AI-generated 3-6 word noun phrase naming the pain; source language of the quote)",
+      "score_counts": { "strong": 0, "medium": 0, "weak": 0, "unknown": 0, "na": 0 }
     }
   ],
   "opportunities_excluded": [
@@ -115,6 +123,9 @@ This is the contract that `OST-compare-opportunities` produces. Downstream skill
 
 ### Field notes
 
+- **`journey_phases[]`** is snapshotted from the clustered map's `phases[]` in upstream array order, `{ id, name }` verbatim, including phases with zero approved opportunities. Always non-empty (any valid clustered map has ≥1 phase). The OST Viewer's Prioritise lens builds its phase columns from this; without it the swim-grid renders zero columns and silently drops every opportunity (the viewer carries a fallback that re-derives phases from the clustered map, but the producer must emit this field).
+- **`summary_title`** (per `opportunities_compared[]` entry) is an AI-generated 3-6 word noun phrase naming the underlying pain, in the source language of the `quote`. Cached across re-runs. The viewer falls back to the opportunity `id` when absent.
+- **`score_counts`** (per `opportunities_compared[]` entry) is the integer tally `{ strong, medium, weak, unknown, na }` over that opportunity's five cells. Deterministically derivable from `cells[]`; emitted so the viewer can sort/filter cards without recomputing.
 - **`criteria[]`** is denormalized into the JSON output (full definitions, not just IDs). Self-documenting; the selector doesn't need to load this anchor to interpret the matrix.
 - **`opportunities_compared[]`** carries `id`, `phase_id`, `quote`, `source` verbatim from the cluster JSON. The comparator does not modify quotes or sources.
 - **`opportunities_excluded[]`** captures the verdict-filter step's output. Empty array if no opportunities were excluded.

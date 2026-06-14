@@ -67,6 +67,23 @@ cd expected-output/OST-discovery && ls decisions.json \
   _working/experience-map-extracted.json _working/experience-map-clustered.json
 ```
 
+## 8b. Prioritise tab — journey_phases covers every opportunity ✅
+
+The viewer's Prioritise lens builds its swim-grid columns from `journey_phases`. If it is absent/empty, or an opportunity carries a `phase_id` not in it, that opportunity is silently dropped from the grid.
+
+```sh
+cd expected-output/OST-discovery && python3 -c "
+import json
+d=json.load(open('_working/comparison-matrix.json'))
+jp={p['id'] for p in d.get('journey_phases',[])}
+assert jp, 'journey_phases missing or empty'
+missing={o['phase_id'] for o in d['opportunities_compared']} - jp
+assert not missing, 'phase_ids not in journey_phases: %s' % missing
+print('OK', len(jp), 'phases cover all opportunities')
+"
+```
+Expect `OK`.
+
 ## 9. Safety gate — zero identifying terms (must pass before any commit) ✅
 
 ```sh
