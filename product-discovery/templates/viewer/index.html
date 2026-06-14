@@ -1389,6 +1389,11 @@
   .journey-raw{margin-top:1.5rem;border-top:1px solid var(--sc-purple-mountains);padding-top:1rem;}
   .journey-raw summary{cursor:pointer;font-weight:600;color:var(--sc-blue-monday);font-size:.9rem;}
   .journey-raw-body{margin-top:1rem;}
+  table.rollup th{position:sticky;top:0;}
+  .rollup-opp{min-width:240px;}
+  .rollup-sub{font-size:.66rem;color:var(--sc-grey-500);}
+  tr.rollup-chosen td{background:rgba(0,34,255,.03);}
+  .rollup-outcome{margin:.5rem 0 1rem;}
 </style>
 </head>
 <body>
@@ -1856,7 +1861,41 @@
     return { rows: rows, outcome: t.outcome };
   }
 
-  async function renderRollup(roundData, container){ container.innerHTML = '<div class="ost-tree-tab"><p style="padding:2rem;">Table — coming in this branch.</p></div>'; }
+  async function renderRollup(roundData, container){
+    var data = await loadRollupData(roundData);
+    var COLS = ['Stage','Opportunity','Solution','Assumption','Betydelse','Bevis','Riskigast','Typ','Testmetod','Framgångskriterier'];
+    var sv = function(v, map){ return v ? (map[v] || v) : '—'; };
+    if (!data.rows.length){
+      container.innerHTML = '<div class="view-section"><div class="tbl-empty">No round data to roll up yet.</div></div>';
+      return;
+    }
+    var head = '<tr><th>#</th>' + COLS.map(function(h){ return '<th>' + esc(h) + '</th>'; }).join('') + '</tr>';
+    var n = 0;
+    var body = data.rows.map(function(r){
+      n++;
+      return '<tr class="' + (r.riskiest ? 'risky' : '') + (r.chosen ? ' rollup-chosen' : '') + '">' +
+        '<td class="idx">' + n + '</td>' +
+        '<td>' + esc(r.stage) + '</td>' +
+        '<td class="rollup-opp">' + esc(r.opp) + (r.parent ? ' <span class="rollup-sub">↳ sub</span>' : '') + (r.chosen ? ' <span class="badge">Vald</span>' : '') + '</td>' +
+        '<td>' + (r.solution ? esc(r.solution) : '—') + '</td>' +
+        '<td class="assum-txt">' + (r.assumption ? esc(r.assumption) : '—') + '</td>' +
+        '<td>' + sv(r.importance, {high:'Hög',low:'Låg'}) + '</td>' +
+        '<td>' + sv(r.evidence, {strong:'Starkt',weak:'Svagt'}) + '</td>' +
+        '<td>' + (r.riskiest ? '<span class="flag-riskiest">Riskigast</span>' : '') + '</td>' +
+        '<td>' + (r.typ ? esc(({desirability:'Önskvärdhet',usability:'Användbarhet',feasibility:'Genomförbarhet',viability:'Lönsamhet',other:'Övrigt'})[r.typ] || r.typ) : '—') + '</td>' +
+        '<td class="test">' + (r.test ? esc(r.test) : '—') + '</td>' +
+        '<td class="succ">' + (r.success ? esc(r.success) : '—') + '</td>' +
+      '</tr>';
+    }).join('');
+    container.innerHTML =
+      '<div class="ost-tree-tab">' +
+        '<div class="view-guide"><h3>Full output — one row per deepest item</h3>' +
+        '<p>Every opportunity in the round, laddered out to the chosen branch\'s assumptions and recommended tests. Empty cells on the right mean a branch wasn\'t taken deeper — not missing data. The completeness/guardrail view; to slice or act on it, ask in the terminal.</p></div>' +
+        '<blockquote class="rollup-outcome"><b>Outcome:</b> ' + esc(data.outcome) + '</blockquote>' +
+        '<div class="tbl-card"><div class="tbl-scroll"><table class="assum rollup">' +
+          '<thead>' + head + '</thead><tbody>' + body + '</tbody></table></div></div>' +
+      '</div>';
+  }
 
   async function renderTree(roundData, container){
     var data = await loadTreeData(roundData);
