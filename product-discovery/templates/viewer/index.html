@@ -248,17 +248,6 @@
     border-bottom: var(--sc-border-width-subtle) solid var(--sc-grey-100);
   }
 
-  .link-tab {
-    font-family: var(--sc-font-family);
-    font-size: var(--sc-font-size-sm);
-    background: none;
-    border: none;
-    padding: 0;
-    color: var(--sc-blue-monday);
-    cursor: pointer;
-    text-decoration: underline;
-  }
-
   /* === Common view styles === */
   .view-section {
     margin-bottom: var(--sc-spacing-lg);
@@ -1513,33 +1502,13 @@
   // === Reading guidance (per-view "how to read this" banners) ===
 
   var VIEW_GUIDE = {
-    'decisions.json': {
-      title: 'What this is',
-      body: 'The ratified spine of the round — the opportunity, solutions, and assumptions the trio has committed to at each gate. Everything else in this viewer is the reasoning that led here. If you disagree with a decision, this is what you edit (in <code>decisions.json</code>).'
+    ‘comparison-matrix.json’: {
+      title: ‘How to read Prioritise’,
+      body: ‘Every approved opportunity scored against the Torres criteria (outcome alignment, customer importance, market size/frequency, strategic fit, competitive landscape). The “which do we pursue, and why” lens — the chosen opportunity is the one carried into the Tree.’
     },
-    'experience-map-extracted.json': {
-      title: 'How to read the journey map',
-      body: 'Each column is a phase of the customer journey, left to right; cards are steps. A blue-bordered <b>Beslut</b> card is a decision point — solid arrows follow its branches, a dashed red path is a rejection/exit, and a pill chip (e.g. “Nej → …”) marks a branch that leaves this map. This is the raw journey; opportunities get attached to it in the Experience Map tab.'
-    },
-    'experience-map-clustered.json': {
-      title: 'How to read the experience map',
-      body: 'The same journey, now with the interview-sourced <b>opportunities</b> clustered under the phase (and step) where they surface. Verdict pills: <span class="score-pill score-strong">approved</span> is well-formed, <span class="score-pill score-medium">needs_tweak</span> needs rewording, <span class="score-pill score-weak">solution_in_disguise</span> describes a fix rather than a need. Only approved ones are scored in the Comparison Matrix.'
-    },
-    'comparison-matrix.json': {
-      title: 'How to read the comparison matrix',
-      body: 'Approved opportunities scored against five Torres criteria, grouped by journey phase. Expand a card for the per-criterion rationale. Scores are qualitative, not summed: <span class="score-pill score-strong">strong</span> <span class="score-pill score-medium">medium</span> <span class="score-pill score-weak">weak</span> <span class="score-pill score-unknown">unknown</span> <span class="score-pill score-na">n/a</span>. Effort is deliberately <i>not</i> judged here. Use the filters to find strong-heavy or evidence-thin opportunities.'
-    },
-    'solution-candidates.json': {
-      title: 'How to read the solutions',
-      body: 'The divergent set for the chosen opportunity — 18 candidates from three role lenses (PM, UX, Tech Lead) over three rounds. This is breadth on purpose: no ranking yet. The trio narrows to a top 3 (see the Decisions tab) before assumptions.'
-    },
-    'riskiest-assumptions.json': {
-      title: 'How to read the riskiest-assumptions grid',
-      body: 'Every assumption behind the top-3 solutions, placed on importance (does the solution fail if this is false?) × evidence (do we already know?). The <b>red top-left quadrant — high importance, weak evidence — is what to test first</b>; that is the definition of “riskiest”. Category pills are Cagan’s product risks: <b>desirability</b> (do they want it), <b>usability</b> (can they use it), <b>feasibility</b> (can we build it), <b>viability</b> (does the business work).'
-    },
-    'validation-experiments.json': {
-      title: 'How to read the experiments',
-      body: 'One test card per riskiest assumption: the hypothesis, what you measure, and the success threshold. Run the cheapest credible test first; record what you learn back into the round (the <code>OST-record-round</code> skill writes results into the cross-round tree).'
+    ‘experience-map-clustered.json’: {
+      title: ‘How to read Journey’,
+      body: ‘Opportunities clustered under the journey phase (and step) where they surface — to see where the pain is dense. Verdict pills: <b>approved</b> is well-formed, <b>needs_tweak</b> needs rewording, <b>solution_in_disguise</b> is a fix not a need. Expand “raw journey” below for the underlying steps.’
     }
   };
 
@@ -1976,73 +1945,6 @@
 
   // === Renderers ===
 
-  function renderDecisions(json, container) {
-    if (!json) {
-      container.innerHTML = '<div class="viewer-error"><h2>No decisions.json</h2><p>This round has no ratified decisions yet.</p></div>';
-      return;
-    }
-    var html = '';
-    var d = json.decided || {};
-
-    if (d.opportunity) {
-      var opp = d.opportunity;
-      html += '<div class="decision-card"><h3>Chosen Opportunity <span class="date-badge">' + esc(opp.ratified || '') + '</span></h3>';
-      html += '<p><strong>' + esc(opp.id || '') + '</strong> (' + esc(opp.phase_id || '') + ')</p>';
-      html += '<blockquote>' + esc(opp.quote || '') + '</blockquote>';
-      html += '<p><em>' + esc(opp.source || '') + '</em></p>';
-      if (opp.rationale) html += '<p>' + esc(opp.rationale) + '</p>';
-      if (opp.scores) {
-        html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">';
-        Object.keys(opp.scores).forEach(function (k) {
-          html += '<span class="score-pill score-' + opp.scores[k] + '">' + esc(k.replace(/_/g, ' ')) + ': ' + esc(opp.scores[k]) + '</span>';
-        });
-        html += '</div>';
-      }
-      if (opp.evidence_gaps && opp.evidence_gaps.length) {
-        html += '<div class="view-section" style="margin-top:12px"><h3>Evidence Gaps</h3><ul class="item-list">';
-        opp.evidence_gaps.forEach(function (g) {
-          html += '<li><strong>' + esc(g.criterion || '') + '</strong>: ' + esc(g.gap || '') + '</li>';
-        });
-        html += '</ul></div>';
-      }
-      html += '</div>';
-    }
-
-    if (d.solutions) {
-      html += '<div class="decision-card"><h3>Top 3 Solutions <span class="date-badge">' + esc(d.solutions.ratified || '') + '</span></h3>';
-      html += '<ul class="pick-list">';
-      (d.solutions.picks || []).forEach(function (p) {
-        html += '<li><strong>' + esc(p.id || '') + '</strong> — ' + esc(p.title || '') + '<br>' + esc(p.rationale || '') + '</li>';
-      });
-      html += '</ul></div>';
-    }
-
-    if (d.assumptions) {
-      html += '<div class="decision-card"><h3>Riskiest Assumptions <span class="date-badge">' + esc(d.assumptions.ratified || '') + '</span></h3>';
-      html += '<ul class="pick-list">';
-      (d.assumptions.riskiest || []).forEach(function (a) {
-        html += '<li><strong>' + esc(a.id || '') + '</strong> (' + esc(a.category || '') + '): ' + esc(a.text || '') + '</li>';
-      });
-      html += '</ul></div>';
-    }
-
-    if (d.experiments) {
-      html += '<div class="decision-card"><h3>Validation Experiments <span class="date-badge">' + esc(d.experiments.ratified || '') + '</span></h3>';
-      html += '<ul class="pick-list">';
-      (d.experiments.test_cards || []).forEach(function (t) {
-        html += '<li><strong>' + esc(t.test_type || '') + '</strong> for ' + esc(t.assumption_id || '') + ': ' + esc(t.hypothesis || '') + '</li>';
-      });
-      html += '</ul></div>';
-    }
-
-    if (!html) {
-      container.innerHTML = '<div class="viewer-error"><h2>Empty decisions</h2><p>No ratified decisions found in this round.</p></div>';
-      return;
-    }
-
-    container.innerHTML = '<div class="view-section"><h2>Ratified Decisions</h2>' + html + '</div>';
-  }
-
   function renderComparisonMatrix(json, container) {
     var phases = json.journey_phases || [];
     var opps = json.opportunities_compared || [];
@@ -2238,124 +2140,6 @@
         apply();
       }
     });
-  }
-
-  function renderRiskiest(json, container) {
-    // v0.2 nests assumptions under assumptions_per_solution[]; fall back to the
-    // older flat top-level `assumptions` array if that's all that's present.
-    var assumptions = [];
-    if (json.assumptions_per_solution) {
-      json.assumptions_per_solution.forEach(function (s) {
-        (s.assumptions || []).forEach(function (a) {
-          assumptions.push({
-            id: a.id, text: a.text, category: a.category,
-            importance: a.importance, evidence: a.evidence,
-            solution_id: s.solution_id
-          });
-        });
-      });
-    } else {
-      assumptions = json.assumptions || [];
-    }
-    var html = '<div class="view-section"><h2>Riskiest Assumptions</h2>';
-
-    var highWeak = [], highStrong = [], lowWeak = [], lowStrong = [];
-    assumptions.forEach(function (a) {
-      var imp = a.importance || 'low';
-      var ev = a.evidence || 'weak';
-      if (imp === 'high' && ev === 'weak') highWeak.push(a);
-      else if (imp === 'high' && ev === 'strong') highStrong.push(a);
-      else if (imp === 'low' && ev === 'weak') lowWeak.push(a);
-      else lowStrong.push(a);
-    });
-
-    html += '<div class="risk-grid">';
-    html += renderQuadrant('High importance / Weak evidence', highWeak, true);
-    html += renderQuadrant('High importance / Strong evidence', highStrong, false);
-    html += renderQuadrant('Low importance / Weak evidence', lowWeak, false);
-    html += renderQuadrant('Low importance / Strong evidence', lowStrong, false);
-    html += '</div></div>';
-
-    container.innerHTML = html;
-  }
-
-  function renderQuadrant(title, items, isRiskiest) {
-    var h = '<div class="risk-quadrant' + (isRiskiest ? ' high-imp-weak-ev' : '') + '">';
-    h += '<h4>' + esc(title) + '</h4>';
-    if (items.length === 0) {
-      h += '<p style="color:var(--sc-grey-400);font-size:var(--sc-font-size-xs);font-style:italic">None</p>';
-    }
-    items.forEach(function (a) {
-      h += '<div class="assumption-item"><strong>' + esc(a.id || '') + '</strong>';
-      if (a.solution_id) h += ' <span style="color:var(--sc-grey-500);font-size:var(--sc-font-size-xs)">(' + esc(a.solution_id) + ')</span>';
-      h += '<br>' + esc(a.text || '');
-      if (a.category) h += ' <span class="score-pill score-unknown">' + esc(a.category) + '</span>';
-      h += '</div>';
-    });
-    h += '</div>';
-    return h;
-  }
-
-  function renderExperiments(json, container) {
-    // v0.2 nests one recommended_test per riskiest assumption under
-    // assumptions_per_solution[].assumptions[]; fall back to a flat top-level
-    // `test_cards` array if that's the shape present.
-    var cards = json.test_cards || [];
-    if (!cards.length && json.assumptions_per_solution) {
-      json.assumptions_per_solution.forEach(function (s) {
-        (s.assumptions || []).forEach(function (a) {
-          var rt = a.recommended_test;
-          if (rt) {
-            cards.push({
-              test_type: rt.test_type, assumption_id: a.id, assumption_text: a.text,
-              solution_id: s.solution_id, hypothesis: rt.hypothesis, metric: rt.metric,
-              success_criteria: rt.success_criteria,
-              estimated_cost: rt.estimated_cost, estimated_time: rt.estimated_time
-            });
-          }
-        });
-      });
-    }
-    var html = '<div class="view-section"><h2>Validation Experiments (' + cards.length + ')</h2>';
-
-    cards.forEach(function (tc) {
-      html += '<div class="test-card">';
-      html += '<h3>' + esc(tc.test_type || 'Test') + '</h3>';
-      html += '<dl>';
-      html += '<dt>Assumption</dt><dd>' + esc(tc.assumption_text || tc.assumption_id || '') + '</dd>';
-      html += '<dt>Hypothesis</dt><dd>' + esc(tc.hypothesis || '') + '</dd>';
-      html += '<dt>Metric</dt><dd>' + esc(tc.metric || '') + '</dd>';
-      html += '<dt>Success criteria</dt><dd>' + esc(tc.success_criteria || '') + '</dd>';
-      html += '<dt>Cost</dt><dd><span class="cost-badge">' + esc(tc.estimated_cost || '') + '</span></dd>';
-      html += '<dt>Time</dt><dd><span class="time-badge">' + esc(tc.estimated_time || '') + '</span></dd>';
-      html += '</dl></div>';
-    });
-
-    if (!cards.length) {
-      html += '<div class="viewer-error"><p>No test cards in this file.</p></div>';
-    }
-    html += '</div>';
-    container.innerHTML = html;
-  }
-
-  function renderSolutions(json, container) {
-    var solutions = json.solutions || json.clusters || [];
-    var html = '<div class="view-section"><h2>Solution Candidates (' + solutions.length + ')</h2>';
-
-    solutions.forEach(function (sol, i) {
-      html += '<div class="solution-card">';
-      html += '<h3>' + esc(sol.title || sol.id || ('Solution ' + (i + 1))) + '</h3>';
-      if (sol.description) html += '<p>' + esc(sol.description) + '</p>';
-      if (sol.rationale) html += '<p style="color:var(--sc-grey-600)">' + esc(sol.rationale) + '</p>';
-      if (sol.role) html += '<p><span class="score-pill score-unknown">' + esc(sol.role) + '</span></p>';
-      html += '</div>';
-    });
-
-    if (!solutions.length) {
-      html += '<div class="viewer-error"><p>No solutions in this file.</p></div>';
-    }
-    html += '</div>';
-    container.innerHTML = html;
   }
 
   // === Journey Map (experience-map-extracted.json) ===
