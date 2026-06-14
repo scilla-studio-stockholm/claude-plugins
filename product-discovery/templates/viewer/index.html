@@ -1284,6 +1284,8 @@
   /* Assumption table */
   .antaganden{margin-top:1.6rem;}
   .antaganden.hidden{display:none;}
+  .sol-considered{margin-top:1.5rem;} .sol-considered summary{cursor:pointer;font-weight:600;color:var(--sc-blue-monday);}
+  .sol-list{margin-top:.75rem;columns:2;gap:1.5rem;font-size:.82rem;line-height:1.5;}
   .tbl-head{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:.75rem;}
   .tbl-head .title{
     font-size:1.05rem;font-weight:700;font-style:italic;letter-spacing:.04em;
@@ -1575,6 +1577,7 @@
     var base = roundData.basePath + '/_working/';
     var clustered = await loadJSON(base + 'experience-map-clustered.json');
     var top3 = await loadJSON(base + 'top-three-solutions.json');
+    var candidates = await loadJSON(base + 'solution-candidates.json');
     // Assumptions: riskiest-assumptions.json carries ALL assumptions with risk axes
     // (importance/evidence/is_riskiest); validation-experiments.json carries test cards
     // for the riskiest subset only. Use the fullest row set as the base and merge in the
@@ -1606,6 +1609,7 @@
       oppRoots: clustered ? buildOpportunityTree(clustered, chosenId) : [],
       chosenId: chosenId,
       solutions: picks,
+      candidates: (candidates && candidates.solutions) || [],
       assumBlocks: assumBlocks,
       hasOpp: !!chosenId
     };
@@ -1762,11 +1766,21 @@
       ostRenderHorizontal(data, wrap);
       bands = [{key:'outcome',label:'Product outcome'},{key:'opp',label:'Möjligheter',sub:'opportunities'}];
       document.getElementById('ost-antaganden').classList.add('hidden');
+      document.getElementById('ost-considered').innerHTML = '';
     } else {
       ostRenderVertical(data, wrap);
       bands = [{key:'outcome',label:'Product outcome'},{key:'opp',label:'Möjligheter',sub:'opportunity'},{key:'sol',label:'Lösningar',sub:'solutions'}];
       ostRenderTable(data, document.getElementById('ost-antaganden'));
       document.getElementById('ost-antaganden').classList.remove('hidden');
+      var considered = document.getElementById('ost-considered');
+      if (data.candidates && data.candidates.length){
+        considered.innerHTML = '<details class="sol-considered"><summary>All ' + data.candidates.length + ' solutions considered</summary>'
+          + '<ul class="sol-list">' + data.candidates.map(function(c){
+              return '<li><b>' + esc(c.title || c.id) + '</b>' + (c.description ? ' — ' + esc(c.description) : '') + '</li>';
+            }).join('') + '</ul></details>';
+      } else {
+        considered.innerHTML = '';
+      }
     }
     ostLayoutBands(board, bands);
     ostCenterRoot(board.querySelector('.canvas'));
@@ -1908,6 +1922,7 @@
           '<div class="canvas"><div class="tree-wrap" id="ost-treewrap"></div></div>' +
         '</div>' +
         '<div class="antaganden" id="ost-antaganden"></div>' +
+        '<div id="ost-considered"></div>' +
       '</div>';
     container.__ostData = data;
     var defaultCut = data.hasOpp ? 'v' : 'h';
