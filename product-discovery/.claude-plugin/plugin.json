@@ -1,7 +1,7 @@
 {
   "name": "product-discovery",
   "description": "Opportunity Solution Tree (OST) skills for product discovery: opportunity extraction, clustering, comparison, solution brainstorming, assumption mapping, and validation experiment design",
-  "version": "2.3.1",
+  "version": "2.4.0",
   "author": {
     "name": "Joni Lindgren"
   }
