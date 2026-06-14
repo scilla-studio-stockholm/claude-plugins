@@ -1377,9 +1377,7 @@
   .hdr-gate{display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--sc-grey-500);}
   .hdr-gate.done{color:var(--sc-essex-green);} .hdr-gate.current{color:var(--sc-blue-monday);font-weight:600;}
   .hdr-mark{font-weight:700;} .hdr-sep{color:var(--sc-grey-300);}
-  .journey-raw{margin-top:1.5rem;border-top:1px solid var(--sc-purple-mountains);padding-top:1rem;}
-  .journey-raw summary{cursor:pointer;font-weight:600;color:var(--sc-blue-monday);font-size:.9rem;}
-  .journey-raw-body{margin-top:1rem;}
+  #journey-body{margin-top:1.25rem;}
   table.rollup th{position:sticky;top:0;}
   .rollup-opp{min-width:240px;}
   .rollup-sub{font-size:.66rem;color:var(--sc-grey-500);}
@@ -1786,26 +1784,32 @@
   }
 
   async function renderJourney(clusteredJson, container){
-    // Primary: opportunities clustered by journey phase (the density lens).
-    var primary = document.createElement('div');
-    renderExperienceMap(clusteredJson, primary);
-
-    // Secondary (collapsed): the raw journey map, loaded on demand.
-    var details = document.createElement('details');
-    details.className = 'journey-raw';
-    details.innerHTML = '<summary>Show the raw journey (steps &amp; decision branches)</summary>'
-      + '<div class="journey-raw-body"></div>';
-
-    container.innerHTML = '';
-    container.appendChild(primary);
-    container.appendChild(details);
-
+    // Two first-class views behind a Tree-style toggle:
+    //   User journey       = the raw flow (phases -> steps -> decision branches)
+    //   Opportunities by phase = the density view (opportunity stickies on phases)
     var extracted = await loadJSON(roundData_basePath() + '/_working/experience-map-extracted.json');
-    if (extracted) {
-      renderJourneyMap(extracted, details.querySelector('.journey-raw-body'));
-    } else {
-      details.querySelector('.journey-raw-body').innerHTML = '<p class="tbl-empty">No raw journey map for this round.</p>';
+    container.innerHTML = '<div class="ost-seg" id="journey-seg"></div><div id="journey-body"></div>';
+
+    function setView(view){
+      document.getElementById('journey-seg').innerHTML =
+        '<button data-jv="journey" class="' + (view === 'journey' ? 'active' : '') + '">User journey</button>' +
+        '<button data-jv="phases" class="' + (view === 'phases' ? 'active' : '') + '">Opportunities by phase</button>';
+      var body = document.getElementById('journey-body');
+      body.innerHTML = '';
+      if (view === 'phases') {
+        renderExperienceMap(clusteredJson, body);
+      } else if (extracted) {
+        renderJourneyMap(extracted, body);
+      } else {
+        body.innerHTML = '<p class="tbl-empty">No raw journey map for this round.</p>';
+      }
     }
+
+    document.getElementById('journey-seg').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-jv]');
+      if (b) setView(b.dataset.jv);
+    });
+    setView('journey');
   }
   function buildRollupRows(clustered, decisions, assumBlocks, solutions, chosenId){
     var rows = [];
