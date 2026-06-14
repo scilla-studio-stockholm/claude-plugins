@@ -1,40 +1,36 @@
 # State
 
-**Last session:** 2026-06-13
-**Branch:** `master` (clean; SCI-207 merged + published)
+**Last session:** 2026-06-14
+**Branch:** `master` (clean; all session work merged + published)
 
-## Shipped this session — OST Tree view (product-discovery 2.2.0 → 2.3.0)
-**SCI-207** — the viewer now renders the actual Opportunity Solution Tree. New default **Tree** tab, merged to master (`aa46750`, = published to the marketplace). Built brainstorm → spec → plan → subagent-driven execution (7 tasks), verified with headless-browser screenshots against the golden fixture.
+## Shipped this session (product-discovery 2.2.0 → 2.4.0)
+- **SCI-207 — OST Tree view (2.3.0).** New default **Tree** tab: horizontal *Opportunity space* cut + vertical *Chosen branch* cut with the assumption table. Pure-CSS orthogonal tree, DOM-measured swimlane bands, `--ost-*` over `--sc-*`. Plus fixed two pre-existing renderers (Riskiest grid, Experiments) that read an obsolete flat schema and rendered empty.
+- **SCI-230 — per-stage model tiering (2.3.1).** OST phase workflows pinned cheaper models on the 7 mechanical single-agent stages (haiku: merge/compose×2/categorize; sonnet: cluster×2/dedup); generative/judgment stages left inherited. Quality-neutral; loop opts use conditional spread so no `model:undefined` reaches the harness.
+- **SCI-242 — viewer redesign to 4 surfaces (2.4.0).** 9 artifact tabs → **Tree · Prioritise · Journey · Table**. Journey has a Tree-style toggle (**User journey ⇄ Opportunities by phase**, defaults to User journey). **Table** = static denormalized **rollup** (one row per deepest leaf; ragged depth; sparse cells where a branch wasn't taken deeper). Header gained a read-only round gate-track. Overview/Decisions/Riskiest/Experiments/Solutions/Journey-Map tabs removed (folded in); 222 lines of dead code stripped.
 
-- **One tree, two cuts** in a new default Tree tab (Overview moved to 2nd):
-  - *Opportunity space* (horizontal/breadth): outcome → full opportunity space via `parent_id`, chosen opp marked (`Vald`), others muted, stops at opp layer.
-  - *Chosen branch* (vertical/depth): outcome → chosen opp → top-3 solutions → **Antaganden** table.
-- **Antaganden table:** all assumptions grouped by solution; risk as the **2×2** (Betydelse=importance, Bevis=evidence) + `is_riskiest` flag; Testmetod/Framgångskriterier **sparse** (riskiest rows only, `—` otherwise); Status/Issue ID/Insikter greyed "(coming soon)".
-- **Build:** vanilla `renderTree()` in `templates/viewer/index.html`, pure-CSS orthogonal tree (no libraries), DOM-measured swimlane bands, `--ost-*` tokens over `--sc-*`, phase auto-default from `decisions.json` + manual toggle.
-- **Data layer:** `loadTreeData` sources the full assumption set from `riskiest-assumptions.json` (33 rows w/ axes) and merges test cards from `validation-experiments.json` by assumption id. `buildOpportunityTree` flattens `phases[].opportunities[]` and rebuilds hierarchy by `parent_id` (ignores journey phases), filters to `verdict==approved` + chosen.
-- **Bonus fixes (same file):** Riskiest Assumptions grid + Experiments tab were reading an obsolete flat schema and rendering empty — now read v0.2 `assumptions_per_solution[]` nesting (21 riskiest in red quadrant, 21 test cards).
+Design artifacts in `docs/superpowers/specs/` + `docs/superpowers/plans/` (2026-06-13 tree, 2026-06-14 redesign).
 
-Design artifacts: `docs/superpowers/specs/2026-06-13-ost-tree-view-design.md` (spec), `…-design-brief.md` (design-Claude brief), `ost-tree-view-mockup/` (vendored mockup + rationale), `docs/superpowers/plans/2026-06-13-ost-tree-view.md` (plan).
+## The architecture decision that frames the open tickets
+**HTML renders, the terminal acts.** The viewer is a **static, read-only** per-iteration sense-making helper (NOT Torres' living OST). Only view-navigation in the page (tab/lens switching, toggles, collapsibles) — no download/sort/export/action controls. *Acting* on a round (start an experiment, spec a ticket, design a prototype) is a **terminal/skill** job. The header gate-track is pure status, not an action prompt.
 
-## Recent decisions
-- **Tree is the default landing tab** (Overview → 2nd), per the ticket. One-line revert (`switchView('tree')` → `'overview'`) if reconsidered.
-- **Two cuts, not one giant tree** — breadth view for choosing an opportunity, depth view for working the chosen branch (assumptions as a table). Matches how coached teams actually use it.
-- **Merged direct to master, no PR review** — user's call ("small project"). Published to team without a review pass.
-- Minor version bump (new feature). Risk rendered as the 2×2, not a single level (the riskiest method's whole point).
+## Open Linear tickets (filed this session, not started)
+- [SCI-244](https://linear.app/scilla/issue/SCI-244) — define the OST post-discovery **action model** (knowledge anchor: action catalog · state→enabled-actions preconditions · likely-intent defaults · per-action output templates). **Blocks SCI-243.** Medium.
+- [SCI-243](https://linear.app/scilla/issue/SCI-243) — the conversational **"act on this round" skill** (reads round JSON, asks what to act on, writes a Claude Design brief / Linear ticket / Claude Code prompt). A skill, not a one-shot agent. **Blocked by SCI-244.** Low.
+- [SCI-247](https://linear.app/scilla/issue/SCI-247) — maybe promote Journey's "Opportunities by phase" to its own tab (vs the current toggle). Decide after real use. Low.
 
-## Open Linear tickets (background, not touched this session)
-- [SCI-31](https://linear.app/scilla/issue/SCI-31) — Replace hardcoded viewer score colors with `--sc-*` tokens. Backlog/Low. (Tree view added a clean `--ost-*`-over-`--sc-*` layer — a good pattern to extend to the older renderers.)
-- [SCI-27](https://linear.app/scilla/issue/SCI-27) — Rename `ratifications.md` → `trio-decisions.md`. Likely superseded by SCI-53; candidate to close.
+## Background tickets (untouched)
+- [SCI-31](https://linear.app/scilla/issue/SCI-31) — hardcoded viewer score colors → `--sc-*` tokens. The viewer now has a clean `--ost-*`-over-`--sc-*` layer to extend. Backlog/Low.
+- [SCI-27](https://linear.app/scilla/issue/SCI-27) — rename `ratifications.md` → `trio-decisions.md`. Likely superseded by SCI-53; candidate to close.
 
 ## Next steps
-1. **Click through the shipped viewer** once (it published without review) — Tree both cuts, Riskiest/Experiments tabs. Quick follow-up if anything's off.
-2. **Real-round trial** of the facilitator + viewer with a live trio (carried from last session — see actual quality headroom before optimizing).
-3. **Token-cost optimization** (unticketed) — phase runs ~450–650k subagent tokens; trim per-stage grounding once trusted. Quality-neutral only (SCI-53).
-4. **Viewer IA redesign** (deferred from SCI-206) — overview-first, phase-sequenced. Tree tab is now the centerpiece it can build around.
+1. **Real-round trial** of the facilitator + redesigned viewer with a live trio (carried across two sessions now — it gates token optimization and informs SCI-243/247).
+2. **SCI-244 → SCI-243** — the action layer. Build the action model first (it's the definition of "right"), then the skill; a golden/RUBRIC-style validation reference is a sub-task of SCI-243.
+3. Token optimization beyond SCI-230: the big fan-outs (07 brainstorm, 10 generate, 9 agents each) need golden-reference validation before downgrading — do after a real run gives per-stage cost attribution.
 
 ## Gotchas
-- **This repo IS the marketplace** (`autoUpdate: true`). Merging to `master` publishes. Teammates get 2.3.0 via `/plugin update product-discovery@scilla-studio` + restart.
-- **Viewer launch:** `serve.py` lives at `templates/serve.py` (NOT `templates/viewer/`) and needs `--templates templates/viewer --data <OST-discovery dir> --port 3000`; browse `/_viewer/?round=<rel-path>`. (An earlier plan draft had the wrong command.) Golden fixture round path is `.`.
-- **Tree feature relies on real data shapes:** opp text = `quote`; chosen opp from `decisions.json.decided.opportunity.id`; solutions from `top-three-solutions.json.picks` (fallback `decisions…picks`); assumptions from riskiest (all 33 + axes) merged with validation (test cards, riskiest only). The three assumption JSONs differ: categorized=33 no axes, riskiest=33 w/axes, validation=21 riskiest-only w/tests.
-- Real client data still lives at `../ost-skill-testbed/` (sibling, not in git). Never copy its content/names here; use `fixtures/golden/`. Pre-existing client-name exposure in a few committed files unchanged (user: "it's fine").
-- Headless screenshots used for verification: `Google Chrome --headless --screenshot=… <url>` works; `--dump-dom` greps are inflated by the inlined `<style>` block (count rendered rows via in-table markers like `grp-count`, not CSS-selector substrings).
+- **This repo IS the marketplace** (`autoUpdate: true`). Merging to `master` publishes. Teammates get 2.4.0 via `/plugin update product-discovery@scilla-studio` + restart.
+- **Viewer launch:** `serve.py` is at `templates/serve.py` (NOT `templates/viewer/`); needs `--templates templates/viewer --data <OST-discovery dir> --port 3000`; browse `/_viewer/?round=.` (golden round path is `.`).
+- **Visual verification is essential for viewer work** — subagent grep/ref checks can't catch runtime breaks. A curly-quote (smart-quote) paste blanked the whole viewer this session and only a headless screenshot caught it. Verify renders with `Google Chrome --headless --screenshot`; to screenshot a non-default tab, temporarily flip `switchView('tree')` then revert.
+- **Cost reality (from `/cost-review` this session):** ~$1k of local-CLI spend on THIS repo over 22 days, cache_read-dominated (huge grounding contexts re-read per turn). cost-review scopes to the cwd's `~/.claude/projects/<encoded>` folder only — the heavy `pmf-analys` repo and any cloud/Cowork sessions are NOT included.
+- Real client data lives at `../ost-skill-testbed/` (sibling, not in git). Never copy its content/names here; use `fixtures/golden/`.
+- Knowledge anchors in `knowledge/discovery/*.md` are symlinked into each skill's `references/` and read verbatim at runtime — keep consistent with SKILL.md bodies.
