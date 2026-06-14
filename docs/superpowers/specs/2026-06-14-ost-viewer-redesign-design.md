@@ -10,6 +10,16 @@ This viewer is **not** Torres' living Opportunity Solution Tree that a team retu
 
 Today it renders that as **9 co-equal, ID-keyed artifact tabs** — organized by how the pipeline produced the data, not by the job the trio does with it. That's the "overwhelming and visually disconnected" problem. The fix is to organize around a few purposeful lenses plus one raw guardrail.
 
+## Principle: the HTML is a static, read-only artifact
+
+The viewer *renders* one round's output for humans to see. **Acting on it happens in the terminal**, conversationally, through the skills/agents (the "act on this round" skill, SCI-243, grounded in the action model, SCI-244) — not through buttons in the page. This is a skills/agents toolkit; the terminal is the interface, and a second, worse interface inside the HTML would fight it.
+
+Keep the distinction clean:
+- **View-navigation stays in the HTML** — switching lenses, toggling the Tree's two cuts, opening a node drill-down. That's looking at static content different ways; it has to live in the page.
+- **Action leaves the HTML** — export, download, sort-to-decide, "make a ticket", "build this", "design a prototype". Those are terminal moves. The agent reads the same `_working/*.json` and answers.
+
+So the rollup renders static (one sensible order); slicing or acting on it is a question you take to Claude Code.
+
 ## Information architecture: 3 lenses + 1 guardrail (replacing 9 tabs)
 
 ### 1. Tree (default)
@@ -27,7 +37,7 @@ The **comparison matrix** (opportunities × Torres criteria) — the "which do w
 **Opportunities clustered by journey phase** — the "where is the pain dense?" lens (the view trios already build in mind-maps to see if one phase carries more opportunities than another). Merges today's Experience Map + Journey Map into one lens; the raw journey (steps/decision-branches) is available beneath as reference.
 
 ### 4. Table (guardrail / fallback)
-One **denormalized rollup**, sortable / searchable / **downloadable (CSV + JSON)**. The completeness anchor: a skeptical trio member can verify the full output is all there, search it, and export it. Detailed below.
+One **denormalized rollup**, rendered **static** in a sensible default order (by stage, then opportunity). The completeness anchor: a skeptical trio member can see the full output is all there on one screen. **No in-HTML interactivity** — see the principle below; slicing, sorting, and acting happen in the terminal, not in the page.
 
 ### Cut as top-level tabs (folded in, not lost)
 - **Overview** → the outcome banner / round-status header (always visible).
@@ -52,9 +62,7 @@ Ragged depth is the point, not a defect:
 
 **Columns:** Product outcome · Stage · Opportunity · Sub-opp · Score/chosen · Solution · Assumption · Betydelse · Bevis · Riskigast · Typ · Testmetod · Framgångskriterier.
 
-**Default grain = assumption** (the recommended test inline) → ~75 rows for the golden fixture (≈33 deep chosen-branch rows + ≈43 shallow opportunity rows). A **"show alternative tests" toggle** drops to the true experiment grain — each riskiest assumption has `recommended_test` + 2 `alternative_tests` in `validation-experiments.json`, so the deepest level answers "what could we run to test this?".
-
-**Download:** "Download CSV / JSON" emits the current table (respecting sort/filter) as a file — gives the trio the joined table as a real artifact in their repo and is the substrate for SCI-243 (act on a row).
+**Grain = assumption** (the recommended test inline) → ~75 rows for the golden fixture (≈33 deep chosen-branch rows + ≈43 shallow opportunity rows). Each riskiest assumption also has 2 `alternative_tests` in `validation-experiments.json`; these are *not* rendered in the static table — they live in the JSON, and the terminal action skill (SCI-243) surfaces them when someone is actually choosing which test to run. The static table answers "what's the recommended next test?"; "what else could we run?" is a terminal question.
 
 ## Data sources (all already in `_working/`)
 
@@ -73,8 +81,9 @@ Reuses the SCI-207 data-layer helpers (`buildOpportunityTree`, `loadTreeData`, `
 ## Constraints & non-goals
 
 - Stay in the single dependency-free `index.html`; vanilla JS string-building, CSS, no libraries — same pattern as the Tree.
+- **Static, read-only.** Only view-navigation JS (lens/tab switching, Tree cut toggle, node drill-downs). No download, sort-to-decide, export, or "act" controls — those are terminal moves (see Principle).
 - Degrade gracefully on partial rounds (no chosen opp, no solutions yet, etc.) — same tolerance the Tree already has.
-- **Out of scope:** the row → Linear ticket / Claude Code prompt automation (SCI-243); the living cross-round `tree.json`; any change to the pipeline skills/workflows.
+- **Out of scope:** acting on the output — the conversational "act on this round" skill (SCI-243) and its action model (SCI-244); the living cross-round `tree.json`; any change to the pipeline skills/workflows.
 
 ## Open question for the plan stage
 - **Solution comparison** as its own front-door vs. a drill-down. The trio compares solutions, but the breadth (18 candidates) reads as "what we considered" — currently a drill-down off the solution layer. Promote to a 5th lens only if the team compares solutions often enough to warrant it. Default: drill-down.
