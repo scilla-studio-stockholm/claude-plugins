@@ -1819,6 +1819,43 @@
       details.querySelector('.journey-raw-body').innerHTML = '<p class="tbl-empty">No raw journey map for this round.</p>';
     }
   }
+  function buildRollupRows(clustered, decisions, assumBlocks, solutions, chosenId){
+    var rows = [];
+    var outcome = decisions.product_outcome || '';
+    var asmBySol = {};
+    (assumBlocks || []).forEach(function(b){ asmBySol[b.solution_id] = b.assumptions || []; });
+    (clustered.phases || []).forEach(function(ph){
+      (ph.opportunities || []).forEach(function(o){
+        if (o.verdict !== 'approved' && o.id !== chosenId) return;
+        var base = { outcome: outcome, stage: ph.name, opp: o.quote, parent: o.parent_id || '', chosen: o.id === chosenId };
+        if (o.id !== chosenId) { rows.push(Object.assign({}, base, { solution:'', assumption:'', importance:'', evidence:'', riskiest:false, typ:'', test:'', success:'' })); return; }
+        (solutions || []).forEach(function(s){
+          var asms = asmBySol[s.id] || [];
+          if (!asms.length) { rows.push(Object.assign({}, base, { solution:s.title, assumption:'', importance:'', evidence:'', riskiest:false, typ:'', test:'', success:'' })); return; }
+          asms.forEach(function(a){
+            var rt = a.recommended_test || null;
+            rows.push(Object.assign({}, base, {
+              solution: s.title, assumption: a.text,
+              importance: a.importance||'', evidence: a.evidence||'', riskiest: !!a.is_riskiest, typ: a.category||'',
+              test: rt ? rt.test_type : '', success: rt ? rt.success_criteria : ''
+            }));
+          });
+        });
+      });
+    });
+    return rows;
+  }
+
+  async function loadRollupData(roundData){
+    var base = roundData.basePath + '/_working/';
+    var clustered = await loadJSON(base + 'experience-map-clustered.json');
+    var t = await loadTreeData(roundData);
+    var rows = (clustered && roundData.decisions)
+      ? buildRollupRows(clustered, roundData.decisions, t.assumBlocks, t.solutions, t.chosenId)
+      : [];
+    return { rows: rows, outcome: t.outcome };
+  }
+
   async function renderRollup(roundData, container){ container.innerHTML = '<div class="ost-tree-tab"><p style="padding:2rem;">Table — coming in this branch.</p></div>'; }
 
   async function renderTree(roundData, container){
