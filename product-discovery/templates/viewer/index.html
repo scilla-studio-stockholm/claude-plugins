@@ -1493,7 +1493,7 @@
       container.innerHTML = '<div class="viewer-error"><h2>Could not load</h2><p>Failed to fetch <code>' + filename + '</code></p></div>';
       return;
     }
-    entry.render(json, container);
+    await entry.render(json, container);
     injectGuide(filename, container);
   }
 
@@ -1949,8 +1949,17 @@
 
   // === Renderers ===
 
-  function renderComparisonMatrix(json, container) {
+  async function renderComparisonMatrix(json, container) {
     var phases = json.journey_phases || [];
+    // The producer (assist-05) does not emit journey_phases into
+    // comparison-matrix.json — opportunities only carry a phase_id. Without a
+    // column set the swim-grid renders zero columns and silently drops every
+    // opportunity. Fall back to the clustered map (the authoritative phase
+    // id→name source the Journey view also reads) to rebuild the columns.
+    if (!phases.length) {
+      var clustered = await loadJSON(roundData.basePath + '/_working/' + (json.source_clustered_map || 'experience-map-clustered.json'));
+      phases = (clustered && clustered.phases) || [];
+    }
     var opps = json.opportunities_compared || [];
     var excluded = json.opportunities_excluded || [];
     var gaps = json.evidence_gaps || [];
